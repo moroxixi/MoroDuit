@@ -16,6 +16,7 @@
   var inputHargaNormal = document.getElementById("hargaNormal");
   var inputHargaPromo = document.getElementById("hargaPromo");
   var inputHargaJual = document.getElementById("hargaJual");
+  var inputKategori = document.getElementById("kategori");
   var inputCatatan = document.getElementById("catatan");
   var checkboxStokHabis = document.getElementById("stokHabis");
   var submitBtn = document.getElementById("submitBtn");
@@ -95,12 +96,14 @@
 
       html += '<div class="produk-item" role="listitem" tabindex="0" '
             + 'data-produk="' + escapeHtml(p.produk) + '" '
+            + 'data-kategori="' + escapeHtml(p.kategori || "") + '" '
             + 'data-harga-normal="' + p.hargaNormal + '" '
             + 'data-harga-promo="' + (p.hargaPromo || "") + '" '
             + 'data-harga-jual="' + p.hargaJual + '" '
             + 'data-status="' + escapeHtml(p.status) + '" '
             + 'data-catatan="' + escapeHtml(p.catatan) + '">'
             + '<span class="produk-name">' + escapeHtml(p.produk) + '</span>'
+            + '<span class="produk-kategori">' + escapeHtml(p.kategori || "-") + '</span>'
             + '<span class="produk-status ' + statusClass + '">' + statusLabel + '</span>'
             + '<span class="produk-price">' + hargaFormatted + '</span>'
             + '</div>';
@@ -125,6 +128,7 @@
   function handleProdukClick(e) {
     var el = e.currentTarget;
     var produk = el.getAttribute("data-produk");
+    var kategori = el.getAttribute("data-kategori");
     var hargaNormal = el.getAttribute("data-harga-normal");
     var hargaPromo = el.getAttribute("data-harga-promo");
     var hargaJual = el.getAttribute("data-harga-jual");
@@ -132,6 +136,7 @@
     var catatan = el.getAttribute("data-catatan");
 
     inputProduk.value = produk;
+    inputKategori.value = kategori;
     inputHargaNormal.value = hargaNormal;
     inputHargaPromo.value = hargaPromo;
     inputHargaJual.value = hargaJual;
@@ -164,6 +169,7 @@
     var hargaNormal = inputHargaNormal.value;
     var hargaPromo = inputHargaPromo.value;
     var hargaJual = inputHargaJual.value;
+    var kategori = inputKategori.value;
     var catatan = inputCatatan.value.trim();
     var status = checkboxStokHabis.checked ? "Tidak Ada" : "Ada";
 
@@ -179,10 +185,17 @@
       return;
     }
 
+    if (!kategori) {
+      showStatus("⚠️ Kategori wajib dipilih!", "error");
+      inputKategori.focus();
+      return;
+    }
+
     var payload = {
       action: "updateProduk",
       token: MORODUIT_CONFIG.TOKEN,
       produk: produk,
+      kategori: kategori,
       hargaNormal: Number(hargaNormal),
       hargaJual: Number(hargaJual || hargaNormal),
       status: status,

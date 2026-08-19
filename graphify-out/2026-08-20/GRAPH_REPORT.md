@@ -1,7 +1,7 @@
-# Graph Report - MoroDuit  (2026-08-20)
+# Graph Report - MoroDuit  (2026-08-19)
 
 ## Corpus Check
-- 8 files · ~6,867 words
+- 8 files · ~6,622 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
@@ -10,7 +10,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `0c85ec97`
+- Built from commit: `8be3612a`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 

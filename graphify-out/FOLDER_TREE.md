@@ -1,8 +1,11 @@
-# Folder Tree (11 files tracked)
+# Folder Tree (12 files tracked)
 
 > Auto-generated dari manifest.json — jangan edit manual. Regenerate: gen-folder-tree.py <path-manifest.json>
 
 ```
+├── .github/
+│   └── workflows/
+│       └── static.yml
 ├── Apps-Script/
 │   └── code.gs.js
 ├── Input/
