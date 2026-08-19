@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MoroDuit — Input Produk</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>🛒 Input Produk MoroDuit</h1>
+    <p class="subtitle">Tambah atau ubah data produk sembako</p>
+  </header>
+
+  <main>
+    <!-- Status message area -->
+    <div id="statusMessage" class="status-message hidden" role="alert" aria-live="polite"></div>
+
+    <div class="layout">
+      <!-- Form section -->
+      <section class="form-section" aria-label="Form Produk">
+        <form id="produkForm" novalidate>
+          <div class="form-group">
+            <label for="produk">Nama Produk <span class="required">*</span></label>
+            <input type="text" id="produk" name="produk" required
+                   placeholder="Contoh: Beras Premium 5kg">
+          </div>
+
+          <div class="form-group">
+            <label for="hargaNormal">Harga Normal <span class="required">*</span></label>
+            <input type="number" id="hargaNormal" name="hargaNormal" required
+                   min="0" step="500" placeholder="Contoh: 65000">
+          </div>
+
+          <div class="form-group">
+            <label for="hargaPromo">Harga Promo <span class="optional">(opsional)</span></label>
+            <input type="number" id="hargaPromo" name="hargaPromo"
+                   min="0" step="500" placeholder="Biarkan kosong jika tidak ada promo">
+          </div>
+
+          <div class="form-group">
+            <label for="hargaJual">Harga Jual <span class="required">*</span></label>
+            <input type="number" id="hargaJual" name="hargaJual" required
+                   min="0" step="500" placeholder="Harga yang dilihat pelanggan">
+            <small class="hint">Otomatis sama dengan Harga Normal. Ketik manual untuk ubah.</small>
+          </div>
+
+          <div class="form-group">
+            <label for="catatan">Catatan <span class="optional">(opsional)</span></label>
+            <input type="text" id="catatan" name="catatan"
+                   placeholder="Keterangan tambahan, misal: promo akhir tahun">
+          </div>
+
+          <div class="form-group checkbox-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="stokHabis" name="stokHabis">
+              <span class="checkbox-custom"></span>
+              <span class="checkbox-text">Stok Habis (Tidak Ada)</span>
+            </label>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" id="submitBtn" class="btn btn-primary">
+              💾 Simpan Produk
+            </button>
+            <button type="button" id="newProdukBtn" class="btn btn-secondary">
+              ➕ Produk Baru
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Product list section -->
+      <section class="list-section" aria-label="Daftar Produk">
+        <h2>📋 Daftar Produk</h2>
+        <p class="list-hint">Klik produk untuk edit. Sedang memuat...</p>
+        <div id="produkList" class="produk-list" role="list">
+          <div class="loading" id="loadingIndicator">Memuat data produk...</div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <p>MoroDuit &mdash; Toko Sembako Online</p>
+  </footer>
+
+  <script src="../config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

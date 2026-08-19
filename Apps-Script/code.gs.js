@@ -115,6 +115,27 @@ function doGet(e) {
     return jsonResponse_(result);
   }
 
+  // ── getKatalogFull ──
+  if (action === "getKatalogFull") {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = ss.getSheetByName("Katalog");
+    var data = sheet.getDataRange().getValues();
+    var result = [];
+
+    for (var i = 1; i < data.length; i++) {
+      result.push({
+        produk: String(data[i][1]).trim(),
+        hargaNormal: data[i][2],
+        hargaPromo: data[i][3],
+        hargaJual: data[i][4],
+        status: String(data[i][5]).trim(),
+        catatan: String(data[i][6] || "")
+      });
+    }
+
+    return jsonResponse_(result);
+  }
+
   return jsonResponse_({success: false, error: "unknown action"});
 }
 
