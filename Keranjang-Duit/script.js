@@ -63,35 +63,62 @@
       });
   }
 
-  // ── Render product list ───────────────────────────────────────────
+  // ── Render product list (grouped by kategori, sorted A-Z) ────────
   function renderProdukList(data) {
-    var html = "";
-
+    // 1. Group by kategori, preserving original order within each group
+    var groups = {};
     for (var i = 0; i < data.length; i++) {
-      var p = data[i];
-      var catatanHtml = "";
-      if (p.catatan && p.catatan.trim() !== "") {
-        catatanHtml = '<div class="produk-catatan">' + escapeHtml(p.catatan) + '</div>';
+      var kategori = (data[i].kategori && data[i].kategori.trim() !== "")
+        ? data[i].kategori.trim() : "Lainnya";
+      if (!groups[kategori]) groups[kategori] = [];
+      groups[kategori].push(i); // store original index
+    }
+
+    // 2. Sort kategori names A-Z; "Lainnya" always last
+    var sortedKategori = Object.keys(groups).sort(function (a, b) {
+      if (a === "Lainnya") return 1;
+      if (b === "Lainnya") return -1;
+      return a.localeCompare(b);
+    });
+
+    // 3. Render per group
+    var html = "";
+    for (var g = 0; g < sortedKategori.length; g++) {
+      var namaKategori = sortedKategori[g];
+      var indices = groups[namaKategori];
+
+      html += '<div class="kategori-group">'
+            + '  <h3 class="kategori-heading">' + escapeHtml(namaKategori) + '</h3>';
+
+      for (var k = 0; k < indices.length; k++) {
+        var idx = indices[k];
+        var p = data[idx];
+        var catatanHtml = "";
+        if (p.catatan && p.catatan.trim() !== "") {
+          catatanHtml = '<div class="produk-catatan">' + escapeHtml(p.catatan) + '</div>';
+        }
+
+        html += '<div class="produk-card" data-index="' + idx + '">'
+              + '  <div class="checkbox-wrapper">'
+              + '    <input type="checkbox" id="chk_' + idx + '" '
+              + '           data-index="' + idx + '">'
+              + '    <label class="checkbox-custom" for="chk_' + idx + '"></label>'
+              + '  </div>'
+              + '  <div class="produk-info">'
+              + '    <div class="produk-name">' + escapeHtml(p.produk) + '</div>'
+              + catatanHtml
+              + '  </div>'
+              + '  <div class="produk-harga">' + formatRupiah(p.hargaJual) + '</div>'
+              + '  <div class="qty-wrapper">'
+              + '    <input type="number" id="qty_' + idx + '" '
+              + '           data-index="' + idx + '" '
+              + '           min="1" max="999" value="1" disabled>'
+              + '    <span class="qty-label">pcs</span>'
+              + '  </div>'
+              + '</div>';
       }
 
-      html += '<div class="produk-card" data-index="' + i + '">'
-            + '  <div class="checkbox-wrapper">'
-            + '    <input type="checkbox" id="chk_' + i + '" '
-            + '           data-index="' + i + '">'
-            + '    <label class="checkbox-custom" for="chk_' + i + '"></label>'
-            + '  </div>'
-            + '  <div class="produk-info">'
-            + '    <div class="produk-name">' + escapeHtml(p.produk) + '</div>'
-            + catatanHtml
-            + '  </div>'
-            + '  <div class="produk-harga">' + formatRupiah(p.hargaJual) + '</div>'
-            + '  <div class="qty-wrapper">'
-            + '    <input type="number" id="qty_' + i + '" '
-            + '           data-index="' + i + '" '
-            + '           min="1" max="999" value="1" disabled>'
-            + '    <span class="qty-label">pcs</span>'
-            + '  </div>'
-            + '</div>';
+      html += '</div>';
     }
 
     produkList.innerHTML = html;
