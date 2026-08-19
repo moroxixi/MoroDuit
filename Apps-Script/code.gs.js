@@ -1,4 +1,4 @@
-var TOKEN = "<TOKEN_DI_SINI>";
+var TOKEN = "c47f9fb4af7826203f70ff7812976ce7f0eb83f04097961a";
 
 // ── Helper: Pastikan tab & header ada ──────────────────────────────────
 function ensureHeaders_() {
