@@ -1,0 +1,57 @@
+{
+  "Apps-Script/code.gs.js": {
+    "mtime": 1787145159.978297,
+    "ast_hash": "4b3484581b493404963fbb1dab9e70cf",
+    "semantic_hash": ""
+  },
+  "Input/script.js": {
+    "mtime": 1787145159.9789915,
+    "ast_hash": "f205a8a00ed237559f18faf9ff1fd8a8",
+    "semantic_hash": ""
+  },
+  "Keranjang-Duit/Priview/script.js": {
+    "mtime": 1787145159.9793346,
+    "ast_hash": "2f88150535bd2293f87d2b160d0726a1",
+    "semantic_hash": ""
+  },
+  "Keranjang-Duit/script.js": {
+    "mtime": 1787145159.9793346,
+    "ast_hash": "862032cd3a47adbf08c055919a2d86cd",
+    "semantic_hash": ""
+  },
+  "MoroDuit-push.sh": {
+    "mtime": 1787145220.1258826,
+    "ast_hash": "f07fb3da0e1a4ff75196b6661084f8cc",
+    "semantic_hash": ""
+  },
+  "config.js": {
+    "mtime": 1787145159.9793346,
+    "ast_hash": "9197970e112387e5c2815a436efa55a0",
+    "semantic_hash": ""
+  },
+  "Input/index.html": {
+    "mtime": 1787145159.978297,
+    "ast_hash": "0307988913520761f731e1a65551dde3",
+    "semantic_hash": ""
+  },
+  "Journal-Proyek.md": {
+    "mtime": 1787145159.9789915,
+    "ast_hash": "9fa68df6bd2c95c0d0e9e36ad34b9729",
+    "semantic_hash": ""
+  },
+  "Keranjang-Duit/Priview/index.html": {
+    "mtime": 1787145159.979259,
+    "ast_hash": "fac0f582b28525f0e43f52b439e89896",
+    "semantic_hash": ""
+  },
+  "Keranjang-Duit/index.html": {
+    "mtime": 1787145159.9793346,
+    "ast_hash": "666fdb7fc65417821fc8d44155b2e673",
+    "semantic_hash": ""
+  },
+  "MoroDuit-ROADMAP.md": {
+    "mtime": 1787145159.9793346,
+    "ast_hash": "f5b9c19abd90ea0c58fee0631382a9ba",
+    "semantic_hash": ""
+  }
+}
