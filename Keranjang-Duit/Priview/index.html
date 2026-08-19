@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MoroDuit — Nota Belanja</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main>
+    <!-- Error state (shown if no data) -->
+    <div id="errorState" class="error-state hidden">
+      <div class="error-icon">📋</div>
+      <p class="error-text">Tidak ada data keranjang.</p>
+      <a href="../index.html" class="btn btn-primary">🛒 Kembali ke Keranjang-Duit</a>
+    </div>
+
+    <!-- Nota -->
+    <div id="notaContainer" class="nota-container hidden">
+      <div class="nota" id="nota">
+        <!-- Nota Header -->
+        <div class="nota-header">
+          <h1 class="nota-toko">Toko Sembako Online Moro Duit</h1>
+          <div class="nota-meta">
+            <div class="nota-row">
+              <span class="nota-label">No Nota:</span>
+              <span class="nota-value" id="noNota">DRAFT</span>
+            </div>
+            <div class="nota-row">
+              <span class="nota-label">Tanggal:</span>
+              <span class="nota-value" id="tanggal">—</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Nota Items -->
+        <table class="nota-table">
+          <thead>
+            <tr>
+              <th class="col-no">No</th>
+              <th class="col-produk">Produk</th>
+              <th class="col-qty">Qty</th>
+              <th class="col-harga">Harga Satuan</th>
+              <th class="col-subtotal">Subtotal</th>
+            </tr>
+          </thead>
+          <tbody id="notaItems"></tbody>
+          <tfoot>
+            <tr>
+              <td colspan="4" class="total-label">Total Nota</td>
+              <td class="total-value" id="totalValue">Rp 0</td>
+            </tr>
+          </tfoot>
+        </table>
+
+        <!-- Nota Footer -->
+        <div class="nota-footer">
+          <p>Terima kasih atas kunjungan Anda! 🙏</p>
+        </div>
+      </div>
+
+      <!-- Action buttons (hidden when printing) -->
+      <div class="nota-actions" id="notaActions">
+        <button id="printBtn" class="btn btn-primary">
+          🖨️ Print & Simpan Nota
+        </button>
+        <button id="batalBtn" class="btn btn-secondary">
+          ❌ Batal / Kembali
+        </button>
+      </div>
+    </div>
+
+    <!-- Status message -->
+    <div id="statusMessage" class="status-message hidden" role="alert" aria-live="polite"></div>
+  </main>
+
+  <script src="../../config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

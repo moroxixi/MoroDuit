@@ -1,0 +1,346 @@
+/* ══════════════════════════════════════════════════════════════════════
+   MoroDuit Priview — Nota Layout (print-ready)
+   Nilai visual SAMA PERSIS dengan Keranjang-Duit/style.css
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* ── Reset & Base ──────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 18px;
+}
+
+body {
+  font-family: "Segoe UI", "Noto Sans", Arial, sans-serif;
+  font-size: 1.125rem;
+  line-height: 1.6;
+  color: #1a1a1a;
+  background-color: #f5f0e8;
+  min-height: 100vh;
+  padding: 1rem;
+}
+
+/* ── Main ──────────────────────────────────────────────────────────── */
+main {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+/* ── Error State ───────────────────────────────────────────────────── */
+.error-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.error-state.hidden {
+  display: none;
+}
+
+.error-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.error-text {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 1.5rem;
+}
+
+/* ── Nota Container ────────────────────────────────────────────────── */
+.nota-container.hidden {
+  display: none;
+}
+
+.nota {
+  background-color: #ffffff;
+  border: 2px solid #2e7d32;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* ── Nota Header ───────────────────────────────────────────────────── */
+.nota-header {
+  text-align: center;
+  border-bottom: 2px dashed #2e7d32;
+  padding-bottom: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.nota-toko {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #2e7d32;
+  margin-bottom: 1rem;
+}
+
+.nota-meta {
+  text-align: left;
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+.nota-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 0.25rem 0;
+  font-size: 1.125rem;
+}
+
+.nota-label {
+  font-weight: 600;
+  color: #666666;
+}
+
+.nota-value {
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+#noNota {
+  color: #c62828;
+  font-size: 1.25rem;
+}
+
+/* ── Nota Table ────────────────────────────────────────────────────── */
+.nota-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.5rem;
+}
+
+.nota-table thead {
+  background-color: #2e7d32;
+  color: #ffffff;
+}
+
+.nota-table th {
+  padding: 0.75rem 1rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+  text-align: left;
+}
+
+.nota-table th.col-no {
+  width: 40px;
+  text-align: center;
+}
+
+.nota-table th.col-qty,
+.nota-table th.col-harga,
+.nota-table th.col-subtotal {
+  text-align: right;
+}
+
+.nota-table td {
+  padding: 0.75rem 1rem;
+  font-size: 1.125rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.nota-table td.col-no {
+  text-align: center;
+}
+
+.nota-table td.col-qty,
+.nota-table td.col-harga,
+.nota-table td.col-subtotal {
+  text-align: right;
+}
+
+.nota-table tbody tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+.nota-table tfoot {
+  border-top: 2px solid #2e7d32;
+}
+
+.nota-table tfoot td {
+  padding: 1rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.total-label {
+  text-align: right !important;
+  color: #1a1a1a;
+}
+
+.total-value {
+  text-align: right !important;
+  color: #2e7d32;
+  font-size: 1.5rem !important;
+}
+
+/* ── Nota Footer ───────────────────────────────────────────────────── */
+.nota-footer {
+  text-align: center;
+  border-top: 2px dashed #2e7d32;
+  padding-top: 1.5rem;
+  font-size: 1.125rem;
+  color: #666666;
+}
+
+/* ── Action Buttons ────────────────────────────────────────────────── */
+.nota-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+@media (max-width: 600px) {
+  .nota-actions {
+    flex-direction: column;
+  }
+}
+
+/* ── Buttons ───────────────────────────────────────────────────────── */
+.btn {
+  flex: 1;
+  padding: 1rem 1.5rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+  min-height: 56px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn-primary {
+  background-color: #2e7d32;
+  color: #ffffff;
+}
+
+.btn-primary:hover {
+  background-color: #1b5e20;
+}
+
+.btn-secondary {
+  background-color: #e0e0e0;
+  color: #1a1a1a;
+}
+
+.btn-secondary:hover {
+  background-color: #bdbdbd;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn:disabled:active {
+  transform: none;
+}
+
+/* ── Status Message ────────────────────────────────────────────────── */
+.status-message {
+  padding: 1rem 1.25rem;
+  border-radius: 10px;
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-top: 1.25rem;
+  text-align: center;
+}
+
+.status-message.hidden {
+  display: none;
+}
+
+.status-message.success {
+  background-color: #e8f5e9;
+  color: #1b5e20;
+  border: 2px solid #2e7d32;
+}
+
+.status-message.error {
+  background-color: #ffebee;
+  color: #c62828;
+  border: 2px solid #c62828;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   @media print — hanya nota yang terlihat
+   ══════════════════════════════════════════════════════════════════════ */
+@media print {
+  body {
+    background-color: #ffffff;
+    padding: 0;
+    font-size: 14px;
+  }
+
+  .nota-actions,
+  #statusMessage {
+    display: none !important;
+  }
+
+  .nota-container.hidden {
+    display: block !important;
+  }
+
+  .error-state {
+    display: none !important;
+  }
+
+  .nota {
+    border: none;
+    box-shadow: none;
+    border-radius: 0;
+    padding: 1rem;
+    max-width: 100%;
+  }
+
+  .nota-header {
+    border-bottom-color: #000000;
+  }
+
+  .nota-toko {
+    color: #000000;
+    font-size: 1.25rem;
+  }
+
+  .nota-table thead {
+    background-color: #000000;
+    color: #ffffff;
+  }
+
+  .nota-table tfoot {
+    border-top-color: #000000;
+  }
+
+  .total-value {
+    color: #000000;
+  }
+
+  .nota-footer {
+    border-top-color: #000000;
+    color: #000000;
+  }
+
+  #noNota {
+    color: #000000;
+  }
+}
