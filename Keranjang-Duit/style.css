@@ -1,0 +1,316 @@
+/* ══════════════════════════════════════════════════════════════════════
+   MoroDuit Keranjang-Duit — Aksesibel untuk ibu-ibu / lansia
+   Nilai visual SAMA PERSIS dengan Input/style.css
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* ── Reset & Base ──────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 18px;
+}
+
+body {
+  font-family: "Segoe UI", "Noto Sans", Arial, sans-serif;
+  font-size: 1.125rem;
+  line-height: 1.6;
+  color: #1a1a1a;
+  background-color: #f5f0e8;
+  min-height: 100vh;
+  padding: 1rem;
+  padding-bottom: 8rem;
+}
+
+/* ── Header ────────────────────────────────────────────────────────── */
+header {
+  text-align: center;
+  padding: 1.5rem 1rem;
+  background-color: #2e7d32;
+  color: #ffffff;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+}
+
+header h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+header .subtitle {
+  font-size: 1.125rem;
+  opacity: 0.9;
+}
+
+/* ── Main ──────────────────────────────────────────────────────────── */
+main {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* ── Status Message ────────────────────────────────────────────────── */
+.status-message {
+  padding: 1rem 1.25rem;
+  border-radius: 10px;
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 1.25rem;
+  text-align: center;
+}
+
+.status-message.hidden {
+  display: none;
+}
+
+.status-message.success {
+  background-color: #e8f5e9;
+  color: #1b5e20;
+  border: 2px solid #2e7d32;
+}
+
+.status-message.error {
+  background-color: #ffebee;
+  color: #c62828;
+  border: 2px solid #c62828;
+}
+
+/* ── Loading ───────────────────────────────────────────────────────── */
+.loading {
+  text-align: center;
+  padding: 2rem;
+  font-size: 1.125rem;
+  color: #666666;
+}
+
+/* ── Empty State ───────────────────────────────────────────────────── */
+.empty-state {
+  text-align: center;
+  padding: 2rem;
+  font-size: 1.25rem;
+  color: #666666;
+  font-weight: 600;
+}
+
+/* ── Product List ──────────────────────────────────────────────────── */
+.produk-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.produk-card {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  background-color: #ffffff;
+  transition: border-color 0.2s;
+}
+
+.produk-card.checked {
+  border-color: #2e7d32;
+  background-color: #f1f8e9;
+}
+
+/* ── Checkbox (custom) ────────────────────────────────────────────── */
+.checkbox-wrapper {
+  position: relative;
+}
+
+.checkbox-wrapper input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.checkbox-custom {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 2px solid #bdbdbd;
+  border-radius: 6px;
+  background-color: #ffffff;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+
+.checkbox-wrapper input[type="checkbox"]:checked + .checkbox-custom {
+  background-color: #2e7d32;
+  border-color: #2e7d32;
+}
+
+.checkbox-wrapper input[type="checkbox"]:checked + .checkbox-custom::after {
+  content: "✓";
+  color: #ffffff;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.checkbox-wrapper input[type="checkbox"]:focus + .checkbox-custom {
+  box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.25);
+}
+
+/* ── Product Info ──────────────────────────────────────────────────── */
+.produk-info {
+  min-width: 0;
+}
+
+.produk-name {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  word-break: break-word;
+}
+
+.produk-catatan {
+  font-size: 0.95rem;
+  color: #666666;
+  margin-top: 0.2rem;
+  font-style: italic;
+}
+
+.produk-harga {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #2e7d32;
+  white-space: nowrap;
+}
+
+/* ── Qty Input ─────────────────────────────────────────────────────── */
+.qty-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.qty-wrapper input[type="number"] {
+  width: 4.5rem;
+  padding: 0.6rem 0.5rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  text-align: center;
+  border: 2px solid #bdbdbd;
+  border-radius: 8px;
+  background-color: #f5f5f5;
+  color: #1a1a1a;
+  transition: border-color 0.2s;
+}
+
+.qty-wrapper input[type="number"]:not(:disabled):focus {
+  outline: none;
+  border-color: #2e7d32;
+  box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.25);
+}
+
+.qty-wrapper input[type="number"]:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.qty-wrapper input[type="number"]::-webkit-inner-spin-button,
+.qty-wrapper input[type="number"]::-webkit-outer-spin-button {
+  opacity: 1;
+}
+
+.qty-label {
+  font-size: 1rem;
+  color: #666666;
+}
+
+/* ── Total Bar (sticky bottom) ────────────────────────────────────── */
+.total-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  background-color: #ffffff;
+  border-top: 3px solid #2e7d32;
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  gap: 1rem;
+}
+
+@media (max-width: 600px) {
+  .total-bar {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+}
+
+.total-info {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+}
+
+.total-label {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.total-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #2e7d32;
+}
+
+/* ── Buttons ───────────────────────────────────────────────────────── */
+.btn {
+  padding: 1rem 1.5rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+  min-height: 56px;
+  white-space: nowrap;
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn-primary {
+  background-color: #2e7d32;
+  color: #ffffff;
+}
+
+.btn-primary:hover {
+  background-color: #1b5e20;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn:disabled:active {
+  transform: none;
+}
+
+/* ── Footer ────────────────────────────────────────────────────────── */
+footer {
+  text-align: center;
+  padding: 1.5rem 1rem;
+  margin-top: 2rem;
+  color: #666666;
+  font-size: 1rem;
+}

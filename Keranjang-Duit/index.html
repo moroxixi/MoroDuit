@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MoroDuit — Keranjang Duit</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>🛒 Keranjang Duit</h1>
+    <p class="subtitle">Pilih produk yang mau dibeli</p>
+  </header>
+
+  <main>
+    <!-- Status / error message -->
+    <div id="statusMessage" class="status-message hidden" role="alert" aria-live="polite"></div>
+
+    <!-- Loading indicator -->
+    <div id="loadingIndicator" class="loading">Memuat daftar produk...</div>
+
+    <!-- Product list (rendered by JS) -->
+    <div id="produkList" class="produk-list"></div>
+
+    <!-- Total bar (sticky at bottom) -->
+    <div id="totalBar" class="total-bar">
+      <div class="total-info">
+        <span class="total-label">Total Belanja:</span>
+        <span id="totalValue" class="total-value">Rp 0</span>
+      </div>
+      <button id="checkoutBtn" class="btn btn-primary" disabled>
+        💳 Checkout
+      </button>
+    </div>
+  </main>
+
+  <footer>
+    <p>MoroDuit &mdash; Toko Sembako Online</p>
+  </footer>
+
+  <script src="../config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
