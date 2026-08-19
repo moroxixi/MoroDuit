@@ -10,10 +10,23 @@ function ensureHeaders_() {
     katalog = ss.insertSheet("Katalog");
   }
   if (katalog.getLastRow() === 0) {
-    katalog.getRange(1, 1, 1, 7).setValues([[
-      "Timestamp", "Produk", "Harga Normal", "Harga Promo",
-      "Harga Jual", "Status", "Catatan"
+    katalog.getRange(1, 1, 1, 8).setValues([["Timestamp", "Produk", "Kategori", "Harga Normal",
+      "Harga Promo", "Harga Jual", "Status", "Catatan"
     ]]);
+  } else {
+    // Idempotent: tambah kolom "Kategori" kalau belum ada
+    var headers = katalog.getRange(1, 1, 1, katalog.getLastColumn()).getValues()[0];
+    var hasKategori = false;
+    for (var h = 0; h < headers.length; h++) {
+      if (String(headers[h]).trim().toLowerCase() === "kategori") {
+        hasKategori = true;
+        break;
+      }
+    }
+    if (!hasKategori) {
+      katalog.insertColumnBefore(3);
+      katalog.getRange(1, 3).setValue("Kategori");
+    }
   }
 
   // Tab Riwayat
@@ -103,11 +116,12 @@ function doGet(e) {
     var result = [];
 
     for (var i = 1; i < data.length; i++) {
-      if (String(data[i][5]).trim() === "Ada") {
+      if (String(data[i][6]).trim() === "Ada") {
         result.push({
           produk: String(data[i][1]).trim(),
-          hargaJual: data[i][4],
-          catatan: String(data[i][6] || "")
+          kategori: String(data[i][2] || ""),
+          hargaJual: data[i][5],
+          catatan: String(data[i][7] || "")
         });
       }
     }
@@ -125,11 +139,12 @@ function doGet(e) {
     for (var i = 1; i < data.length; i++) {
       result.push({
         produk: String(data[i][1]).trim(),
-        hargaNormal: data[i][2],
-        hargaPromo: data[i][3],
-        hargaJual: data[i][4],
-        status: String(data[i][5]).trim(),
-        catatan: String(data[i][6] || "")
+        kategori: String(data[i][2] || ""),
+        hargaNormal: data[i][3],
+        hargaPromo: data[i][4],
+        hargaJual: data[i][5],
+        status: String(data[i][6]).trim(),
+        catatan: String(data[i][7] || "")
       });
     }
 
@@ -183,10 +198,22 @@ function doPost(e) {
     var timestamp = new Date();
 
     var row = findProdukRow_(sheet, produk);
-    var rowData = [timestamp, produk, hargaNormal, hargaPromo, hargaJual, status, catatan];
+    var kategori = String(body.kategori || "").trim();
+    var kategoriList = [
+      "Kopi", "Minuman Manis", "Bumbu Dapur", "Mie Instan",
+      "Perawatan Diri", "Obat Nyamuk", "Tisu", "Susu", "Roti", "Sabun"
+    ];
+    if (!kategori) {
+      return jsonResponse_({success: false, error: "kategori wajib diisi"});
+    }
+    if (kategoriList.indexOf(kategori) === -1) {
+      return jsonResponse_({success: false, error: "kategori tidak valid, harus salah satu dari: " + kategoriList.join(", ")});
+    }
+
+    var rowData = [timestamp, produk, kategori, hargaNormal, hargaPromo, hargaJual, status, catatan];
 
     if (row > 0) {
-      sheet.getRange(row, 1, 1, 7).setValues([rowData]);
+      sheet.getRange(row, 1, 1, 8).setValues([rowData]);
     } else {
       sheet.appendRow(rowData);
     }
