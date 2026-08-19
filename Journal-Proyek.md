@@ -165,3 +165,62 @@ PENUTUP:
 ────────────────────────────────────────────────────────────────────────────────
 
 🎉 MoroDuit lengkap! 4 halaman (Input, Keranjang-Duit, Priview) + backend Apps Script sudah ter-commit. Task 5 (registrasi ke graph) sudah otomatis terpenuhi sejak Task 1 karena PENUTUP selalu pakai scope  ~/HomeLab .
+
+
+Lanjut 
+
+
+✅ Token MoroDuit berhasil di-generate & diisi identik di kedua file.
+
+Ringkasan Verifikasi:
+
+┌─────────────────────────┬──────────────────────────────────────────────────────────────┐
+│ Langkah                 │ Hasil                                                        │
+├─────────────────────────┼──────────────────────────────────────────────────────────────┤
+│ Generate token          │ c47f...961a (48 char hex) ✅                                 │
+│ node --check code.gs.js │ syntax OK ✅                                                 │
+│ node --check config.js  │ syntax OK ✅                                                 │
+│ <TOKEN_DI_SINI> count   │ 0 di kedua file ✅                                           │
+│ URL placeholder         │ Masih ada di config.js (tidak disentuh) ✅                   │
+│ Token match             │ Identik di code.gs.js & config.js ✅                         │
+│ git diff scope          │ 2 file token + 1 file (Journal-Proyek.md, ikut di-commit) ✅ │
+└─────────────────────────┴──────────────────────────────────────────────────────────────┘
+
+PENUTUP:
+
+ freebuff-close.sh  → exit 0, push OK — commit  auto: 2026-08-19 19:22 .
+> ⚠️ Catatan:  APPS_SCRIPT_URL_DI_SINI  di config.js sudah berisi URL asli (bukan placeholder lagi — sepertinya sudah pernah diisi sebelumnya). Task ini tidak menyentuhnya sesuai instruksi.
+
+
+
+
+Hasil Analisis Token
+
+Backend — Cara  validateToken_()  membaca token dari request:
+
+┌───────────┬──────────────┬───────────────────┐
+│ Endpoint  │ Mekanisme    │ Field             │
+├───────────┼──────────────┼───────────────────┤
+│ doGet(e)  │ Query string │ e.parameter.token │
+│ doPost(e) │ JSON body    │ body.token        │
+└───────────┴──────────────┴───────────────────┘
+
+Client — Setiap pemanggilan fetch ke Apps Script:
+
+┌──────────────────────────┬──────────────────────┬───────────────────┬──────────────────────────┬──────────────────────────────┐
+│ File                     │ Action               │ Token Disertakan? │ Field/Mekanisme          │ Cocok Backend?               │
+├──────────────────────────┼──────────────────────┼───────────────────┼──────────────────────────┼──────────────────────────────┤
+│ Input/script.js          │ getKatalogFull (GET) │ ✅ Ya             │ ?token=... query string  │ ✅ Cocok (e.parameter.token) │
+│ Input/script.js          │ updateProduk (POST)  │ ✅ Ya             │ token field di JSON body │ ✅ Cocok (body.token)        │
+│ Keranjang-Duit/script.js │ getKatalog (GET)     │ ✅ Ya             │ ?token=... query string  │ ✅ Cocok (e.parameter.token) │
+│ Priview/script.js        │ simpanRiwayat (POST) │ ✅ Ya             │ token field di JSON body │ ✅ Cocok (body.token)        │
+└──────────────────────────┴──────────────────────┴───────────────────┴──────────────────────────┴──────────────────────────────┘
+
+Jumlah fetch per file:
+- Input/script.js → 2 fetch (loadProdukList + submit) → 2/2 tercakup ✅
+- Keranjang-Duit/script.js → 1 fetch (loadKatalog) → 1/1 tercakup ✅
+- Priview/script.js → 1 fetch (printBtn click) → 1/1 tercakup ✅
+
+Kesimpulan
+
+SEMUA 4 pemanggilan fetch sudah token-wired dengan benar. Token dari  MORODUIT_CONFIG.TOKEN  dikirim dengan mekanisme yang tepat sesuai cara backend membacanya (query string untuk GET, body JSON untuk POST). Tidak ada yang perlu diperbaiki — siap untuk Rofi redeemploy.
