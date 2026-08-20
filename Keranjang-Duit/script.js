@@ -12,6 +12,7 @@
   var statusMessage = document.getElementById("statusMessage");
   var totalValue = document.getElementById("totalValue");
   var checkoutBtn = document.getElementById("checkoutBtn");
+  var namaPelangganInput = document.getElementById("namaPelanggan");
 
   // ── State ──────────────────────────────────────────────────────────
   var produkData = []; // Array of {produk, hargaJual, catatan}
@@ -93,11 +94,6 @@
       for (var k = 0; k < indices.length; k++) {
         var idx = indices[k];
         var p = data[idx];
-        var catatanHtml = "";
-        if (p.catatan && p.catatan.trim() !== "") {
-          catatanHtml = '<div class="produk-catatan">' + escapeHtml(p.catatan) + '</div>';
-        }
-
         html += '<div class="produk-card" data-index="' + idx + '">'
               + '  <div class="checkbox-wrapper">'
               + '    <input type="checkbox" id="chk_' + idx + '" '
@@ -106,7 +102,6 @@
               + '  </div>'
               + '  <div class="produk-info">'
               + '    <div class="produk-name">' + escapeHtml(p.produk) + '</div>'
-              + catatanHtml
               + '  </div>'
               + '  <div class="produk-harga">' + formatRupiah(p.hargaJual) + '</div>'
               + '  <div class="qty-wrapper">'
@@ -206,9 +201,11 @@
     }
 
     // Save to sessionStorage
+    var namaPelanggan = namaPelangganInput ? namaPelangganInput.value.trim() : "";
     var keranjangData = {
       items: items,
-      total: total
+      total: total,
+      namaPelanggan: namaPelanggan
     };
 
     try {

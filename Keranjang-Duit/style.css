@@ -97,6 +97,46 @@ main {
   font-weight: 600;
 }
 
+/* ── Nama Pelanggan Input ─────────────────────────────────────────── */
+.pelanggan-input {
+  margin-bottom: 1rem;
+  padding: 1rem 1.25rem;
+  background-color: #ffffff;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+}
+
+.pelanggan-input label {
+  display: block;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 0.5rem;
+}
+
+.pelanggan-input .optional {
+  font-weight: 400;
+  color: #666666;
+  font-size: 0.95rem;
+}
+
+.pelanggan-input input[type="text"] {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  font-size: 1.125rem;
+  border: 2px solid #bdbdbd;
+  border-radius: 8px;
+  background-color: #f5f5f5;
+  color: #1a1a1a;
+  transition: border-color 0.2s;
+}
+
+.pelanggan-input input[type="text"]:focus {
+  outline: none;
+  border-color: #2e7d32;
+  box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.25);
+}
+
 /* ── Product List ──────────────────────────────────────────────────── */
 .produk-list {
   display: flex;

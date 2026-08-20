@@ -87,7 +87,7 @@ main {
 
 .nota-meta {
   text-align: left;
-  max-width: 300px;
+  max-width: 400px;
   margin: 0 auto;
 }
 
@@ -97,6 +97,7 @@ main {
   align-items: baseline;
   padding: 0.25rem 0;
   font-size: 1.125rem;
+  gap: 1rem;
 }
 
 .nota-label {
@@ -109,9 +110,9 @@ main {
   color: #1a1a1a;
 }
 
-#noNota {
-  color: #c62828;
-  font-size: 1.25rem;
+#namaPelanggan {
+  color: #1a1a1a;
+  font-size: 1.125rem;
 }
 
 /* ── Nota Table ────────────────────────────────────────────────────── */
@@ -185,12 +186,15 @@ main {
 .total-label {
   text-align: right !important;
   color: #1a1a1a;
+  white-space: nowrap;
 }
 
 .total-value {
   text-align: right !important;
   color: #2e7d32;
   font-size: 1.5rem !important;
+  white-space: nowrap;
+  min-width: 120px;
 }
 
 /* ── Mobile: hide subtotal column to save space ───────────────────── */
@@ -366,7 +370,7 @@ main {
     color: #000000;
   }
 
-  #noNota {
+  #namaPelanggan {
     color: #000000;
   }
 }

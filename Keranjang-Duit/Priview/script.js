@@ -9,7 +9,7 @@
   // ── DOM refs ───────────────────────────────────────────────────────
   var errorState = document.getElementById("errorState");
   var notaContainer = document.getElementById("notaContainer");
-  var noNotaEl = document.getElementById("noNota");
+  var namaPelangganEl = document.getElementById("namaPelanggan");
   var tanggalEl = document.getElementById("tanggal");
   var notaItemsEl = document.getElementById("notaItems");
   var totalValueEl = document.getElementById("totalValue");
@@ -58,6 +58,10 @@
 
   // ── Render nota ───────────────────────────────────────────────────
   function renderNota(data) {
+    // Set nama pelanggan
+    var namaPelanggan = data.namaPelanggan || "";
+    namaPelangganEl.textContent = namaPelanggan !== "" ? namaPelanggan : "-";
+
     // Set tanggal draft (client-side)
     var now = new Date();
     var tanggalStr = now.toLocaleDateString("id-ID", {
@@ -106,9 +110,8 @@
     })
       .then(function (res) { return res.json(); })
       .then(function (response) {
-        if (response.success && response.noNota && response.tanggal) {
-          // Update display with real No Nota & Tanggal
-          noNotaEl.textContent = response.noNota;
+        if (response.success && response.tanggal) {
+          // Update display with real Tanggal
           tanggalEl.textContent = response.tanggal;
 
           // Remove from sessionStorage (prevent double-submit)
