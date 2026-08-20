@@ -1,16 +1,16 @@
 # Graph Report - MoroDuit  (2026-08-20)
 
 ## Corpus Check
-- 8 files · ~7,513 words
+- 9 files · ~9,943 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 53 nodes · 72 edges · 8 communities (7 shown, 1 thin omitted)
-- Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 1 edges (avg confidence: 0.5)
+- 145 nodes · 188 edges · 21 communities (14 shown, 7 thin omitted)
+- Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 6 edges (avg confidence: 0.5)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `244cec2e`
+- Built from commit: `d4e15166`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -21,18 +21,30 @@
 - Input/script.js
 - Priview/script.js
 - MoroDuit-push.sh
+- wA
+- te
+- gs
+- on
+- UA
+- xB
+- A
+- an
+- Be
+- dA
+- Kr
+- Lr
 
 ## God Nodes (most connected - your core abstractions)
 1. `MoroDuit — Rencana Proyek & Task Roadmap` - 10 edges
 2. `doPost()` - 6 edges
-3. `renderProdukList()` - 6 edges
-4. `renderProdukList()` - 5 edges
-5. `loadKatalog()` - 5 edges
-6. `doGet()` - 4 edges
-7. `applyFilters()` - 4 edges
-8. `ensureHeaders_()` - 3 edges
-9. `validateToken_()` - 3 edges
-10. `jsonResponse_()` - 3 edges
+3. `wA()` - 6 edges
+4. `renderProdukList()` - 6 edges
+5. `renderProdukList()` - 5 edges
+6. `loadKatalog()` - 5 edges
+7. `doGet()` - 4 edges
+8. `te()` - 4 edges
+9. `gs()` - 4 edges
+10. `applyFilters()` - 4 edges
 
 ## Surprising Connections (you probably didn't know these)
 - None detected - all connections are within the same source files.
@@ -40,7 +52,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (8 total, 1 thin omitted)
+## Communities (21 total, 7 thin omitted)
 
 ### Community 0 - "MoroDuit — Rencana Proyek & Task Roadmap"
 Cohesion: 0.15
@@ -59,16 +71,46 @@ Cohesion: 0.39
 Nodes (5): escapeHtml(), formatRupiah(), handleProdukClick(), loadProdukList(), renderProdukList()
 
 ### Community 4 - "Priview/script.js"
-Cohesion: 0.38
+Cohesion: 0.32
 Nodes (3): escapeHtml(), formatRupiah(), renderNota()
+
+### Community 9 - "wA"
+Cohesion: 0.25
+Nodes (8): B(), E(), I(), p(), SUPPORT_RANGE_BOUNDS(), SUPPORT_WORD_BREAKING(), t(), wA()
+
+### Community 10 - "te"
+Cohesion: 0.50
+Nodes (4): ee(), He(), te(), ye()
+
+### Community 11 - "gs"
+Cohesion: 0.50
+Nodes (4): gs(), ns(), rs(), ts()
+
+### Community 12 - "on"
+Cohesion: 0.67
+Nodes (3): cn(), on(), Qn()
+
+### Community 13 - "UA"
+Cohesion: 0.67
+Nodes (3): FA(), lA(), UA()
+
+### Community 14 - "xB"
+Cohesion: 0.67
+Nodes (3): fe(), oe(), xB()
 
 ## Knowledge Gaps
 - **11 isolated node(s):** `MoroDuit-push.sh script`, `1. Ringkasan Proyek`, `2. Keputusan dari Diskusi (Q&A)`, `3. Struktur Folder (Final)`, `Tab 1 — `Katalog`` (+6 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **1 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **7 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
+- **Why does `wA()` connect `wA` to `html2canvas.min.js`?**
+  _High betweenness centrality (0.000) - this node is a cross-community bridge._
+- **Are the 2 inferred relationships involving `wA()` (e.g. with `B()` and `t()`) actually correct?**
+  _`wA()` has 2 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `MoroDuit-push.sh script`, `1. Ringkasan Proyek`, `2. Keputusan dari Diskusi (Q&A)` to the rest of the system?**
   _11 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Should `html2canvas.min.js` be split into smaller, more focused modules?**
+  _Cohesion score 0.037037037037037035 - nodes in this community are weakly interconnected._

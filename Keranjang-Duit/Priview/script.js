@@ -118,6 +118,9 @@
           // Remove from sessionStorage (prevent double-submit)
           sessionStorage.removeItem("moroduit_keranjang");
 
+          // Screenshot & download (before print, avoids @media print CSS)
+          captureAndDownloadNota(response.noNota);
+
           // Print
           window.print();
         } else {
@@ -139,6 +142,50 @@
     statusMessage.className = "status-message error";
 
     // DO NOT remove sessionStorage — user can retry
+  }
+
+  // ── Screenshot & auto-download nota ──────────────────────────────
+  function captureAndDownloadNota(noNota) {
+    try {
+      if (typeof html2canvas === "undefined") {
+        console.warn("html2canvas not loaded, skipping screenshot");
+        return;
+      }
+
+      var notaEl = document.getElementById("nota");
+      if (!notaEl) {
+        console.warn("Nota element not found, skipping screenshot");
+        return;
+      }
+
+      // Sanitize noNota for filename
+      var safeNoNota = noNota ? String(noNota).replace(/[^A-Za-z0-9_-]/g, "-") : null;
+      var timestamp = Date.now();
+      var filename = safeNoNota
+        ? "Nota-" + safeNoNota + "-" + timestamp + ".png"
+        : "Nota-" + timestamp + ".png";
+
+      html2canvas(notaEl).then(function (canvas) {
+        canvas.toBlob(function (blob) {
+          if (!blob) {
+            console.warn("Failed to create blob for screenshot");
+            return;
+          }
+          var url = URL.createObjectURL(blob);
+          var a = document.createElement("a");
+          a.href = url;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        }, "image/png");
+      }).catch(function (err) {
+        console.error("html2canvas render failed:", err);
+      });
+    } catch (err) {
+      console.error("Screenshot capture failed:", err);
+    }
   }
 
   // ── Batal button click handler ───────────────────────────────────
