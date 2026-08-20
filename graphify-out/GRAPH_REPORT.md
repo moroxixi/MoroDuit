@@ -1,16 +1,16 @@
 # Graph Report - MoroDuit  (2026-08-20)
 
 ## Corpus Check
-- 9 files · ~9,943 words
+- 9 files · ~10,209 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 145 nodes · 188 edges · 21 communities (14 shown, 7 thin omitted)
+- 148 nodes · 195 edges · 21 communities (14 shown, 7 thin omitted)
 - Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 6 edges (avg confidence: 0.5)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `d4e15166`
+- Built from commit: `2d84750c`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -37,9 +37,9 @@
 ## God Nodes (most connected - your core abstractions)
 1. `MoroDuit — Rencana Proyek & Task Roadmap` - 10 edges
 2. `doPost()` - 6 edges
-3. `wA()` - 6 edges
-4. `renderProdukList()` - 6 edges
-5. `renderProdukList()` - 5 edges
+3. `renderProdukList()` - 6 edges
+4. `wA()` - 6 edges
+5. `renderProdukList()` - 6 edges
 6. `loadKatalog()` - 5 edges
 7. `doGet()` - 4 edges
 8. `te()` - 4 edges
@@ -67,8 +67,8 @@ Cohesion: 0.54
 Nodes (7): doGet(), doPost(), ensureHeaders_(), findProdukRow_(), generateNoNota_(), jsonResponse_(), validateToken_()
 
 ### Community 3 - "Input/script.js"
-Cohesion: 0.39
-Nodes (5): escapeHtml(), formatRupiah(), handleProdukClick(), loadProdukList(), renderProdukList()
+Cohesion: 0.33
+Nodes (8): applyFilters(), escapeHtml(), formatRupiah(), getFilteredData(), handleProdukClick(), loadProdukList(), populateKategoriFilter(), renderProdukList()
 
 ### Community 4 - "Priview/script.js"
 Cohesion: 0.32

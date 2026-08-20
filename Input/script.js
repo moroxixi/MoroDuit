@@ -9,6 +9,7 @@
   // ── State ──────────────────────────────────────────────────────────
   var hargaJualTouched = false;
   var selectedProdukName = null;
+  var produkData = []; // Full unfiltered data from API
 
   // ── DOM refs ───────────────────────────────────────────────────────
   var form = document.getElementById("produkForm");
@@ -24,6 +25,8 @@
   var statusMessage = document.getElementById("statusMessage");
   var produkList = document.getElementById("produkList");
   var loadingIndicator = document.getElementById("loadingIndicator");
+  var searchInput = document.getElementById("searchInput");
+  var kategoriFilter = document.getElementById("kategoriFilter");
 
   // ── Harga Jual: linked-until-touched ──────────────────────────────
   inputHargaNormal.addEventListener("input", function () {
@@ -60,6 +63,54 @@
     }
   }
 
+  // ── Get filtered data based on search + kategori ──────────────────
+  function getFilteredData() {
+    var query = searchInput.value.trim().toLowerCase();
+    var selectedKategori = kategoriFilter.value;
+
+    return produkData.filter(function (p) {
+      // Search filter: substring match on product name
+      if (query !== "") {
+        var namaProduk = (p.produk || "").toLowerCase();
+        if (namaProduk.indexOf(query) === -1) return false;
+      }
+      // Kategori filter: exact match (empty = show all)
+      if (selectedKategori !== "") {
+        var kategori = (p.kategori && p.kategori.trim() !== "")
+          ? p.kategori.trim() : "Lainnya";
+        if (kategori !== selectedKategori) return false;
+      }
+      return true;
+    });
+  }
+
+  // ── Populate kategori dropdown from data ──────────────────────────
+  function populateKategoriFilter() {
+    var kategoriSet = {};
+    for (var i = 0; i < produkData.length; i++) {
+      var k = (produkData[i].kategori && produkData[i].kategori.trim() !== "")
+        ? produkData[i].kategori.trim() : "Lainnya";
+      kategoriSet[k] = true;
+    }
+    var sorted = Object.keys(kategoriSet).sort(function (a, b) {
+      if (a === "Lainnya") return 1;
+      if (b === "Lainnya") return -1;
+      return a.localeCompare(b);
+    });
+    var html = '<option value="">Semua Kategori</option>';
+    for (var j = 0; j < sorted.length; j++) {
+      html += '<option value="' + escapeHtml(sorted[j]) + '">'
+            + escapeHtml(sorted[j]) + '</option>';
+    }
+    kategoriFilter.innerHTML = html;
+  }
+
+  // ── Apply filters and re-render ──────────────────────────────────
+  function applyFilters() {
+    var filtered = getFilteredData();
+    renderProdukList(filtered);
+  }
+
   // ── Fetch & render product list ───────────────────────────────────
   function loadProdukList() {
     loadingIndicator.style.display = "block";
@@ -72,6 +123,10 @@
       .then(function (res) { return res.json(); })
       .then(function (data) {
         loadingIndicator.style.display = "none";
+        if (Array.isArray(data)) {
+          produkData = data;
+          populateKategoriFilter();
+        }
         renderProdukList(data);
       })
       .catch(function (err) {
@@ -252,6 +307,15 @@
     div.appendChild(document.createTextNode(str));
     return div.innerHTML;
   }
+
+  // ── Filter event listeners ───────────────────────────────────────
+  searchInput.addEventListener("input", function () {
+    applyFilters();
+  });
+
+  kategoriFilter.addEventListener("change", function () {
+    applyFilters();
+  });
 
   // ── Init ───────────────────────────────────────────────────────────
   loadProdukList();

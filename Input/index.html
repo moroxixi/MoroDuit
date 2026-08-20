@@ -91,6 +91,16 @@
       <section class="list-section" aria-label="Daftar Produk">
         <h2>📋 Daftar Produk</h2>
         <p class="list-hint">Klik produk untuk edit. Sedang memuat...</p>
+        <div class="filter-bar">
+          <div class="filter-search">
+            <input type="text" id="searchInput" placeholder="Cari produk..." maxlength="100">
+          </div>
+          <div class="filter-kategori">
+            <select id="kategoriFilter">
+              <option value="">Semua Kategori</option>
+            </select>
+          </div>
+        </div>
         <div id="produkList" class="produk-list" role="list">
           <div class="loading" id="loadingIndicator">Memuat data produk...</div>
         </div>
