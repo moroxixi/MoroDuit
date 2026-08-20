@@ -100,7 +100,8 @@
       action: "simpanRiwayat",
       token: MORODUIT_CONFIG.TOKEN,
       items: keranjangData.items,
-      total: keranjangData.total
+      total: keranjangData.total,
+      namaPelanggan: keranjangData.namaPelanggan || ""
     };
 
     fetch(MORODUIT_CONFIG.APPS_SCRIPT_URL, {

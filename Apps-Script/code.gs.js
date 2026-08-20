@@ -35,10 +35,24 @@ function ensureHeaders_() {
     riwayat = ss.insertSheet("Riwayat");
   }
   if (riwayat.getLastRow() === 0) {
-    riwayat.getRange(1, 1, 1, 7).setValues([[
-      "No Nota", "Tanggal", "Produk", "Qty",
+    riwayat.getRange(1, 1, 1, 8).setValues([[
+      "No Nota", "Nama Pelanggan", "Tanggal", "Produk", "Qty",
       "Harga Satuan", "Subtotal", "Total Nota"
     ]]);
+  } else {
+    // Idempotent: tambah kolom "Nama Pelanggan" kalau belum ada
+    var headers = riwayat.getRange(1, 1, 1, riwayat.getLastColumn()).getValues()[0];
+    var hasNamaPelanggan = false;
+    for (var h = 0; h < headers.length; h++) {
+      if (String(headers[h]).trim().toLowerCase() === "nama pelanggan") {
+        hasNamaPelanggan = true;
+        break;
+      }
+    }
+    if (!hasNamaPelanggan) {
+      riwayat.insertColumnBefore(2);
+      riwayat.getRange(1, 2).setValue("Nama Pelanggan");
+    }
   }
 }
 
@@ -228,6 +242,7 @@ function doPost(e) {
 
     var items = body.items || [];
     var total = body.total;
+    var namaPelanggan = body.namaPelanggan || "";
 
     if (items.length === 0) {
       return jsonResponse_({success: false, error: "items tidak boleh kosong"});
@@ -241,6 +256,7 @@ function doPost(e) {
       var item = items[i];
       rows.push([
         noNota,
+        namaPelanggan,
         tanggal,
         item.produk,
         item.qty,
@@ -251,7 +267,7 @@ function doPost(e) {
     }
 
     if (rows.length > 0) {
-      sheet.getRange(sheet.getLastRow() + 1, 1, rows.length, 7).setValues(rows);
+      sheet.getRange(sheet.getLastRow() + 1, 1, rows.length, 8).setValues(rows);
     }
 
     return jsonResponse_({success: true, noNota: noNota, tanggal: tanggal});
