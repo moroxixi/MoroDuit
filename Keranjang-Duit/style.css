@@ -124,6 +124,8 @@ main {
 /* ── Checkbox (custom) ────────────────────────────────────────────── */
 .checkbox-wrapper {
   position: relative;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .checkbox-wrapper input[type="checkbox"] {
@@ -165,13 +167,15 @@ main {
 /* ── Product Info ──────────────────────────────────────────────────── */
 .produk-info {
   min-width: 0;
+  overflow: hidden;
 }
 
 .produk-name {
   font-size: 1.25rem;
   font-weight: 600;
   color: #1a1a1a;
-  word-break: break-word;
+  word-break: normal;
+  overflow-wrap: anywhere;
 }
 
 .produk-catatan {
@@ -186,6 +190,8 @@ main {
   font-weight: 700;
   color: #2e7d32;
   white-space: nowrap;
+  min-width: 0;
+  overflow: hidden;
 }
 
 /* ── Qty Input ─────────────────────────────────────────────────────── */
@@ -193,10 +199,13 @@ main {
   display: flex;
   align-items: center;
   gap: 0.25rem;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .qty-wrapper input[type="number"] {
-  width: 4.5rem;
+  width: 4rem;
+  min-width: 0;
   padding: 0.6rem 0.5rem;
   font-size: 1.25rem;
   font-weight: 600;
@@ -250,6 +259,29 @@ main {
   .total-bar {
     flex-direction: column;
     gap: 0.75rem;
+  }
+}
+
+/* ── Mobile: stacked card layout ───────────────────────────────────── */
+@media (max-width: 520px) {
+  .produk-card {
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto auto;
+    gap: 0.5rem 0.75rem;
+  }
+
+  .produk-info {
+    grid-column: 2;
+  }
+
+  .produk-harga {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .qty-wrapper {
+    grid-column: 2;
+    grid-row: 3;
   }
 }
 

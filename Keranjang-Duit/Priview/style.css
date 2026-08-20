@@ -148,10 +148,18 @@ main {
   padding: 0.75rem 1rem;
   font-size: 1.125rem;
   border-bottom: 1px solid #e0e0e0;
+  overflow-wrap: anywhere;
+  word-break: normal;
 }
 
 .nota-table td.col-no {
   text-align: center;
+  width: 40px;
+}
+
+.nota-table td.col-produk {
+  word-break: normal;
+  overflow-wrap: anywhere;
 }
 
 .nota-table td.col-qty,
@@ -183,6 +191,24 @@ main {
   text-align: right !important;
   color: #2e7d32;
   font-size: 1.5rem !important;
+}
+
+/* ── Mobile: hide subtotal column to save space ───────────────────── */
+@media (max-width: 520px) {
+  .nota-table th.col-subtotal,
+  .nota-table td.col-subtotal {
+    display: none;
+  }
+
+  .nota-table th,
+  .nota-table td {
+    padding: 0.5rem 0.5rem;
+    font-size: 1rem;
+  }
+
+  .nota {
+    padding: 1rem;
+  }
 }
 
 /* ── Nota Footer ───────────────────────────────────────────────────── */

@@ -293,6 +293,8 @@ main {
   transition: all 0.2s;
   background-color: #fafafa;
   min-height: 60px;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .produk-item:hover,
@@ -305,6 +307,19 @@ main {
   font-size: 1.25rem;
   font-weight: 600;
   color: #1a1a1a;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  flex: 1 1 0;
+}
+
+.produk-item .produk-kategori {
+  font-size: 0.9rem;
+  color: #666666;
+  white-space: nowrap;
+  padding: 0.15rem 0.5rem;
+  background-color: #f0f0f0;
+  border-radius: 4px;
 }
 
 .produk-item .produk-price {
@@ -361,4 +376,30 @@ footer {
 .produk-item.selected {
   border-color: #1565c0;
   background-color: #e3f2fd;
+}
+
+/* ── Mobile: stacked product items ─────────────────────────────────── */
+@media (max-width: 520px) {
+  .produk-item {
+    flex-wrap: wrap;
+    gap: 0.3rem 0.75rem;
+    padding: 0.75rem 1rem;
+  }
+
+  .produk-item .produk-name {
+    flex: 1 1 100%;
+  }
+
+  .produk-item .produk-kategori {
+    flex: 0 1 auto;
+  }
+
+  .produk-item .produk-status {
+    flex: 0 1 auto;
+  }
+
+  .produk-item .produk-price {
+    flex: 1 1 auto;
+    text-align: right;
+  }
 }
