@@ -98,10 +98,11 @@ main {
 }
 
 .form-group input[type="text"],
-.form-group input[type="number"] {
+.form-group input[type="number"],
+.form-group select {
   width: 100%;
-  padding: 0.875rem 1rem;
-  font-size: 1.25rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
   border: 2px solid #bdbdbd;
   border-radius: 8px;
   background-color: #ffffff;
@@ -109,7 +110,8 @@ main {
   transition: border-color 0.2s;
 }
 
-.form-group input:focus {
+.form-group input:focus,
+.form-group select:focus {
   outline: none;
   border-color: #2e7d32;
   box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.25);
@@ -117,7 +119,32 @@ main {
 
 .form-group input::placeholder {
   color: #999999;
-  font-size: 1.125rem;
+  font-size: 0.875rem;
+}
+
+/* ── Filter Bar (search + kategori dropdown) ──────────────────────── */
+.filter-bar input,
+.filter-bar select {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  border: 2px solid #bdbdbd;
+  border-radius: 8px;
+  background-color: #ffffff;
+  color: #1a1a1a;
+  transition: border-color 0.2s;
+}
+
+.filter-bar input:focus,
+.filter-bar select:focus {
+  outline: none;
+  border-color: #2e7d32;
+  box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.25);
+}
+
+.filter-bar input::placeholder {
+  color: #999999;
+  font-size: 0.875rem;
 }
 
 .hint {
