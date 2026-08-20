@@ -13,9 +13,12 @@
   var totalValue = document.getElementById("totalValue");
   var checkoutBtn = document.getElementById("checkoutBtn");
   var namaPelangganInput = document.getElementById("namaPelanggan");
+  var searchInput = document.getElementById("searchInput");
+  var kategoriFilter = document.getElementById("kategoriFilter");
 
   // ── State ──────────────────────────────────────────────────────────
-  var produkData = []; // Array of {produk, hargaJual, catatan}
+  var produkData = []; // Full unfiltered data from API
+  var produkState = {}; // {index: {checked: bool, qty: number}} — survives re-render
 
   // ── Show status message ───────────────────────────────────────────
   function showStatus(message, type) {
@@ -25,6 +28,71 @@
 
   function hideStatus() {
     statusMessage.className = "status-message hidden";
+  }
+
+  // ── Save current DOM state to produkState ─────────────────────────
+  function saveState() {
+    for (var i = 0; i < produkData.length; i++) {
+      var checkbox = document.getElementById("chk_" + i);
+      var qtyInput = document.getElementById("qty_" + i);
+      if (checkbox) {
+        if (!produkState[i]) produkState[i] = { checked: false, qty: 1 };
+        produkState[i].checked = checkbox.checked;
+        if (qtyInput) {
+          var q = parseInt(qtyInput.value, 10);
+          produkState[i].qty = (isNaN(q) || q < 1) ? 1 : q;
+        }
+      }
+    }
+  }
+
+  // ── Get filtered data based on search + kategori ──────────────────
+  function getFilteredData() {
+    var query = searchInput.value.trim().toLowerCase();
+    var selectedKategori = kategoriFilter.value;
+
+    return produkData.filter(function (p, i) {
+      // Search filter: substring match on product name
+      if (query !== "") {
+        var namaProduk = (p.produk || "").toLowerCase();
+        if (namaProduk.indexOf(query) === -1) return false;
+      }
+      // Kategori filter: exact match (empty = show all)
+      if (selectedKategori !== "") {
+        var kategori = (p.kategori && p.kategori.trim() !== "")
+          ? p.kategori.trim() : "Lainnya";
+        if (kategori !== selectedKategori) return false;
+      }
+      return true;
+    });
+  }
+
+  // ── Populate kategori dropdown from data ──────────────────────────
+  function populateKategoriFilter() {
+    var kategoriSet = {};
+    for (var i = 0; i < produkData.length; i++) {
+      var k = (produkData[i].kategori && produkData[i].kategori.trim() !== "")
+        ? produkData[i].kategori.trim() : "Lainnya";
+      kategoriSet[k] = true;
+    }
+    var sorted = Object.keys(kategoriSet).sort(function (a, b) {
+      if (a === "Lainnya") return 1;
+      if (b === "Lainnya") return -1;
+      return a.localeCompare(b);
+    });
+    var html = '<option value="">Semua Kategori</option>';
+    for (var j = 0; j < sorted.length; j++) {
+      html += '<option value="' + escapeHtml(sorted[j]) + '">'
+            + escapeHtml(sorted[j]) + '</option>';
+    }
+    kategoriFilter.innerHTML = html;
+  }
+
+  // ── Apply filters and re-render ──────────────────────────────────
+  function applyFilters() {
+    saveState();
+    var filtered = getFilteredData();
+    renderProdukList(filtered);
   }
 
   // ── Fetch katalog ─────────────────────────────────────────────────
@@ -55,6 +123,7 @@
 
         hideStatus();
         produkData = data;
+        populateKategoriFilter();
         renderProdukList(data);
       })
       .catch(function (err) {
@@ -68,11 +137,12 @@
   function renderProdukList(data) {
     // 1. Group by kategori, preserving original order within each group
     var groups = {};
+    var allIndices = []; // flat list of original indices, in render order
     for (var i = 0; i < data.length; i++) {
       var kategori = (data[i].kategori && data[i].kategori.trim() !== "")
         ? data[i].kategori.trim() : "Lainnya";
       if (!groups[kategori]) groups[kategori] = [];
-      groups[kategori].push(i); // store original index
+      groups[kategori].push(i);
     }
 
     // 2. Sort kategori names A-Z; "Lainnya" always last
@@ -93,6 +163,7 @@
 
       for (var k = 0; k < indices.length; k++) {
         var idx = indices[k];
+        allIndices.push(idx);
         var p = data[idx];
         html += '<div class="produk-card" data-index="' + idx + '">'
               + '  <div class="checkbox-wrapper">'
@@ -118,9 +189,19 @@
 
     produkList.innerHTML = html;
 
-    // Attach event listeners
-    for (var j = 0; j < data.length; j++) {
-      attachListeners(j);
+    // Apply saved state + attach event listeners for rendered items
+    for (var j = 0; j < allIndices.length; j++) {
+      var origIdx = allIndices[j];
+      var state = produkState[origIdx];
+      var chk = document.getElementById("chk_" + origIdx);
+      var qty = document.getElementById("qty_" + origIdx);
+      if (chk && state && state.checked) {
+        chk.checked = true;
+        qty.disabled = false;
+        qty.value = state.qty;
+        chk.closest(".produk-card").classList.add("checked");
+      }
+      attachListeners(origIdx);
     }
   }
 
@@ -128,6 +209,8 @@
   function attachListeners(index) {
     var checkbox = document.getElementById("chk_" + index);
     var qtyInput = document.getElementById("qty_" + index);
+
+    if (!produkState[index]) produkState[index] = { checked: false, qty: 1 };
 
     checkbox.addEventListener("change", function () {
       var isChecked = checkbox.checked;
@@ -144,25 +227,29 @@
         qtyInput.value = 1;
       }
 
+      // Sync to state
+      produkState[index].checked = isChecked;
+      if (!isChecked) produkState[index].qty = 1;
+
       updateTotal();
     });
 
     qtyInput.addEventListener("input", function () {
+      var q = parseInt(qtyInput.value, 10);
+      produkState[index].qty = (isNaN(q) || q < 1) ? 1 : q;
       updateTotal();
     });
   }
 
-  // ── Update total (live) ──────────────────────────────────────────
+  // ── Update total (live) — reads from produkState for filtered-out items
   function updateTotal() {
     var total = 0;
 
     for (var i = 0; i < produkData.length; i++) {
-      var checkbox = document.getElementById("chk_" + i);
-      var qtyInput = document.getElementById("qty_" + i);
-
-      if (checkbox && checkbox.checked) {
+      var st = produkState[i];
+      if (st && st.checked) {
         var harga = Number(produkData[i].hargaJual);
-        var qty = parseInt(qtyInput.value, 10);
+        var qty = st.qty;
         if (isNaN(qty) || qty < 1) qty = 1;
         total += harga * qty;
       }
@@ -174,15 +261,14 @@
 
   // ── Checkout ──────────────────────────────────────────────────────
   checkoutBtn.addEventListener("click", function () {
+    saveState(); // ensure latest DOM state is captured
     var items = [];
 
     for (var i = 0; i < produkData.length; i++) {
-      var checkbox = document.getElementById("chk_" + i);
-      var qtyInput = document.getElementById("qty_" + i);
-
-      if (checkbox && checkbox.checked) {
+      var st = produkState[i];
+      if (st && st.checked) {
         var hargaJual = Number(produkData[i].hargaJual);
-        var qty = parseInt(qtyInput.value, 10);
+        var qty = st.qty;
         if (isNaN(qty) || qty < 1) qty = 1;
 
         items.push({
@@ -232,6 +318,15 @@
     div.appendChild(document.createTextNode(str));
     return div.innerHTML;
   }
+
+  // ── Filter event listeners ───────────────────────────────────────
+  searchInput.addEventListener("input", function () {
+    applyFilters();
+  });
+
+  kategoriFilter.addEventListener("change", function () {
+    applyFilters();
+  });
 
   // ── Init ───────────────────────────────────────────────────────────
   loadKatalog();
