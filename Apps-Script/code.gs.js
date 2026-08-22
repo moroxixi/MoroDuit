@@ -267,7 +267,22 @@ function doPost(e) {
     }
 
     if (rows.length > 0) {
-      sheet.getRange(sheet.getLastRow() + 1, 1, rows.length, 8).setValues(rows);
+      var startRow = sheet.getLastRow() + 1;
+      sheet.getRange(startRow, 1, rows.length, 8).setValues(rows);
+
+      // ── Auto-fill formula kolom I (Harga Normal) & J (Profit per baris) ──
+      // CATATAN: Pemisah argumen pakai koma (,) — konvensi API setFormulas()
+      // Apps Script, BUKAN locale sheet. User WAJIB verify setelah deploy manual
+      // apakah formula tampil benar (locale sheet tertentu bisa pakai titik koma).
+      var formulasI = [];
+      var formulasJ = [];
+      for (var f = 0; f < rows.length; f++) {
+        var r = startRow + f;
+        formulasI.push(["=IFERROR(VLOOKUP(D" + r + ",Katalog!$B:$D,3,FALSE),\"\")"]);
+        formulasJ.push(["=IF(I" + r + "=\"\",\"\",G" + r + "-(I" + r + "*E" + r + "))"]);
+      }
+      sheet.getRange(startRow, 9, rows.length, 1).setFormulas(formulasI);
+      sheet.getRange(startRow, 10, rows.length, 1).setFormulas(formulasJ);
     }
 
     return jsonResponse_({success: true, noNota: noNota, tanggal: tanggal});

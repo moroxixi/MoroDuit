@@ -121,8 +121,9 @@
           // Screenshot & download (before print, avoids @media print CSS)
           captureAndDownloadNota(response.noNota);
 
-          // Print
-          window.print();
+          // Print — DISABLED sementara: printer belum ada, screenshot jadi pengganti.
+          // Re-enable: uncomment baris window.print() di bawah.
+          // window.print();
         } else {
           // Server returned failure
           handlePrintError(response.error || "Gagal menyimpan nota");
