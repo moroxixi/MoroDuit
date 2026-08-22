@@ -123,6 +123,16 @@
 
         hideStatus();
         produkData = data;
+
+        // Sort produk A-Z berdasarkan nama (case-insensitive)
+        // Hasil sort berlaku untuk renderProdukList & getFilteredData
+        // karena keduanya bergantung pada urutan array produkData.
+        produkData.sort(function (a, b) {
+          var namaA = (a.produk || "").toLowerCase();
+          var namaB = (b.produk || "").toLowerCase();
+          return namaA.localeCompare(namaB, "id");
+        });
+
         populateKategoriFilter();
         renderProdukList(data);
       })
