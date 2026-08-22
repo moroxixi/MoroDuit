@@ -216,6 +216,68 @@ main {
   box-shadow: 0 0 0 5px rgba(46, 125, 50, 0.3);
 }
 
+/* ── Produk Favorit Section ───────────────────────────────────────── */
+.produk-favorit-section {
+  margin-bottom: 1.5rem;
+}
+
+.produk-favorit-section h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 0.25rem;
+  padding-left: 0.25rem;
+}
+
+.produk-favorit-sub {
+  font-size: 1.05rem;
+  color: #555555;
+  margin-bottom: 1rem;
+  padding-left: 0.25rem;
+}
+
+.loading-perkenalan {
+  text-align: center;
+  padding: 1rem;
+  color: #2e7d32;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.produk-perkenalan-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.produk-favorit-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.9rem 1.25rem;
+  background-color: #ffffff;
+  border: 2px solid #c8e6c9;
+  border-radius: 12px;
+  transition: border-color 0.2s;
+}
+
+.produk-favorit-card:hover {
+  border-color: #2e7d32;
+}
+
+.produk-favorit-nama {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.produk-favorit-harga {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #2e7d32;
+  white-space: nowrap;
+}
+
 /* ── Footer ────────────────────────────────────────────────────────── */
 footer {
   text-align: center;

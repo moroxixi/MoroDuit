@@ -1,16 +1,16 @@
 # Graph Report - MoroDuit  (2026-08-22)
 
 ## Corpus Check
-- 9 files · ~10,450 words
+- 10 files · ~11,031 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 149 nodes · 197 edges · 21 communities (14 shown, 7 thin omitted)
+- 153 nodes · 202 edges · 22 communities (15 shown, 7 thin omitted)
 - Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 6 edges (avg confidence: 0.5)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `19efbcac`
+- Built from commit: `f1bf505b`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -33,6 +33,7 @@
 - dA
 - Kr
 - Lr
+- Perkenalan/script.js
 
 ## God Nodes (most connected - your core abstractions)
 1. `MoroDuit — Rencana Proyek & Task Roadmap` - 10 edges
@@ -52,7 +53,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (21 total, 7 thin omitted)
+## Communities (22 total, 7 thin omitted)
 
 ### Community 0 - "MoroDuit — Rencana Proyek & Task Roadmap"
 Cohesion: 0.15
@@ -97,6 +98,10 @@ Nodes (3): FA(), lA(), UA()
 ### Community 14 - "xB"
 Cohesion: 0.67
 Nodes (3): fe(), oe(), xB()
+
+### Community 21 - "Perkenalan/script.js"
+Cohesion: 0.83
+Nodes (3): escapeHtml(), formatRupiah(), loadProdukPerkenalan()
 
 ## Knowledge Gaps
 - **11 isolated node(s):** `MoroDuit-push.sh script`, `1. Ringkasan Proyek`, `2. Keputusan dari Diskusi (Q&A)`, `3. Struktur Folder (Final)`, `Tab 1 — `Katalog`` (+6 more)

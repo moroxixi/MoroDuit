@@ -260,7 +260,7 @@
       "label": "handlePrintError()",
       "file_type": "code",
       "source_file": "Keranjang-Duit/Priview/script.js",
-      "source_location": "L138",
+      "source_location": "L141",
       "_origin": "ast",
       "id": "keranjang_duit_priview_script_handleprinterror",
       "community": 4,
@@ -268,10 +268,21 @@
       "norm_label": "handleprinterror()"
     },
     {
+      "label": "resetPrintBtn()",
+      "file_type": "code",
+      "source_file": "Keranjang-Duit/Priview/script.js",
+      "source_location": "L150",
+      "_origin": "ast",
+      "id": "keranjang_duit_priview_script_resetprintbtn",
+      "community": 4,
+      "community_name": "Priview/script.js",
+      "norm_label": "resetprintbtn()"
+    },
+    {
       "label": "captureAndDownloadNota()",
       "file_type": "code",
       "source_file": "Keranjang-Duit/Priview/script.js",
-      "source_location": "L149",
+      "source_location": "L156",
       "_origin": "ast",
       "id": "keranjang_duit_priview_script_captureanddownloadnota",
       "community": 4,
@@ -282,7 +293,7 @@
       "label": "formatRupiah()",
       "file_type": "code",
       "source_file": "Keranjang-Duit/Priview/script.js",
-      "source_location": "L199",
+      "source_location": "L208",
       "_origin": "ast",
       "id": "keranjang_duit_priview_script_formatrupiah",
       "community": 4,
@@ -293,7 +304,7 @@
       "label": "escapeHtml()",
       "file_type": "code",
       "source_file": "Keranjang-Duit/Priview/script.js",
-      "source_location": "L205",
+      "source_location": "L214",
       "_origin": "ast",
       "id": "keranjang_duit_priview_script_escapehtml",
       "community": 4,
@@ -2024,7 +2035,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "Keranjang-Duit/Priview/script.js",
-      "source_location": "L149",
+      "source_location": "L156",
       "weight": 1.0,
       "_origin": "ast",
       "source": "keranjang_duit_priview_script",
@@ -2035,7 +2046,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "Keranjang-Duit/Priview/script.js",
-      "source_location": "L205",
+      "source_location": "L214",
       "weight": 1.0,
       "_origin": "ast",
       "source": "keranjang_duit_priview_script",
@@ -2046,7 +2057,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "Keranjang-Duit/Priview/script.js",
-      "source_location": "L199",
+      "source_location": "L208",
       "weight": 1.0,
       "_origin": "ast",
       "source": "keranjang_duit_priview_script",
@@ -2057,7 +2068,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "Keranjang-Duit/Priview/script.js",
-      "source_location": "L138",
+      "source_location": "L141",
       "weight": 1.0,
       "_origin": "ast",
       "source": "keranjang_duit_priview_script",
@@ -2073,6 +2084,17 @@
       "_origin": "ast",
       "source": "keranjang_duit_priview_script",
       "target": "keranjang_duit_priview_script_rendernota",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Keranjang-Duit/Priview/script.js",
+      "source_location": "L150",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "keranjang_duit_priview_script",
+      "target": "keranjang_duit_priview_script_resetprintbtn",
       "confidence_score": 1.0
     },
     {
@@ -2119,6 +2141,18 @@
       "_origin": "ast",
       "source": "keranjang_duit_priview_script_rendernota",
       "target": "keranjang_duit_priview_script_formatrupiah",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Keranjang-Duit/Priview/script.js",
+      "source_location": "L142",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "keranjang_duit_priview_script_handleprinterror",
+      "target": "keranjang_duit_priview_script_resetprintbtn",
       "confidence_score": 1.0
     },
     {
@@ -3844,5 +3878,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "013b61af78dffd4dfe29254824ec30cadca75d76"
+  "built_at_commit": "19efbcaca59c05e07d03361fe8f9efab58989048"
 }
