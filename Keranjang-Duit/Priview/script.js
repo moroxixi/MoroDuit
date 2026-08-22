@@ -118,8 +118,11 @@
           // Remove from sessionStorage (prevent double-submit)
           sessionStorage.removeItem("moroduit_keranjang");
 
-          // Screenshot & download (before print, avoids @media print CSS)
-          captureAndDownloadNota(response.noNota);
+          // Screenshot & download, then reset button
+          captureAndDownloadNota(response.noNota)
+            .finally(function () {
+              resetPrintBtn();
+            });
 
           // Print — DISABLED sementara: printer belum ada, screenshot jadi pengganti.
           // Re-enable: uncomment baris window.print() di bawah.
@@ -136,8 +139,7 @@
   });
 
   function handlePrintError(message) {
-    printBtn.disabled = false;
-    printBtn.textContent = "🖨️ Print & Simpan Nota";
+    resetPrintBtn();
 
     statusMessage.textContent = "❌ " + message;
     statusMessage.className = "status-message error";
@@ -145,28 +147,33 @@
     // DO NOT remove sessionStorage — user can retry
   }
 
+  function resetPrintBtn() {
+    printBtn.disabled = false;
+    printBtn.textContent = "🖨️ Print & Simpan Nota";
+  }
+
   // ── Screenshot & auto-download nota ──────────────────────────────
   function captureAndDownloadNota(noNota) {
-    try {
-      if (typeof html2canvas === "undefined") {
-        console.warn("html2canvas not loaded, skipping screenshot");
-        return;
-      }
+    var notaEl = document.getElementById("nota");
+    if (!notaEl || typeof html2canvas === "undefined") {
+      console.warn("html2canvas not loaded or nota element not found, skipping screenshot");
+      return Promise.resolve();
+    }
 
-      var notaEl = document.getElementById("nota");
-      if (!notaEl) {
-        console.warn("Nota element not found, skipping screenshot");
-        return;
-      }
+    // Sanitize noNota for filename
+    var safeNoNota = noNota ? String(noNota).replace(/[^A-Za-z0-9_-]/g, "-") : null;
+    var timestamp = Date.now();
+    var filename = safeNoNota
+      ? "Nota-" + safeNoNota + "-" + timestamp + ".png"
+      : "Nota-" + timestamp + ".png";
 
-      // Sanitize noNota for filename
-      var safeNoNota = noNota ? String(noNota).replace(/[^A-Za-z0-9_-]/g, "-") : null;
-      var timestamp = Date.now();
-      var filename = safeNoNota
-        ? "Nota-" + safeNoNota + "-" + timestamp + ".png"
-        : "Nota-" + timestamp + ".png";
+    // Bug #1 fix: temporarily remove box-shadow to prevent html2canvas
+    // rendering artifacts (belang/faded gradient)
+    var savedShadow = notaEl.style.boxShadow;
+    notaEl.style.boxShadow = "none";
 
-      html2canvas(notaEl).then(function (canvas) {
+    return html2canvas(notaEl)
+      .then(function (canvas) {
         canvas.toBlob(function (blob) {
           if (!blob) {
             console.warn("Failed to create blob for screenshot");
@@ -181,12 +188,14 @@
           document.body.removeChild(a);
           URL.revokeObjectURL(url);
         }, "image/png");
-      }).catch(function (err) {
+      })
+      .catch(function (err) {
         console.error("html2canvas render failed:", err);
+      })
+      .finally(function () {
+        // Restore box-shadow after capture
+        notaEl.style.boxShadow = savedShadow;
       });
-    } catch (err) {
-      console.error("Screenshot capture failed:", err);
-    }
   }
 
   // ── Batal button click handler ───────────────────────────────────

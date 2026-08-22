@@ -143,6 +143,7 @@ main {
 .nota-table th.col-harga,
 .nota-table th.col-subtotal {
   text-align: right;
+  white-space: nowrap;
 }
 
 .nota-table td {
@@ -167,6 +168,7 @@ main {
 .nota-table td.col-harga,
 .nota-table td.col-subtotal {
   text-align: right;
+  white-space: nowrap;
 }
 
 .nota-table tbody tr:nth-child(even) {
