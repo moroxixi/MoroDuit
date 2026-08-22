@@ -278,8 +278,8 @@ function doPost(e) {
       var formulasJ = [];
       for (var f = 0; f < rows.length; f++) {
         var r = startRow + f;
-        formulasI.push(["=IFERROR(VLOOKUP(D" + r + ",Katalog!$B:$D,3,FALSE),\"\")"]);
-        formulasJ.push(["=IF(I" + r + "=\"\",\"\",G" + r + "-(I" + r + "*E" + r + "))"]);
+        formulasI.push(["=IFERROR(VLOOKUP(D" + r + ";Katalog!$B:$D;3;FALSE);\"\")"]);
+        formulasJ.push(["=IF(I" + r + "=\"\";\"\";G" + r + "-(I" + r + "*E" + r + "))"]);
       }
       sheet.getRange(startRow, 9, rows.length, 1).setFormulas(formulasI);
       sheet.getRange(startRow, 10, rows.length, 1).setFormulas(formulasJ);
