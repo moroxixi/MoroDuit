@@ -7,7 +7,6 @@
   "use strict";
 
   // ── State ──────────────────────────────────────────────────────────
-  var hargaJualTouched = false;
   var selectedProdukName = null;
   var produkData = []; // Full unfiltered data from API
 
@@ -16,7 +15,6 @@
   var inputProduk = document.getElementById("produk");
   var inputHargaNormal = document.getElementById("hargaNormal");
   var inputHargaPromo = document.getElementById("hargaPromo");
-  var inputHargaJual = document.getElementById("hargaJual");
   var inputKategori = document.getElementById("kategori");
   var inputCatatan = document.getElementById("catatan");
   var checkboxStokHabis = document.getElementById("stokHabis");
@@ -27,17 +25,6 @@
   var loadingIndicator = document.getElementById("loadingIndicator");
   var searchInput = document.getElementById("searchInput");
   var kategoriFilter = document.getElementById("kategoriFilter");
-
-  // ── Harga Jual: linked-until-touched ──────────────────────────────
-  inputHargaNormal.addEventListener("input", function () {
-    if (!hargaJualTouched) {
-      inputHargaJual.value = inputHargaNormal.value;
-    }
-  });
-
-  inputHargaJual.addEventListener("input", function () {
-    hargaJualTouched = true;
-  });
 
   // ── Show status message ───────────────────────────────────────────
   function showStatus(message, type) {
@@ -52,7 +39,6 @@
   // ── Clear form ────────────────────────────────────────────────────
   function clearForm() {
     form.reset();
-    hargaJualTouched = false;
     selectedProdukName = null;
     submitBtn.textContent = "💾 Simpan Produk";
 
@@ -157,14 +143,13 @@
       var p = produkArray[i];
       var statusClass = p.status === "Ada" ? "ada" : "tidak-ada";
       var statusLabel = p.status === "Ada" ? "Stok Ada" : "Stok Habis";
-      var hargaFormatted = formatRupiah(p.hargaJual);
+      var hargaFormatted = formatRupiah(p.hargaNormal);
 
       html += '<div class="produk-item" role="listitem" tabindex="0" '
             + 'data-produk="' + escapeHtml(p.produk) + '" '
             + 'data-kategori="' + escapeHtml(p.kategori || "") + '" '
             + 'data-harga-normal="' + p.hargaNormal + '" '
             + 'data-harga-promo="' + (p.hargaPromo || "") + '" '
-            + 'data-harga-jual="' + p.hargaJual + '" '
             + 'data-status="' + escapeHtml(p.status) + '" '
             + 'data-catatan="' + escapeHtml(p.catatan) + '">'
             + '<span class="produk-name">' + escapeHtml(p.produk) + '</span>'
@@ -196,7 +181,6 @@
     var kategori = el.getAttribute("data-kategori");
     var hargaNormal = el.getAttribute("data-harga-normal");
     var hargaPromo = el.getAttribute("data-harga-promo");
-    var hargaJual = el.getAttribute("data-harga-jual");
     var status = el.getAttribute("data-status");
     var catatan = el.getAttribute("data-catatan");
 
@@ -204,13 +188,8 @@
     inputKategori.value = kategori;
     inputHargaNormal.value = hargaNormal;
     inputHargaPromo.value = hargaPromo;
-    inputHargaJual.value = hargaJual;
     inputCatatan.value = catatan;
     checkboxStokHabis.checked = (status === "Tidak Ada");
-
-    // Reset auto-sync when selecting existing product
-    hargaJualTouched = false;
-    inputHargaJual.value = hargaJual;
 
     selectedProdukName = produk;
     submitBtn.textContent = "💾 Update Produk";
@@ -233,7 +212,6 @@
     var produk = inputProduk.value.trim();
     var hargaNormal = inputHargaNormal.value;
     var hargaPromo = inputHargaPromo.value;
-    var hargaJual = inputHargaJual.value;
     var kategori = inputKategori.value;
     var catatan = inputCatatan.value.trim();
     var status = checkboxStokHabis.checked ? "Tidak Ada" : "Ada";
@@ -262,7 +240,6 @@
       produk: produk,
       kategori: kategori,
       hargaNormal: Number(hargaNormal),
-      hargaJual: Number(hargaJual || hargaNormal),
       status: status,
       catatan: catatan
     };
