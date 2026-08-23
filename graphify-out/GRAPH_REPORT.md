@@ -1,16 +1,16 @@
 # Graph Report - MoroDuit  (2026-08-23)
 
 ## Corpus Check
-- 11 files · ~15,134 words
+- 11 files · ~15,476 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 180 nodes · 228 edges · 23 communities (16 shown, 7 thin omitted)
+- 181 nodes · 229 edges · 23 communities (16 shown, 7 thin omitted)
 - Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 6 edges (avg confidence: 0.5)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `15852e83`
+- Built from commit: `97224623`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -65,7 +65,7 @@ Cohesion: 0.32
 Nodes (12): applyFilters(), attachListeners(), escapeHtml(), formatRupiah(), getFilteredData(), hideStatus(), loadKatalog(), populateKategoriFilter() (+4 more)
 
 ### Community 2 - "code.gs.js"
-Cohesion: 0.54
+Cohesion: 0.44
 Nodes (7): doGet(), doPost(), ensureHeaders_(), findProdukRow_(), generateNoNota_(), jsonResponse_(), validateToken_()
 
 ### Community 3 - "Input/script.js"

@@ -230,9 +230,6 @@ function doPost(e) {
     }
 
     var hargaPromo = body.hargaPromo || "";
-    var hargaJual = (body.hargaJual !== undefined && body.hargaJual !== "")
-      ? body.hargaJual
-      : hargaNormal;
     var catatan = body.catatan || "";
     var status = body.status || "Ada";
     var timestamp = new Date();
@@ -250,13 +247,29 @@ function doPost(e) {
       return jsonResponse_({success: false, error: "kategori tidak valid, harus salah satu dari: " + kategoriList.join(", ")});
     }
 
-    var rowData = [timestamp, produk, kategori, hargaNormal, hargaPromo, hargaJual, status, catatan];
-
-    if (row > 0) {
-      sheet.getRange(row, 1, 1, 8).setValues([rowData]);
-    } else {
-      sheet.appendRow(rowData);
+    // ── Tentukan nomor baris (update existing ATAU baris baru) ──
+    if (row < 0) {
+      // Produk baru — tulis pakai getRange (bukan appendRow) agar
+      // kita tahu pasti nomor barisnya untuk formula kolom F.
+      row = sheet.getLastRow() + 1;
     }
+
+    // ── Tulis kolom A-E (Timestamp, Produk, Kategori, Harga Normal, Harga Promo) ──
+    sheet.getRange(row, 1, 1, 5).setValues([[
+      timestamp, produk, kategori, hargaNormal, hargaPromo
+    ]]);
+
+    // ── Tulis kolom G-H (Status, Catatan) — SKIP kolom F (Harga Jual) ──
+    sheet.getRange(row, 7, 1, 2).setValues([[status, catatan]]);
+
+    // ── Kolom F (Harga Jual): formula auto-generate dari tabel margin K:L ──
+    // Asumsi: tabel margin (Kategori → %) ada di range $K$2:$L$100
+    // pada sheet Katalog yang SAMA. User WAJIB verifikasi manual saat deploy.
+    // Kalau tabel margin ternyata di sheet lain, ganti $K$2:$L$100 jadi
+    // NamaSheet!$K$2:$L$100.
+    sheet.getRange(row, 6).setFormula(
+      "=IFERROR(D" + row + "*(1+VLOOKUP(C" + row + ",$K$2:$L$100,2,FALSE)),D" + row + ")"
+    );
 
     return jsonResponse_({success: true});
   }
@@ -315,4 +328,44 @@ function doPost(e) {
   }
 
   return jsonResponse_({success: false, error: "unknown action"});
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// BACKFILL: Harga Jual Formula (Manual Run Only)
+// ══════════════════════════════════════════════════════════════════════
+// JALANKAN MANUAL SEKALI dari Apps Script editor
+// (pilih fungsi ini di dropdown, klik Run) SETELAH deploy baru —
+// fungsi ini akan MENIMPA nilai Harga Jual lama di SEMUA baris
+// existing dengan hasil formula. TIDAK dipanggil otomatis oleh sistem.
+//
+// PERINGATAN: Efeknya nyata (overwrite data live kolom F di sheet
+// Katalog). Tidak ada rollback otomatis. Kalau perlu undo, gunakan
+// File > Version history di Google Sheet untuk restore per-cell.
+//
+// Asumsi: tabel margin (Kategori → %) ada di range $K$2:$L$100
+// pada sheet Katalog yang SAMA. Kalau tabel margin ternyata di sheet
+// lain, ganti $K$2:$L$100 di bawah jadi NamaSheet!$K$2:$L$100.
+function backfillHargaJualFormula_() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName("Katalog");
+  if (!sheet) {
+    Logger.log("Sheet Katalog tidak ditemukan.");
+    return;
+  }
+
+  var lastRow = sheet.getLastRow();
+  if (lastRow < 2) {
+    Logger.log("Sheet Katalog kosong atau hanya header, tidak ada yang perlu di-backfill.");
+    return;
+  }
+
+  // Bangun array formula untuk SEMUA baris sekaligus (batch, satu panggilan)
+  var numDataRows = lastRow - 1; // baris 2 sampai lastRow
+  var formulas = [];
+  for (var r = 2; r <= lastRow; r++) {
+    formulas.push(["=IFERROR(D" + r + "*(1+VLOOKUP(C" + r + ",$K$2:$L$100,2,FALSE)),D" + r + ")"]);
+  }
+
+  sheet.getRange(2, 6, numDataRows, 1).setFormulas(formulas);
+  Logger.log("Backfill selesai: " + numDataRows + " baris di kolom F (Harga Jual) telah diisi formula.");
 }
