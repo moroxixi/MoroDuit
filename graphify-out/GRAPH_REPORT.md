@@ -1,16 +1,16 @@
 # Graph Report - MoroDuit  (2026-08-23)
 
 ## Corpus Check
-- 10 files · ~11,210 words
+- 11 files · ~15,134 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 153 nodes · 202 edges · 22 communities (15 shown, 7 thin omitted)
+- 180 nodes · 228 edges · 23 communities (16 shown, 7 thin omitted)
 - Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 6 edges (avg confidence: 0.5)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `fe935c09`
+- Built from commit: `15852e83`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -34,18 +34,19 @@
 - Kr
 - Lr
 - Perkenalan/script.js
+- DISCOVERY: Harga Jual & Priview Mobile — MoroDuit
 
 ## God Nodes (most connected - your core abstractions)
 1. `MoroDuit — Rencana Proyek & Task Roadmap` - 10 edges
-2. `doPost()` - 6 edges
-3. `renderProdukList()` - 6 edges
-4. `wA()` - 6 edges
-5. `renderProdukList()` - 6 edges
-6. `loadKatalog()` - 5 edges
-7. `doGet()` - 4 edges
-8. `te()` - 4 edges
-9. `gs()` - 4 edges
-10. `applyFilters()` - 4 edges
+2. `DISCOVERY: Harga Jual & Priview Mobile — MoroDuit` - 9 edges
+3. `doPost()` - 6 edges
+4. `renderProdukList()` - 6 edges
+5. `wA()` - 6 edges
+6. `renderProdukList()` - 6 edges
+7. `loadKatalog()` - 5 edges
+8. `1. Struktur Google Sheet & Tab "Riwayat"` - 5 edges
+9. `2. `doPost()` dan `doGet()` di `code.gs.js`` - 5 edges
+10. `doGet()` - 4 edges
 
 ## Surprising Connections (you probably didn't know these)
 - None detected - all connections are within the same source files.
@@ -53,7 +54,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (22 total, 7 thin omitted)
+## Communities (23 total, 7 thin omitted)
 
 ### Community 0 - "MoroDuit — Rencana Proyek & Task Roadmap"
 Cohesion: 0.15
@@ -103,19 +104,23 @@ Nodes (3): fe(), oe(), xB()
 Cohesion: 0.83
 Nodes (3): escapeHtml(), formatRupiah(), loadProdukPerkenalan()
 
+### Community 22 - "DISCOVERY: Harga Jual & Priview Mobile — MoroDuit"
+Cohesion: 0.07
+Nodes (26): 1.1 Semua Referensi Nama Sheet di `Apps-Script/code.gs.js`, 1.2 Konfirmasi Tab "Riwayat", 1.3 Formula Kalkulasi Margin di Tab Riwayat (POLA ACUAN), 1.4 Kapan Margin Disimpan sebagai NILAI FINAL vs FORMULA, 1. Struktur Google Sheet & Tab "Riwayat", 2.1 `doGet()` — Lengkap, 2.2 `doPost()` — Lengkap, 2.3 Kolom Katalog — Harga Normal vs Harga Jual vs Formula (+18 more)
+
 ## Knowledge Gaps
-- **11 isolated node(s):** `MoroDuit-push.sh script`, `1. Ringkasan Proyek`, `2. Keputusan dari Diskusi (Q&A)`, `3. Struktur Folder (Final)`, `Tab 1 — `Katalog`` (+6 more)
+- **31 isolated node(s):** `MoroDuit-push.sh script`, `1.1 Semua Referensi Nama Sheet di `Apps-Script/code.gs.js``, `1.2 Konfirmasi Tab "Riwayat"`, `1.3 Formula Kalkulasi Margin di Tab Riwayat (POLA ACUAN)`, `1.4 Kapan Margin Disimpan sebagai NILAI FINAL vs FORMULA` (+26 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **7 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `wA()` connect `wA` to `html2canvas.min.js`?**
-  _High betweenness centrality (0.000) - this node is a cross-community bridge._
 - **Are the 2 inferred relationships involving `wA()` (e.g. with `B()` and `t()`) actually correct?**
   _`wA()` has 2 INFERRED edges - model-reasoned connections that need verification._
-- **What connects `MoroDuit-push.sh script`, `1. Ringkasan Proyek`, `2. Keputusan dari Diskusi (Q&A)` to the rest of the system?**
-  _11 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **What connects `MoroDuit-push.sh script`, `1.1 Semua Referensi Nama Sheet di `Apps-Script/code.gs.js``, `1.2 Konfirmasi Tab "Riwayat"` to the rest of the system?**
+  _31 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `html2canvas.min.js` be split into smaller, more focused modules?**
   _Cohesion score 0.037037037037037035 - nodes in this community are weakly interconnected._
+- **Should `DISCOVERY: Harga Jual & Priview Mobile — MoroDuit` be split into smaller, more focused modules?**
+  _Cohesion score 0.07407407407407407 - nodes in this community are weakly interconnected._
