@@ -218,6 +218,14 @@ main {
   .nota {
     padding: 1rem;
   }
+
+  .total-value {
+    min-width: 0;
+    white-space: normal;
+    word-break: normal;
+    overflow-wrap: anywhere;
+    font-size: 1rem;
+  }
 }
 
 /* ── Extra-narrow: allow harga to wrap instead of overflowing ────── */
