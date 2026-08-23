@@ -202,7 +202,7 @@ main {
   min-width: 120px;
 }
 
-/* ── Mobile: hide subtotal column to save space ───────────────────── */
+/* ── Mobile: hide subtotal column + fix overflow ──────────────────── */
 @media (max-width: 520px) {
   .nota-table th.col-subtotal,
   .nota-table td.col-subtotal {
@@ -219,22 +219,31 @@ main {
     padding: 1rem;
   }
 
-  .total-value {
-    min-width: 0;
+  /* Allow qty, harga, subtotal headers to wrap — prevents "Harga Satuan"
+     from truncating on viewport ~375-390px. */
+  .nota-table th.col-qty,
+  .nota-table th.col-harga,
+  .nota-table th.col-subtotal {
     white-space: normal;
+    word-break: normal;
+    overflow-wrap: anywhere;
+  }
+
+  /* Allow numeric cells to wrap as fallback on narrow screens. */
+  .nota-table td.col-qty,
+  .nota-table td.col-harga,
+  .nota-table td.col-subtotal {
+    white-space: normal;
+  }
+
+  /* Remove min-width: 120px (base) that forces table wider than viewport;
+     !important needed to override base .total-value white-space: nowrap !important. */
+  .nota-table tfoot td.total-value {
+    min-width: 0;
+    white-space: normal !important;
     word-break: normal;
     overflow-wrap: anywhere;
     font-size: 1rem;
-  }
-}
-
-/* ── Extra-narrow: allow harga to wrap instead of overflowing ────── */
-@media (max-width: 400px) {
-  .nota-table td.col-harga,
-  .nota-table th.col-harga {
-    white-space: normal;
-    word-break: normal;
-    overflow-wrap: anywhere;
   }
 }
 

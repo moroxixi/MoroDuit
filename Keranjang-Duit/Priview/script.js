@@ -100,6 +100,10 @@
     var savedShadow = notaEl.style.boxShadow;
     notaEl.style.boxShadow = "none";
 
+    // Track whether fetch completed successfully — prevents false error
+    // message when location.href navigation aborts the pending fetch.
+    var fetchDone = false;
+
     // Step 1: Capture PNG SYNCHRONOUSLY in user-gesture context
     // (avoids popup-blocker for downstream download + wa.me redirect)
     html2canvas(notaEl).then(function (canvas) {
@@ -112,19 +116,17 @@
       // This must happen in the SAME .then() as toDataURL, BEFORE fetch(),
       // so iOS Safari/Chrome retains the "trusted user gesture" for
       // programmatic download. (Same pattern as Tempura/Wonton proven on iPhone.)
+      var timestamp = Date.now();
+      var filename = "nota-" + timestamp + ".png";
+
       var a = document.createElement("a");
       a.href = dataURL;
-      a.download = "nota.png";
+      a.download = filename;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
 
       // ── Step 2: POST simpanRiwayat AFTER download triggered ──
-      // Download already fired (synchronous a.click()), now save to server.
-      // TRADE-OFF: If fetch fails, the PNG is already downloaded but the
-      // order is NOT saved to Riwayat. User sees error "Gagal menghubungi
-      // server...". This is intentional — fixing the iOS download bug takes
-      // priority over atomicity.
       var payload = {
         action: "simpanRiwayat",
         token: MORODUIT_CONFIG.TOKEN,
@@ -141,6 +143,22 @@
         .then(function (res) { return res.json(); })
         .then(function (response) {
           if (response.success && response.tanggal) {
+            fetchDone = true;
+
+            // ── Re-download with server-assigned noNota + timestamp ──
+            var safeNoNota = response.noNota
+              ? String(response.noNota).replace(/[^A-Za-z0-9_-]/g, "-")
+              : "unknown";
+            var ts = Date.now();
+            var finalFilename = "nota-" + safeNoNota + "-" + ts + ".png";
+
+            var a2 = document.createElement("a");
+            a2.href = dataURL;
+            a2.download = finalFilename;
+            document.body.appendChild(a2);
+            a2.click();
+            document.body.removeChild(a2);
+
             // Update display with real Tanggal
             tanggalEl.textContent = response.tanggal;
 
@@ -161,7 +179,11 @@
           }
         })
         .catch(function (err) {
-          handlePrintError("Gagal menghubungi server. Periksa koneksi internet.");
+          // Only show error if fetch actually failed (not when location.href
+          // navigation aborted the pending fetch after successful response).
+          if (!fetchDone) {
+            handlePrintError("Gagal menghubungi server. Periksa koneksi internet.");
+          }
           console.error("Print fetch error:", err);
         });
 
