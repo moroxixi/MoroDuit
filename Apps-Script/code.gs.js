@@ -268,7 +268,7 @@ function doPost(e) {
     // Kalau tabel margin ternyata di sheet lain, ganti $K$2:$L$100 jadi
     // NamaSheet!$K$2:$L$100.
     sheet.getRange(row, 6).setFormula(
-      "=IFERROR(D" + row + "*(1+VLOOKUP(C" + row + ",$K$2:$L$100,2,FALSE)),D" + row + ")"
+      "=IFERROR(D" + row + "*(1+VLOOKUP(C" + row + ";$K$2:$L$100;2;FALSE));D" + row + ")"
     );
 
     return jsonResponse_({success: true});
@@ -330,42 +330,4 @@ function doPost(e) {
   return jsonResponse_({success: false, error: "unknown action"});
 }
 
-// ══════════════════════════════════════════════════════════════════════
-// BACKFILL: Harga Jual Formula (Manual Run Only)
-// ══════════════════════════════════════════════════════════════════════
-// JALANKAN MANUAL SEKALI dari Apps Script editor
-// (pilih fungsi ini di dropdown, klik Run) SETELAH deploy baru —
-// fungsi ini akan MENIMPA nilai Harga Jual lama di SEMUA baris
-// existing dengan hasil formula. TIDAK dipanggil otomatis oleh sistem.
-//
-// PERINGATAN: Efeknya nyata (overwrite data live kolom F di sheet
-// Katalog). Tidak ada rollback otomatis. Kalau perlu undo, gunakan
-// File > Version history di Google Sheet untuk restore per-cell.
-//
-// Asumsi: tabel margin (Kategori → %) ada di range $K$2:$L$100
-// pada sheet Katalog yang SAMA. Kalau tabel margin ternyata di sheet
-// lain, ganti $K$2:$L$100 di bawah jadi NamaSheet!$K$2:$L$100.
-function backfillHargaJualFormula_() {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = ss.getSheetByName("Katalog");
-  if (!sheet) {
-    Logger.log("Sheet Katalog tidak ditemukan.");
-    return;
-  }
 
-  var lastRow = sheet.getLastRow();
-  if (lastRow < 2) {
-    Logger.log("Sheet Katalog kosong atau hanya header, tidak ada yang perlu di-backfill.");
-    return;
-  }
-
-  // Bangun array formula untuk SEMUA baris sekaligus (batch, satu panggilan)
-  var numDataRows = lastRow - 1; // baris 2 sampai lastRow
-  var formulas = [];
-  for (var r = 2; r <= lastRow; r++) {
-    formulas.push(["=IFERROR(D" + r + "*(1+VLOOKUP(C" + r + ",$K$2:$L$100,2,FALSE)),D" + r + ")"]);
-  }
-
-  sheet.getRange(2, 6, numDataRows, 1).setFormulas(formulas);
-  Logger.log("Backfill selesai: " + numDataRows + " baris di kolom F (Harga Jual) telah diisi formula.");
-}
