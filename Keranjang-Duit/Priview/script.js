@@ -94,48 +94,80 @@
   printBtn.addEventListener("click", function () {
     // Disable button (prevent double-click)
     printBtn.disabled = true;
-    printBtn.textContent = "⏳ Menyimpan & Mencetak...";
+    printBtn.textContent = "⏳ Menyimpan & Mengirim...";
 
-    var payload = {
-      action: "simpanRiwayat",
-      token: MORODUIT_CONFIG.TOKEN,
-      items: keranjangData.items,
-      total: keranjangData.total,
-      namaPelanggan: keranjangData.namaPelanggan || ""
-    };
+    var notaEl = document.getElementById("nota");
+    var savedShadow = notaEl.style.boxShadow;
+    notaEl.style.boxShadow = "none";
 
-    fetch(MORODUIT_CONFIG.APPS_SCRIPT_URL, {
-      method: "POST",
-      headers: { "Content-Type": "text/plain" },
-      body: JSON.stringify(payload)
-    })
-      .then(function (res) { return res.json(); })
-      .then(function (response) {
-        if (response.success && response.tanggal) {
-          // Update display with real Tanggal
-          tanggalEl.textContent = response.tanggal;
+    // Step 1: Capture PNG SYNCHRONOUSLY in user-gesture context
+    // (avoids popup-blocker for downstream download + wa.me redirect)
+    html2canvas(notaEl).then(function (canvas) {
+      notaEl.style.boxShadow = savedShadow;
 
-          // Remove from sessionStorage (prevent double-submit)
-          sessionStorage.removeItem("moroduit_keranjang");
+      // Generate data URL while still in gesture context
+      var dataURL = canvas.toDataURL("image/png");
 
-          // Screenshot & download, then reset button
-          captureAndDownloadNota(response.noNota)
-            .finally(function () {
-              resetPrintBtn();
-            });
+      // Step 2: POST simpanRiwayat — payload, timing, logic UNCHANGED
+      var payload = {
+        action: "simpanRiwayat",
+        token: MORODUIT_CONFIG.TOKEN,
+        items: keranjangData.items,
+        total: keranjangData.total,
+        namaPelanggan: keranjangData.namaPelanggan || ""
+      };
 
-          // Print — DISABLED sementara: printer belum ada, screenshot jadi pengganti.
-          // Re-enable: uncomment baris window.print() di bawah.
-          // window.print();
-        } else {
-          // Server returned failure
-          handlePrintError(response.error || "Gagal menyimpan nota");
-        }
+      fetch(MORODUIT_CONFIG.APPS_SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain" },
+        body: JSON.stringify(payload)
       })
-      .catch(function (err) {
-        handlePrintError("Gagal menghubungi server. Periksa koneksi internet.");
-        console.error("Print fetch error:", err);
-      });
+        .then(function (res) { return res.json(); })
+        .then(function (response) {
+          if (response.success && response.tanggal) {
+            // Update display with real Tanggal
+            tanggalEl.textContent = response.tanggal;
+
+            // Remove from sessionStorage (prevent double-submit)
+            sessionStorage.removeItem("moroduit_keranjang");
+
+            // Step 3a: Auto-download PNG to device
+            var safeNoNota = response.noNota
+              ? String(response.noNota).replace(/[^A-Za-z0-9_-]/g, "-")
+              : null;
+            var filename = safeNoNota
+              ? "nota-" + safeNoNota + ".png"
+              : "nota.png";
+            var a = document.createElement("a");
+            a.href = dataURL;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+
+            // Step 3b: Redirect to WhatsApp (location.href = same tab, no popup blocker)
+            var noWA = MORODUIT_CONFIG.NOMOR_WA_TOKO.replace(/[^0-9]/g, "");
+            var totalFormatted = formatRupiah(keranjangData.total);
+            var ringkasan = "No Nota: " + (response.noNota || "-")
+              + ", Total: " + totalFormatted
+              + ". Mohon lampirkan foto nota yang baru terunduh.";
+            location.href = "https://wa.me/" + noWA
+              + "?text=" + encodeURIComponent(ringkasan);
+          } else {
+            // Server returned failure
+            handlePrintError(response.error || "Gagal menyimpan nota");
+          }
+        })
+        .catch(function (err) {
+          handlePrintError("Gagal menghubungi server. Periksa koneksi internet.");
+          console.error("Print fetch error:", err);
+        });
+
+    }).catch(function (err) {
+      notaEl.style.boxShadow = savedShadow;
+      console.error("html2canvas render failed:", err);
+      handlePrintError("Gagal membuat screenshot nota.");
+    });
   });
 
   function handlePrintError(message) {
@@ -149,7 +181,7 @@
 
   function resetPrintBtn() {
     printBtn.disabled = false;
-    printBtn.textContent = "🖨️ Print & Simpan Nota";
+    printBtn.textContent = "🛒 Kirim Pesanan";
   }
 
   // ── Screenshot & auto-download nota ──────────────────────────────

@@ -6,6 +6,13 @@
 (function () {
   "use strict";
 
+  // ── Set WA link from config ──────────────────────────────────────
+  var waLink = document.getElementById("waLink");
+  if (waLink && MORODUIT_CONFIG && MORODUIT_CONFIG.NOMOR_WA_TOKO) {
+    var noWA = MORODUIT_CONFIG.NOMOR_WA_TOKO.replace(/[^0-9]/g, "");
+    waLink.href = "https://wa.me/" + noWA + "?text=" + encodeURIComponent("Halo Rofi, saya ingin bertanya tentang Belanja Online MoroDuit. ");
+  }
+
   // ── DOM refs ───────────────────────────────────────────────────────
   var section = document.getElementById("produkFavoritSection");
   var loading = document.getElementById("loadingPerkenalan");
