@@ -271,6 +271,16 @@ function doPost(e) {
       "=IFERROR(D" + row + "*(1+VLOOKUP(C" + row + ";$K$2:$L$100;2;FALSE));D" + row + ")"
     );
 
+    // ── Kolom I (Profit per Item) ──
+    sheet.getRange(row, 9).setFormula(
+      "=F" + row + "-D" + row + ""
+    );
+
+    // ── Kolom M (Turun Berapa Persen -> Normal) ──
+    sheet.getRange(row, 13).setFormula(
+      "=IF(E" + row + "=\"\";\"\";(E" + row + "-D" + row + ")/D" + row + ")"
+    );
+
     return jsonResponse_({success: true});
   }
 
