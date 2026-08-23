@@ -105,10 +105,26 @@
     html2canvas(notaEl).then(function (canvas) {
       notaEl.style.boxShadow = savedShadow;
 
-      // Generate data URL while still in gesture context
+      // Generate data URL while still in user-gesture context
       var dataURL = canvas.toDataURL("image/png");
 
-      // Step 2: POST simpanRiwayat — payload, timing, logic UNCHANGED
+      // ── Step 1: Auto-download PNG IMMEDIATELY (1-level nesting) ──
+      // This must happen in the SAME .then() as toDataURL, BEFORE fetch(),
+      // so iOS Safari/Chrome retains the "trusted user gesture" for
+      // programmatic download. (Same pattern as Tempura/Wonton proven on iPhone.)
+      var a = document.createElement("a");
+      a.href = dataURL;
+      a.download = "nota.png";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+
+      // ── Step 2: POST simpanRiwayat AFTER download triggered ──
+      // Download already fired (synchronous a.click()), now save to server.
+      // TRADE-OFF: If fetch fails, the PNG is already downloaded but the
+      // order is NOT saved to Riwayat. User sees error "Gagal menghubungi
+      // server...". This is intentional — fixing the iOS download bug takes
+      // priority over atomicity.
       var payload = {
         action: "simpanRiwayat",
         token: MORODUIT_CONFIG.TOKEN,
@@ -131,21 +147,7 @@
             // Remove from sessionStorage (prevent double-submit)
             sessionStorage.removeItem("moroduit_keranjang");
 
-            // Step 3a: Auto-download PNG to device
-            var safeNoNota = response.noNota
-              ? String(response.noNota).replace(/[^A-Za-z0-9_-]/g, "-")
-              : null;
-            var filename = safeNoNota
-              ? "nota-" + safeNoNota + ".png"
-              : "nota.png";
-            var a = document.createElement("a");
-            a.href = dataURL;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-
-            // Step 3b: Redirect to WhatsApp (location.href = same tab, no popup blocker)
+            // Redirect to WhatsApp (location.href = same tab, no popup blocker)
             var noWA = MORODUIT_CONFIG.NOMOR_WA_TOKO.replace(/[^0-9]/g, "");
             var totalFormatted = formatRupiah(keranjangData.total);
             var ringkasan = "No Nota: " + (response.noNota || "-")

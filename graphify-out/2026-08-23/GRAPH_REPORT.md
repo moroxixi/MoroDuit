@@ -1,16 +1,16 @@
 # Graph Report - MoroDuit  (2026-08-23)
 
 ## Corpus Check
-- 11 files · ~15,193 words
+- 12 files · ~17,928 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 180 nodes · 228 edges · 23 communities (16 shown, 7 thin omitted)
-- Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 6 edges (avg confidence: 0.5)
+- 206 nodes · 253 edges · 24 communities (17 shown, 7 thin omitted)
+- Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 6 edges (avg confidence: 0.5)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `f49376fc`
+- Built from commit: `b3739909`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -35,18 +35,19 @@
 - Lr
 - Perkenalan/script.js
 - DISCOVERY: Harga Jual & Priview Mobile — MoroDuit
+- DISCOVERY: Priview Mobile Download Failure & Baseline Spacing Tempura/Wonton
 
 ## God Nodes (most connected - your core abstractions)
 1. `MoroDuit — Rencana Proyek & Task Roadmap` - 10 edges
 2. `DISCOVERY: Harga Jual & Priview Mobile — MoroDuit` - 9 edges
-3. `doPost()` - 6 edges
-4. `renderProdukList()` - 6 edges
-5. `wA()` - 6 edges
-6. `renderProdukList()` - 6 edges
-7. `loadKatalog()` - 5 edges
-8. `1. Struktur Google Sheet & Tab "Riwayat"` - 5 edges
-9. `2. `doPost()` dan `doGet()` di `code.gs.js`` - 5 edges
-10. `doGet()` - 4 edges
+3. `DISCOVERY: Priview Mobile Download Failure & Baseline Spacing Tempura/Wonton` - 7 edges
+4. `doPost()` - 6 edges
+5. `renderProdukList()` - 6 edges
+6. `wA()` - 6 edges
+7. `renderProdukList()` - 6 edges
+8. `loadKatalog()` - 5 edges
+9. `1. Struktur Google Sheet & Tab "Riwayat"` - 5 edges
+10. `2. `doPost()` dan `doGet()` di `code.gs.js`` - 5 edges
 
 ## Surprising Connections (you probably didn't know these)
 - None detected - all connections are within the same source files.
@@ -54,7 +55,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (23 total, 7 thin omitted)
+## Communities (24 total, 7 thin omitted)
 
 ### Community 0 - "MoroDuit — Rencana Proyek & Task Roadmap"
 Cohesion: 0.15
@@ -108,19 +109,23 @@ Nodes (3): escapeHtml(), formatRupiah(), loadProdukPerkenalan()
 Cohesion: 0.07
 Nodes (26): 1.1 Semua Referensi Nama Sheet di `Apps-Script/code.gs.js`, 1.2 Konfirmasi Tab "Riwayat", 1.3 Formula Kalkulasi Margin di Tab Riwayat (POLA ACUAN), 1.4 Kapan Margin Disimpan sebagai NILAI FINAL vs FORMULA, 1. Struktur Google Sheet & Tab "Riwayat", 2.1 `doGet()` — Lengkap, 2.2 `doPost()` — Lengkap, 2.3 Kolom Katalog — Harga Normal vs Harga Jual vs Formula (+18 more)
 
+### Community 23 - "DISCOVERY: Priview Mobile Download Failure & Baseline Spacing Tempura/Wonton"
+Cohesion: 0.08
+Nodes (25): 1.1 File yang Diperiksa, 1.2 Analisis Lebar Elemen & Potensi Overflow, 1.3 Mekanisme Download PNG Saat Ini, 1.4 Catatan Tambahan: `captureAndDownloadNota()`, 1. State Priview MoroDuit Saat Ini (Post-Edit), 2.1 File Diperiksa, 2.2 Kode Download Persis, 2.3 Library (+17 more)
+
 ## Knowledge Gaps
-- **31 isolated node(s):** `MoroDuit-push.sh script`, `1.1 Semua Referensi Nama Sheet di `Apps-Script/code.gs.js``, `1.2 Konfirmasi Tab "Riwayat"`, `1.3 Formula Kalkulasi Margin di Tab Riwayat (POLA ACUAN)`, `1.4 Kapan Margin Disimpan sebagai NILAI FINAL vs FORMULA` (+26 more)
+- **50 isolated node(s):** `MoroDuit-push.sh script`, `1.1 Semua Referensi Nama Sheet di `Apps-Script/code.gs.js``, `1.2 Konfirmasi Tab "Riwayat"`, `1.3 Formula Kalkulasi Margin di Tab Riwayat (POLA ACUAN)`, `1.4 Kapan Margin Disimpan sebagai NILAI FINAL vs FORMULA` (+45 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **7 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Are the 2 inferred relationships involving `wA()` (e.g. with `B()` and `t()`) actually correct?**
-  _`wA()` has 2 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `MoroDuit-push.sh script`, `1.1 Semua Referensi Nama Sheet di `Apps-Script/code.gs.js``, `1.2 Konfirmasi Tab "Riwayat"` to the rest of the system?**
-  _31 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _50 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `html2canvas.min.js` be split into smaller, more focused modules?**
   _Cohesion score 0.037037037037037035 - nodes in this community are weakly interconnected._
 - **Should `DISCOVERY: Harga Jual & Priview Mobile — MoroDuit` be split into smaller, more focused modules?**
   _Cohesion score 0.07407407407407407 - nodes in this community are weakly interconnected._
+- **Should `DISCOVERY: Priview Mobile Download Failure & Baseline Spacing Tempura/Wonton` be split into smaller, more focused modules?**
+  _Cohesion score 0.07692307692307693 - nodes in this community are weakly interconnected._

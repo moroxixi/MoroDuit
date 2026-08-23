@@ -1,4 +1,4 @@
-# Folder Tree (17 files tracked)
+# Folder Tree (18 files tracked)
 
 > Auto-generated dari manifest.json — jangan edit manual. Regenerate: gen-folder-tree.py <path-manifest.json>
 
@@ -13,6 +13,8 @@
 │   └── script.js
 ├── Keranjang-Duit/
 │   ├── Priview/
+│   │   ├── test-results/
+│   │   │   └── .last-run.json
 │   │   ├── vendor/
 │   │   │   └── html2canvas/
 │   │   │       └── html2canvas.min.js
