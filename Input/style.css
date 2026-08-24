@@ -102,7 +102,7 @@ main {
 .form-group select {
   width: 100%;
   padding: 0.5rem 0.75rem;
-  font-size: 0.875rem;
+  font-size: 1rem;
   border: 2px solid #bdbdbd;
   border-radius: 8px;
   background-color: #ffffff;
@@ -119,7 +119,7 @@ main {
 
 .form-group input::placeholder {
   color: #999999;
-  font-size: 0.875rem;
+  font-size: 1rem;
 }
 
 /* ── Filter Bar (search + kategori dropdown) ──────────────────────── */
@@ -127,7 +127,7 @@ main {
 .filter-bar select {
   width: 100%;
   padding: 0.5rem 0.75rem;
-  font-size: 0.875rem;
+  font-size: 1rem;
   border: 2px solid #bdbdbd;
   border-radius: 8px;
   background-color: #ffffff;
@@ -144,7 +144,7 @@ main {
 
 .filter-bar input::placeholder {
   color: #999999;
-  font-size: 0.875rem;
+  font-size: 1rem;
 }
 
 .hint {
@@ -181,8 +181,8 @@ main {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2rem;
-  height: 2rem;
+  width: 2.75rem;
+  height: 2.75rem;
   border: 2px solid #bdbdbd;
   border-radius: 6px;
   background-color: #ffffff;
