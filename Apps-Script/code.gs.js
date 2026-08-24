@@ -74,6 +74,21 @@ function findProdukRow_(sheet, produk) {
   return -1;
 }
 
+// ── Helper: Cari baris Riwayat berdasarkan No Nota ─────────────────────
+// Mengembalikan array nomor baris (1-indexed), kosong [] jika tidak ketemu.
+// PERHATIAN: operasi ini mendukung repushRiwayat — JANGAN panggil dari
+// fungsi yang tidak memerlukan pencarian baris Riwayat.
+function findRiwayatRows_(sheet, noNota) {
+  var data = sheet.getDataRange().getValues();
+  var rows = [];
+  for (var i = 1; i < data.length; i++) {
+    if (String(data[i][0]) === noNota) {
+      rows.push(i + 1); // 1-indexed
+    }
+  }
+  return rows;
+}
+
 // ── Helper: Generate No Nota ──────────────────────────────────────────
 // Format: MD-YYYYMMDD-XXX (timezone WIB / Asia/Jakarta)
 function generateNoNota_() {
@@ -369,6 +384,91 @@ function doPost(e) {
     }
 
     return jsonResponse_({success: true, noNota: noNota, tanggal: tanggal});
+  }
+
+  // ── repushRiwayat ──
+  // Update transaksi existing: hapus baris lama berdasarkan noNota,
+  // tulis ulang dengan data baru + tanggal baru.
+  // KRUSIAL: operasi DESTRUCTIVE — hapus baris lama sebelum tulis baru.
+  if (action === "repushRiwayat") {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = ss.getSheetByName("Riwayat");
+
+    var noNota = String(body.noNota || "").trim();
+    if (!noNota) {
+      return jsonResponse_({success: false, error: "noNota wajib diisi"});
+    }
+
+    // Validasi format noNota: MD-YYYYMMDD-XXX
+    if (!/^MD-\d{8}-\d{3}$/.test(noNota)) {
+      return jsonResponse_({success: false, error: "Format noNota tidak valid, harus MD-YYYYMMDD-XXX"});
+    }
+
+    var items = body.items || [];
+    var total = body.total;
+    var namaPelanggan = body.namaPelanggan || "";
+
+    if (items.length === 0) {
+      return jsonResponse_({success: false, error: "items tidak boleh kosong"});
+    }
+
+    // ── Cari baris existing ──
+    var existingRows = findRiwayatRows_(sheet, noNota);
+    if (existingRows.length === 0) {
+      return jsonResponse_({success: false, error: "No Nota tidak ditemukan, tidak bisa di-repush"});
+    }
+
+    var rowsDeleted = existingRows.length;
+
+    // ── Hapus baris existing (dari row TERBESAR ke TERKECIL) ──
+    // Agar index baris di bawahnya tidak bergeser saat delete berjalan.
+    existingRows.sort(function (a, b) { return b - a; });
+    for (var d = 0; d < existingRows.length; d++) {
+      sheet.deleteRows(existingRows[d], 1);
+    }
+
+    // ── Tulis baris baru dengan noNota YANG SAMA + tanggal BARU ──
+    var tanggal = Utilities.formatDate(new Date(), "Asia/Jakarta", "yyyy-MM-dd HH:mm:ss");
+
+    var rows = [];
+    for (var i = 0; i < items.length; i++) {
+      var item = items[i];
+      rows.push([
+        noNota,
+        namaPelanggan,
+        tanggal,
+        item.produk,
+        item.qty,
+        item.hargaSatuan,
+        item.subtotal,
+        total
+      ]);
+    }
+
+    if (rows.length > 0) {
+      var startRow = sheet.getLastRow() + 1;
+      sheet.getRange(startRow, 1, rows.length, 8).setValues(rows);
+
+      // ── Auto-fill formula kolom I (Harga Normal) & J (Profit per baris) ──
+      // REUSE pola yang SAMA dengan simpanRiwayat.
+      var formulasI = [];
+      var formulasJ = [];
+      for (var f = 0; f < rows.length; f++) {
+        var r = startRow + f;
+        formulasI.push(["=IFERROR(VLOOKUP(D" + r + ";Katalog!$B:$D;3;FALSE);\"\")"]);
+        formulasJ.push(["=IF(I" + r + "=\"\";\"\";G" + r + "-(I" + r + "*E" + r + "))"]);
+      }
+      sheet.getRange(startRow, 9, rows.length, 1).setFormulas(formulasI);
+      sheet.getRange(startRow, 10, rows.length, 1).setFormulas(formulasJ);
+    }
+
+    return jsonResponse_({
+      success: true,
+      noNota: noNota,
+      tanggal: tanggal,
+      rowsDeleted: rowsDeleted,
+      rowsWritten: rows.length
+    });
   }
 
   return jsonResponse_({success: false, error: "unknown action"});

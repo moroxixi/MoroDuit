@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MoroDuit — Nota Edit</title>
+  <link rel="stylesheet" href="../../style.css">
+  <style>
+    /* ── Priview Mode-Edit overrides ───────────────────────────────── */
+    .nota-container { padding: 0; }
+    .nota-container.hidden { display: none; }
+
+    .nota {
+      background-color: #ffffff;
+      border: 2px solid #2e7d32;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      overflow-x: auto;
+    }
+
+    .nota-header { margin-bottom: 1rem; }
+
+    .nota-toko {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #2e7d32;
+      text-align: center;
+      margin-bottom: 0.75rem;
+    }
+
+    .nota-edit-badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: #ffffff;
+      background-color: #ff9800;
+      border-radius: 4px;
+      padding: 0.15rem 0.5rem;
+      margin-left: 0.35rem;
+      vertical-align: middle;
+    }
+
+    .nota-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.15rem 0;
+    }
+
+    .nota-label {
+      font-size: 0.85rem;
+      color: #666666;
+    }
+
+    .nota-value {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #1a1a1a;
+    }
+
+    .nota-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1rem;
+    }
+
+    .nota-table th,
+    .nota-table td {
+      padding: 0.6rem 0.75rem;
+      font-size: 0.85rem;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .nota-table th {
+      background-color: #f1f8e9;
+      font-weight: 700;
+      color: #1a1a1a;
+      text-align: left;
+    }
+
+    .nota-table td.col-no,
+    .nota-table td.col-qty { text-align: center; }
+    .nota-table td.col-harga,
+    .nota-table td.col-subtotal { text-align: right; white-space: nowrap; }
+
+    .nota-table tfoot td {
+      font-weight: 700;
+      border-top: 2px solid #2e7d32;
+      padding-top: 0.75rem;
+    }
+
+    .nota-footer {
+      text-align: center;
+      font-size: 0.8rem;
+      color: #666666;
+      margin-top: 0.5rem;
+    }
+
+    /* ── Actions ────────────────────────────────────────────────────── */
+    .nota-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    .nota-actions .btn {
+      flex: 1;
+      min-width: 140px;
+      text-align: center;
+    }
+
+    .btn {
+      padding: 0.75rem 1rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.2s, transform 0.1s;
+      min-height: 48px;
+      white-space: nowrap;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn:active:not(:disabled) { transform: scale(0.97); }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .btn-sheet { background-color: #1565c0; color: #ffffff; }
+    .btn-sheet:hover { background-color: #0d47a1; }
+    .btn-primary { background-color: #2e7d32; color: #ffffff; }
+    .btn-primary:hover { background-color: #1b5e20; }
+    .btn-wa { background-color: #25d366; color: #ffffff; }
+    .btn-wa:hover { background-color: #1da851; }
+    .btn-secondary { background-color: #ffffff; color: #1a1a1a; border: 2px solid #bdbdbd; }
+    .btn-secondary:hover { background-color: #f5f5f5; }
+
+    /* ── Status message ─────────────────────────────────────────────── */
+    .status-message {
+      padding: 0.75rem 1rem;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-top: 0.75rem;
+      text-align: center;
+    }
+    .status-message.hidden { display: none; }
+    .status-message.success { background-color: #e8f5e9; color: #1b5e20; border: 2px solid #2e7d32; }
+    .status-message.error { background-color: #ffebee; color: #c62828; border: 2px solid #c62828; }
+
+    /* ── Error state ──────────────────────────────────────────────── */
+    .error-state { text-align: center; padding: 2rem 1rem; }
+    .error-state.hidden { display: none; }
+    .error-icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+    .error-text { font-size: 0.95rem; color: #666666; margin-bottom: 1rem; }
+    .error-link {
+      display: inline-block;
+      padding: 0.75rem 1.25rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #ffffff;
+      background-color: #2e7d32;
+      border-radius: 10px;
+      text-decoration: none;
+    }
+    .error-link:hover { background-color: #1b5e20; }
+
+    /* ── Main layout ────────────────────────────────────────────────── */
+    main { max-width: 700px; margin: 0 auto; }
+    body { padding: 1rem; font-family: "Segoe UI", "Noto Sans", Arial, sans-serif; color: #1a1a1a; background-color: #f5f0e8; }
+
+    /* ── Mobile ────────────────────────────────────────────────────── */
+    @media (max-width: 520px) {
+      .nota { padding: 1rem; }
+      .nota-actions { flex-direction: column; }
+      .nota-actions .btn { min-width: 0; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <!-- Error state (shown if no data) -->
+    <div id="errorState" class="error-state hidden">
+      <div class="error-icon">📋</div>
+      <p class="error-text" id="errorText">Tidak ada data edit.</p>
+      <a href="../index.html" class="error-link">← Kembali ke Edit</a>
+    </div>
+
+    <!-- Nota -->
+    <div id="notaContainer" class="nota-container hidden">
+      <div class="nota" id="nota">
+        <!-- Nota Header -->
+        <div class="nota-header">
+          <h1 class="nota-toko">Toko Sembako Online Moro Duit <span class="nota-edit-badge">EDIT</span></h1>
+          <div class="nota-meta">
+            <div class="nota-row">
+              <span class="nota-label">No Nota:</span>
+              <span class="nota-value" id="displayNoNota">-</span>
+            </div>
+            <div class="nota-row">
+              <span class="nota-label">Nama Pelanggan:</span>
+              <span class="nota-value" id="namaPelanggan">-</span>
+            </div>
+            <div class="nota-row">
+              <span class="nota-label">Tanggal:</span>
+              <span class="nota-value" id="tanggal">—</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Nota Items -->
+        <table class="nota-table">
+          <thead>
+            <tr>
+              <th class="col-no">No</th>
+              <th class="col-produk">Produk</th>
+              <th class="col-qty">Qty</th>
+              <th class="col-harga">Harga Satuan</th>
+              <th class="col-subtotal">Subtotal</th>
+            </tr>
+          </thead>
+          <tbody id="notaItems"></tbody>
+          <tfoot>
+            <tr>
+              <td colspan="4" class="total-label">Total Nota</td>
+              <td class="total-value" id="totalValue">Rp 0</td>
+            </tr>
+          </tfoot>
+        </table>
+
+        <!-- Nota Footer -->
+        <div class="nota-footer">
+          <p>Terima kasih sudah belanja di Moro Duit! 🙏</p>
+        </div>
+      </div>
+
+      <!-- Action buttons -->
+      <div class="nota-actions" id="notaActions">
+        <button id="btnSimpanSheet" class="btn btn-sheet">
+          📊 Simpan ke Sheet
+        </button>
+        <button id="btnDownloadNota" class="btn btn-primary">
+          📥 Download Gambar Nota
+        </button>
+        <a id="btnKirimWA" class="btn btn-wa" href="#" target="_blank" rel="noopener noreferrer">
+          💬 Kirim ke WhatsApp
+        </a>
+        <button id="batalBtn" class="btn btn-secondary">
+          ❌ Batal / Kembali
+        </button>
+      </div>
+    </div>
+
+    <!-- Status message -->
+    <div id="statusMessage" class="status-message hidden" role="alert" aria-live="polite"></div>
+  </main>
+
+  <script src="../../../config.js"></script>
+  <script src="vendor/html2canvas/html2canvas.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

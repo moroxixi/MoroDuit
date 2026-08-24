@@ -1,16 +1,16 @@
 # Graph Report - MoroDuit  (2026-08-24)
 
 ## Corpus Check
-- 15 files · ~22,662 words
+- 16 files · ~25,014 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 271 nodes · 330 edges · 28 communities (21 shown, 7 thin omitted)
-- Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 7 edges (avg confidence: 0.5)
+- 288 nodes · 361 edges · 29 communities (22 shown, 7 thin omitted)
+- Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 8 edges (avg confidence: 0.5)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `cbfc6a08`
+- Built from commit: `83c1b8a9`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -37,9 +37,10 @@
 - DISCOVERY: Harga Jual & Priview Mobile — MoroDuit
 - DISCOVERY: Priview Mobile Download Failure & Baseline Spacing Tempura/Wonton
 - DISCOVERY: Mekanisme Riwayat, Mode-Edit & Repush — MoroDuit
-- 4. Alur `doGet()` Lengkap Saat Ini
-- 8. Mekanisme `initWhatsAppLink()` dan `renderNota()` di Priview
+- Mode-Edit/script.js
+- 10. Ringkasan Akhir: `doPost()` — Append-Only atau Sudah Support Update?
 - Riwayat/script.js
+- 3. Alur `doPost()` Lengkap Saat Ini
 
 ## God Nodes (most connected - your core abstractions)
 1. `DISCOVERY: Mekanisme Riwayat, Mode-Edit & Repush — MoroDuit` - 12 edges
@@ -51,7 +52,7 @@
 7. `doPost()` - 6 edges
 8. `renderProdukList()` - 6 edges
 9. `wA()` - 6 edges
-10. `renderRiwayat()` - 6 edges
+10. `recalcAndRender()` - 6 edges
 
 ## Surprising Connections (you probably didn't know these)
 - None detected - all connections are within the same source files.
@@ -59,7 +60,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (28 total, 7 thin omitted)
+## Communities (29 total, 7 thin omitted)
 
 ### Community 0 - "MoroDuit — Rencana Proyek & Task Roadmap"
 Cohesion: 0.15
@@ -119,19 +120,23 @@ Nodes (25): 1.1 File yang Diperiksa, 1.2 Analisis Lebar Elemen & Potensi Overflo
 
 ### Community 24 - "DISCOVERY: Mekanisme Riwayat, Mode-Edit & Repush — MoroDuit"
 Cohesion: 0.05
-Nodes (40): 10.1 Status Saat Ini: MURNI APPEND-ONLY untuk Riwayat, 10.2 Perbandingan: `updateProduk` Sudah Punya Pola Update, 10.3 Kesenjangan untuk Fitur Mode-Edit + Repush, 10.4 Status God Node (untuk Referensi Task Lanjutan), 10. Ringkasan Akhir: `doPost()` — Append-Only atau Sudah Support Update?, 1.1 Header yang Didefinisikan oleh `ensureHeaders_()`, 1.2 Kolom Lengkap (termasuk kolom formula yang di-auto-fill oleh `simpanRiwayat`), 1.3 Formula Kolom I & J (auto-fill) (+32 more)
+Nodes (41): 1.1 Header yang Didefinisikan oleh `ensureHeaders_()`, 1.2 Kolom Lengkap (termasuk kolom formula yang di-auto-fill oleh `simpanRiwayat`), 1.3 Formula Kolom I & J (auto-fill), 1.4 Catatan: Satu Baris = Satu Item, 1. Struktur Sheet "Riwayat" — Kolom Persis & Tipe Data, 2.1 Format, 2.2 Mekanisme Hitung Sequence, 2.3 Potensi Dipakai sebagai Identifier Cari Baris (+33 more)
 
-### Community 25 - "4. Alur `doGet()` Lengkap Saat Ini"
-Cohesion: 0.33
-Nodes (6): 4.1 Struktur Umum, 4.2 Action: `getKatalog`, 4.3 Action: `getKatalogFull`, 4.4 Action: `getKatalogPerkenalan`, 4.5 Yang BELUM Ada di `doGet()`, 4. Alur `doGet()` Lengkap Saat Ini
+### Community 25 - "Mode-Edit/script.js"
+Cohesion: 0.23
+Nodes (13): attachItemListeners(), escapeHtml(), formatRupiah(), handleAddProduct(), handleLanjut(), init(), loadKatalog(), recalcAndRender() (+5 more)
 
-### Community 26 - "8. Mekanisme `initWhatsAppLink()` dan `renderNota()` di Priview"
+### Community 26 - "10. Ringkasan Akhir: `doPost()` — Append-Only atau Sudah Support Update?"
 Cohesion: 0.40
-Nodes (5): 8.1 `initWhatsAppLink()` — Generate Link WA, 8.2 Kapan Link WA Di-update, 8.3 `renderNota()` — Render Tabel Nota, 8.4 Replikasi untuk Mode-Edit Priview, 8. Mekanisme `initWhatsAppLink()` dan `renderNota()` di Priview
+Nodes (5): 10.1 Status Saat Ini: MURNI APPEND-ONLY untuk Riwayat, 10.2 Perbandingan: `updateProduk` Sudah Punya Pola Update, 10.3 Kesenjangan untuk Fitur Mode-Edit + Repush, 10.4 Status God Node (untuk Referensi Task Lanjutan), 10. Ringkasan Akhir: `doPost()` — Append-Only atau Sudah Support Update?
 
 ### Community 27 - "Riwayat/script.js"
 Cohesion: 0.40
 Nodes (9): escapeHtml(), formatRupiah(), formatTanggalIndo(), groupByNoNota(), handleCardClick(), hideStatus(), loadRiwayat(), renderRiwayat() (+1 more)
+
+### Community 28 - "3. Alur `doPost()` Lengkap Saat Ini"
+Cohesion: 0.40
+Nodes (5): 3.1 Struktur Umum, 3.2 Action: `updateProduk`, 3.3 Action: `simpanRiwayat`, 3.4 Ringkasan Validasi, 3. Alur `doPost()` Lengkap Saat Ini
 
 ## Knowledge Gaps
 - **90 isolated node(s):** `MoroDuit-push.sh script`, `1.1 Semua Referensi Nama Sheet di `Apps-Script/code.gs.js``, `1.2 Konfirmasi Tab "Riwayat"`, `1.3 Formula Kalkulasi Margin di Tab Riwayat (POLA ACUAN)`, `1.4 Kapan Margin Disimpan sebagai NILAI FINAL vs FORMULA` (+85 more)
@@ -141,8 +146,8 @@ Nodes (9): escapeHtml(), formatRupiah(), formatTanggalIndo(), groupByNoNota(), h
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `DISCOVERY: Mekanisme Riwayat, Mode-Edit & Repush — MoroDuit` connect `DISCOVERY: Mekanisme Riwayat, Mode-Edit & Repush — MoroDuit` to `4. Alur `doGet()` Lengkap Saat Ini`, `8. Mekanisme `initWhatsAppLink()` dan `renderNota()` di Priview`?**
-  _High betweenness centrality (0.032) - this node is a cross-community bridge._
+- **Why does `DISCOVERY: Mekanisme Riwayat, Mode-Edit & Repush — MoroDuit` connect `DISCOVERY: Mekanisme Riwayat, Mode-Edit & Repush — MoroDuit` to `10. Ringkasan Akhir: `doPost()` — Append-Only atau Sudah Support Update?`, `3. Alur `doPost()` Lengkap Saat Ini`?**
+  _High betweenness centrality (0.029) - this node is a cross-community bridge._
 - **What connects `MoroDuit-push.sh script`, `1.1 Semua Referensi Nama Sheet di `Apps-Script/code.gs.js``, `1.2 Konfirmasi Tab "Riwayat"` to the rest of the system?**
   _90 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `html2canvas.min.js` be split into smaller, more focused modules?**
@@ -152,4 +157,4 @@ _Questions this graph is uniquely positioned to answer:_
 - **Should `DISCOVERY: Priview Mobile Download Failure & Baseline Spacing Tempura/Wonton` be split into smaller, more focused modules?**
   _Cohesion score 0.07692307692307693 - nodes in this community are weakly interconnected._
 - **Should `DISCOVERY: Mekanisme Riwayat, Mode-Edit & Repush — MoroDuit` be split into smaller, more focused modules?**
-  _Cohesion score 0.04878048780487805 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.047619047619047616 - nodes in this community are weakly interconnected._

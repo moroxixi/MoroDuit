@@ -1,7 +1,7 @@
 {
   "Apps-Script/code.gs.js": {
-    "mtime": 1787580280.4553435,
-    "ast_hash": "bfe926aac255dd291a48ce49d0c5db99",
+    "mtime": 1787580981.6186879,
+    "ast_hash": "634ebb16a97f2a63eddbcff672e632a0",
     "semantic_hash": ""
   },
   "Input/script.js": {
@@ -112,6 +112,21 @@
   "Riwayat/Mode-Edit/index.html": {
     "mtime": 1787580729.5220172,
     "ast_hash": "6b393386e50fa9455c23a266944d4bc5",
+    "semantic_hash": ""
+  },
+  "Riwayat/Mode-Edit/Priview/script.js": {
+    "mtime": 1787581109.3053565,
+    "ast_hash": "ad5973ec4459365a0fcd0aeed0fae06e",
+    "semantic_hash": ""
+  },
+  "Riwayat/Mode-Edit/Priview/vendor/html2canvas/html2canvas.min.js": {
+    "mtime": 1787580993.8388329,
+    "ast_hash": "d7530aa0b7587e627484c49fdf8f13f2",
+    "semantic_hash": ""
+  },
+  "Riwayat/Mode-Edit/Priview/index.html": {
+    "mtime": 1787581051.768689,
+    "ast_hash": "fe82d53687659523d61645517db2bdfd",
     "semantic_hash": ""
   }
 }
