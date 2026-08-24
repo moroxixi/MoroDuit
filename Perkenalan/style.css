@@ -14,12 +14,12 @@
 }
 
 html {
-  font-size: 18px;
+  font-size: 16px;
 }
 
 body {
   font-family: "Segoe UI", "Noto Sans", Arial, sans-serif;
-  font-size: 1.125rem;
+  font-size: 1rem;
   line-height: 1.65;
   color: #1a1a1a;
   background: linear-gradient(170deg, #f5f0e8 0%, #eef7eb 100%);
@@ -44,18 +44,18 @@ a {
 }
 
 .hero-icon {
-  font-size: 3rem;
+  font-size: 2.25rem;
   margin-bottom: 0.5rem;
 }
 
 .hero h1 {
-  font-size: 1.75rem;
+  font-size: 1.25rem;
   font-weight: 700;
   margin-bottom: 0.75rem;
 }
 
 .hero-sub {
-  font-size: 1.15rem;
+  font-size: 0.9rem;
   line-height: 1.7;
   opacity: 0.95;
   max-width: 480px;
@@ -63,7 +63,7 @@ a {
 }
 
 .hero-owner {
-  font-size: 1rem;
+  font-size: 0.85rem;
   opacity: 0.85;
   margin-top: 0.5rem;
 }
@@ -80,7 +80,7 @@ main {
 }
 
 .steps h2 {
-  font-size: 1.5rem;
+  font-size: 1.1rem;
   font-weight: 700;
   color: #1a1a1a;
   margin-bottom: 1rem;
@@ -118,21 +118,21 @@ main {
   height: 2.5rem;
   background-color: #2e7d32;
   color: #ffffff;
-  font-size: 1.25rem;
+  font-size: 1rem;
   font-weight: 700;
   border-radius: 50%;
   flex-shrink: 0;
 }
 
 .steps-list li strong {
-  font-size: 1.2rem;
+  font-size: 0.95rem;
   display: block;
   margin-bottom: 0.2rem;
   color: #1a1a1a;
 }
 
 .steps-list li p {
-  font-size: 1.05rem;
+  font-size: 0.85rem;
   color: #444444;
   line-height: 1.5;
 }
@@ -157,21 +157,21 @@ main {
 }
 
 .badge-icon {
-  font-size: 1.75rem;
+  font-size: 1.35rem;
   flex-shrink: 0;
   line-height: 1;
   margin-top: 0.15rem;
 }
 
 .badge strong {
-  font-size: 1.1rem;
+  font-size: 0.9rem;
   display: block;
   margin-bottom: 0.15rem;
   color: #1a1a1a;
 }
 
 .badge p {
-  font-size: 1rem;
+  font-size: 0.85rem;
   color: #555555;
   line-height: 1.45;
 }
@@ -189,7 +189,7 @@ main {
   gap: 0.5rem;
   padding: 1rem 2.5rem;
   min-height: 56px;
-  font-size: 1.35rem;
+  font-size: 1rem;
   font-weight: 700;
   color: #ffffff;
   background-color: #2e7d32;
@@ -222,7 +222,7 @@ main {
 }
 
 .produk-favorit-section h2 {
-  font-size: 1.5rem;
+  font-size: 1.1rem;
   font-weight: 700;
   color: #1a1a1a;
   margin-bottom: 0.25rem;
@@ -230,7 +230,7 @@ main {
 }
 
 .produk-favorit-sub {
-  font-size: 1.05rem;
+  font-size: 0.85rem;
   color: #555555;
   margin-bottom: 1rem;
   padding-left: 0.25rem;
@@ -240,7 +240,7 @@ main {
   text-align: center;
   padding: 1rem;
   color: #2e7d32;
-  font-size: 1.1rem;
+  font-size: 0.85rem;
   font-weight: 600;
 }
 
@@ -266,13 +266,13 @@ main {
 }
 
 .produk-favorit-nama {
-  font-size: 1.15rem;
+  font-size: 0.9rem;
   font-weight: 600;
   color: #1a1a1a;
 }
 
 .produk-favorit-harga {
-  font-size: 1.15rem;
+  font-size: 0.9rem;
   font-weight: 700;
   color: #2e7d32;
   white-space: nowrap;
@@ -304,7 +304,7 @@ button:focus-visible {
   }
 
   .hero h1 {
-    font-size: 1.5rem;
+    font-size: 1.1rem;
   }
 
   .steps-list li {
@@ -314,7 +314,7 @@ button:focus-visible {
   .cta-btn {
     width: 100%;
     padding: 1rem 1.5rem;
-    font-size: 1.25rem;
+    font-size: 0.95rem;
   }
 }
 
