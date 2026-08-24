@@ -1,7 +1,7 @@
 {
   "Apps-Script/code.gs.js": {
-    "mtime": 1787564541.2917483,
-    "ast_hash": "d3a70c11e14fca3f88af25dcb14b3e9b",
+    "mtime": 1787580280.4553435,
+    "ast_hash": "bfe926aac255dd291a48ce49d0c5db99",
     "semantic_hash": ""
   },
   "Input/script.js": {
@@ -92,6 +92,16 @@
   "DISCOVERY_riwayat-edit-repush-mekanisme.md": {
     "mtime": 1787579767.8253355,
     "ast_hash": "e871c04d6dd2c9dde0712cd26e955855",
+    "semantic_hash": ""
+  },
+  "Riwayat/script.js": {
+    "mtime": 1787580322.3586774,
+    "ast_hash": "e01bfe21ac081e78307f2788af0c885b",
+    "semantic_hash": ""
+  },
+  "Riwayat/index.html": {
+    "mtime": 1787580289.208677,
+    "ast_hash": "c62cf6792ed47db807af450e5746db71",
     "semantic_hash": ""
   }
 }

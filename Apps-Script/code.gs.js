@@ -191,6 +191,37 @@ function doGet(e) {
     return jsonResponse_(result);
   }
 
+  // ── getRiwayat ──
+  // Ambil SEMUA baris dari sheet "Riwayat" (skip header row 1).
+  // Return array of object per baris: { noNota, namaPelanggan, tanggal,
+  //   produk, qty, hargaSatuan, subtotal, total }.
+  // Field "total" = kolom H "Total Nota" (sama untuk semua baris 1 nota).
+  // Grouping by noNota dilakukan di client (Riwayat/script.js).
+  if (action === "getRiwayat") {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = ss.getSheetByName("Riwayat");
+    var data = sheet.getDataRange().getValues();
+    var result = [];
+
+    for (var i = 1; i < data.length; i++) {
+      var row = data[i];
+      // Skip baris kosong (semua cell kosong)
+      if (!row[0] && !row[3]) continue;
+      result.push({
+        noNota: String(row[0] || ""),
+        namaPelanggan: String(row[1] || ""),
+        tanggal: String(row[2] || ""),
+        produk: String(row[3] || ""),
+        qty: row[4],
+        hargaSatuan: row[5],
+        subtotal: row[6],
+        total: row[7]
+      });
+    }
+
+    return jsonResponse_(result);
+  }
+
   return jsonResponse_({success: false, error: "unknown action"});
 }
 

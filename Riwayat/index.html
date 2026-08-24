@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MoroDuit — Riwayat Transaksi</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>📋 Riwayat Transaksi</h1>
+    <p class="subtitle">Daftar semua nota belanja</p>
+  </header>
+
+  <main>
+    <!-- Status / error message -->
+    <div id="statusMessage" class="status-message hidden" role="alert" aria-live="polite"></div>
+
+    <!-- Loading indicator -->
+    <div id="loadingIndicator" class="loading">Memuat riwayat transaksi...</div>
+
+    <!-- Riwayat list (rendered by JS) -->
+    <div id="riwayatList" class="riwayat-list"></div>
+  </main>
+
+  <footer>
+    <p>MoroDuit &mdash; Toko Sembako Online</p>
+  </footer>
+
+  <script src="../config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

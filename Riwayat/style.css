@@ -1,0 +1,198 @@
+/* ══════════════════════════════════════════════════════════════════════
+   MoroDuit Riwayat — Style
+   Pola visual sama dengan Keranjang-Duit/style.css
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* ── Reset & Base ──────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  font-family: "Segoe UI", "Noto Sans", Arial, sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #1a1a1a;
+  background-color: #f5f0e8;
+  min-height: 100vh;
+  padding: 1rem;
+}
+
+/* ── Header ────────────────────────────────────────────────────────── */
+header {
+  text-align: center;
+  padding: 1.5rem 1rem;
+  background-color: #2e7d32;
+  color: #ffffff;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+}
+
+header h1 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+header .subtitle {
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+/* ── Main ──────────────────────────────────────────────────────────── */
+main {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* ── Status Message ────────────────────────────────────────────────── */
+.status-message {
+  padding: 1rem 1.25rem;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 1.25rem;
+  text-align: center;
+}
+
+.status-message.hidden {
+  display: none;
+}
+
+.status-message.success {
+  background-color: #e8f5e9;
+  color: #1b5e20;
+  border: 2px solid #2e7d32;
+}
+
+.status-message.error {
+  background-color: #ffebee;
+  color: #c62828;
+  border: 2px solid #c62828;
+}
+
+/* ── Loading ───────────────────────────────────────────────────────── */
+.loading {
+  text-align: center;
+  padding: 2rem;
+  font-size: 0.875rem;
+  color: #666666;
+}
+
+/* ── Empty State ───────────────────────────────────────────────────── */
+.empty-state {
+  text-align: center;
+  padding: 2rem;
+  font-size: 0.875rem;
+  color: #666666;
+  font-weight: 600;
+}
+
+/* ── Riwayat List ──────────────────────────────────────────────────── */
+.riwayat-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* ── Riwayat Card ─────────────────────────────────────────────────── */
+.riwayat-card {
+  padding: 1rem 1.25rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  background-color: #ffffff;
+  cursor: pointer;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.riwayat-card:hover {
+  border-color: #2e7d32;
+  background-color: #f1f8e9;
+}
+
+.riwayat-card:active {
+  background-color: #e8f5e9;
+}
+
+.riwayat-card:focus {
+  outline: none;
+  border-color: #2e7d32;
+  box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.25);
+}
+
+/* ── Card Header: No Nota + Total ──────────────────────────────────── */
+.riwayat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.riwayat-no-nota {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #2e7d32;
+}
+
+.riwayat-total {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+/* ── Card Meta: Pelanggan + Tanggal ────────────────────────────────── */
+.riwayat-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.25rem;
+}
+
+.riwayat-pelanggan {
+  font-size: 0.85rem;
+  color: #1a1a1a;
+  font-weight: 600;
+}
+
+.riwayat-tanggal {
+  font-size: 0.8rem;
+  color: #666666;
+}
+
+/* ── Card Summary: Jumlah item ─────────────────────────────────────── */
+.riwayat-summary {
+  font-size: 0.8rem;
+  color: #666666;
+}
+
+/* ── Mobile ────────────────────────────────────────────────────────── */
+@media (max-width: 520px) {
+  .riwayat-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+
+  .riwayat-meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.1rem;
+  }
+}
+
+/* ── Footer ────────────────────────────────────────────────────────── */
+footer {
+  text-align: center;
+  padding: 1.5rem 1rem;
+  margin-top: 2rem;
+  color: #666666;
+  font-size: 1rem;
+}
