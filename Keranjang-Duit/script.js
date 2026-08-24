@@ -20,6 +20,7 @@
   // ── Constants ──────────────────────────────────────────────────────
   var STORAGE_KEY_SELECTION = "moroduit_selection";
   var STORAGE_KEY_KERANJANG = "moroduit_keranjang";
+  var STORAGE_KEY_NAMA = "moroduit_nama_pelanggan";
 
   // ── State ──────────────────────────────────────────────────────────
   var produkData = []; // Full unfiltered data from API
@@ -173,6 +174,14 @@
         // then render once with state applied (avoids flash of unchecked state)
         restoreSelectionFromStorage();
         renderProdukList(produkData);
+
+        // Explicitly calculate total — renderProdukList applies checked state
+        // via direct DOM property (chk.checked = true) which does NOT fire
+        // change events, so updateTotal() is never triggered implicitly.
+        updateTotal();
+
+        // Restore Nama Pelanggan from sessionStorage
+        restoreNamaPelanggan();
       })
       .catch(function (err) {
         loadingIndicator.style.display = "none";
@@ -368,6 +377,28 @@
     }
   }
 
+  // ── Persist Nama Pelanggan to sessionStorage ─────────────────────
+  function persistNamaPelanggan() {
+    try {
+      var val = namaPelangganInput ? namaPelangganInput.value.trim() : "";
+      sessionStorage.setItem(STORAGE_KEY_NAMA, val);
+    } catch (err) {
+      console.error("Gagal simpan nama pelanggan ke sessionStorage:", err);
+    }
+  }
+
+  // ── Restore Nama Pelanggan from sessionStorage ───────────────────
+  function restoreNamaPelanggan() {
+    try {
+      var val = sessionStorage.getItem(STORAGE_KEY_NAMA);
+      if (val !== null && namaPelangganInput) {
+        namaPelangganInput.value = val;
+      }
+    } catch (err) {
+      console.warn("Gagal restore nama pelanggan dari sessionStorage:", err);
+    }
+  }
+
   // ── Persist selection state to sessionStorage ─────────────────────
   //    Called on checkout and on clear-cart, so selections survive
   //    navigation to Priview/ and back.
@@ -442,6 +473,7 @@
 
     // Persist selection state so it survives the round-trip to Priview/ and back
     persistSelectionToStorage();
+    persistNamaPelanggan();
 
     // Redirect to preview page
     window.location.href = "../Keranjang-Duit/Priview/index.html";
@@ -496,6 +528,13 @@
     updateTotal();
   });
 
+  // ── Nama Pelanggan auto-persist on input ─────────────────────────
+  if (namaPelangganInput) {
+    namaPelangganInput.addEventListener("input", function () {
+      persistNamaPelanggan();
+    });
+  }
+
   // ── Filter event listeners ───────────────────────────────────────
   searchInput.addEventListener("input", function () {
     applyFilters();
@@ -518,6 +557,7 @@
       restoreSelectionFromStorage();
       renderProdukList(produkData);
       updateTotal();
+      restoreNamaPelanggan();
     }
   });
 })();
