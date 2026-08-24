@@ -1,16 +1,16 @@
 # Graph Report - MoroDuit  (2026-08-24)
 
 ## Corpus Check
-- 13 files · ~18,170 words
+- 13 files · ~17,986 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 206 nodes · 253 edges · 24 communities (17 shown, 7 thin omitted)
+- 204 nodes · 251 edges · 24 communities (17 shown, 7 thin omitted)
 - Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 6 edges (avg confidence: 0.5)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `1ec478e6`
+- Built from commit: `2af16f51`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -74,8 +74,8 @@ Cohesion: 0.33
 Nodes (8): applyFilters(), escapeHtml(), formatRupiah(), getFilteredData(), handleProdukClick(), loadProdukList(), populateKategoriFilter(), renderProdukList()
 
 ### Community 4 - "Priview/script.js"
-Cohesion: 0.31
-Nodes (5): escapeHtml(), formatRupiah(), handlePrintError(), renderNota(), resetPrintBtn()
+Cohesion: 0.43
+Nodes (4): escapeHtml(), formatRupiah(), initWhatsAppLink(), renderNota()
 
 ### Community 9 - "wA"
 Cohesion: 0.25

@@ -237,8 +237,11 @@ function doPost(e) {
     var row = findProdukRow_(sheet, produk);
     var kategori = String(body.kategori || "").trim();
     var kategoriList = [
-      "Kopi", "Minuman Manis", "Bumbu Dapur", "Mie Instan",
-      "Perawatan Diri", "Obat Nyamuk", "Tisu", "Susu", "Roti", "Sabun"
+      "Bumbu Dapur", "Gula", "Kopi", "Mie Instan", "Minuman Serbuk/Sachet",
+      "Minuman Siap Minum", "Obat Nyamuk", "Pembersih Rumah Tangga",
+      "Perawatan Diri", "Perawatan Gigi", "Popok & Pembalut", "Roti",
+      "Sabun Cuci/Deterjen Sachet", "Sabun Mandi & Shampoo Sachet",
+      "Snack & Biskuit", "Suplemen", "Susu", "Tisu"
     ];
     if (!kategori) {
       return jsonResponse_({success: false, error: "kategori wajib diisi"});
