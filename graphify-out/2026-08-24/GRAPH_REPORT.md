@@ -1,16 +1,16 @@
 # Graph Report - MoroDuit  (2026-08-24)
 
 ## Corpus Check
-- 14 files · ~21,835 words
+- 15 files · ~22,662 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 261 nodes · 312 edges · 27 communities (20 shown, 7 thin omitted)
-- Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 6 edges (avg confidence: 0.5)
+- 271 nodes · 330 edges · 28 communities (21 shown, 7 thin omitted)
+- Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 7 edges (avg confidence: 0.5)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `6f483353`
+- Built from commit: `cbfc6a08`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -39,6 +39,7 @@
 - DISCOVERY: Mekanisme Riwayat, Mode-Edit & Repush — MoroDuit
 - 4. Alur `doGet()` Lengkap Saat Ini
 - 8. Mekanisme `initWhatsAppLink()` dan `renderNota()` di Priview
+- Riwayat/script.js
 
 ## God Nodes (most connected - your core abstractions)
 1. `DISCOVERY: Mekanisme Riwayat, Mode-Edit & Repush — MoroDuit` - 12 edges
@@ -50,7 +51,7 @@
 7. `doPost()` - 6 edges
 8. `renderProdukList()` - 6 edges
 9. `wA()` - 6 edges
-10. `4. Alur `doGet()` Lengkap Saat Ini` - 6 edges
+10. `renderRiwayat()` - 6 edges
 
 ## Surprising Connections (you probably didn't know these)
 - None detected - all connections are within the same source files.
@@ -58,7 +59,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (27 total, 7 thin omitted)
+## Communities (28 total, 7 thin omitted)
 
 ### Community 0 - "MoroDuit — Rencana Proyek & Task Roadmap"
 Cohesion: 0.15
@@ -128,6 +129,10 @@ Nodes (6): 4.1 Struktur Umum, 4.2 Action: `getKatalog`, 4.3 Action: `getKatalogF
 Cohesion: 0.40
 Nodes (5): 8.1 `initWhatsAppLink()` — Generate Link WA, 8.2 Kapan Link WA Di-update, 8.3 `renderNota()` — Render Tabel Nota, 8.4 Replikasi untuk Mode-Edit Priview, 8. Mekanisme `initWhatsAppLink()` dan `renderNota()` di Priview
 
+### Community 27 - "Riwayat/script.js"
+Cohesion: 0.40
+Nodes (9): escapeHtml(), formatRupiah(), formatTanggalIndo(), groupByNoNota(), handleCardClick(), hideStatus(), loadRiwayat(), renderRiwayat() (+1 more)
+
 ## Knowledge Gaps
 - **90 isolated node(s):** `MoroDuit-push.sh script`, `1.1 Semua Referensi Nama Sheet di `Apps-Script/code.gs.js``, `1.2 Konfirmasi Tab "Riwayat"`, `1.3 Formula Kalkulasi Margin di Tab Riwayat (POLA ACUAN)`, `1.4 Kapan Margin Disimpan sebagai NILAI FINAL vs FORMULA` (+85 more)
   These have ≤1 connection - possible missing edges or undocumented components.
@@ -137,7 +142,7 @@ Nodes (5): 8.1 `initWhatsAppLink()` — Generate Link WA, 8.2 Kapan Link WA Di-u
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `DISCOVERY: Mekanisme Riwayat, Mode-Edit & Repush — MoroDuit` connect `DISCOVERY: Mekanisme Riwayat, Mode-Edit & Repush — MoroDuit` to `4. Alur `doGet()` Lengkap Saat Ini`, `8. Mekanisme `initWhatsAppLink()` dan `renderNota()` di Priview`?**
-  _High betweenness centrality (0.035) - this node is a cross-community bridge._
+  _High betweenness centrality (0.032) - this node is a cross-community bridge._
 - **What connects `MoroDuit-push.sh script`, `1.1 Semua Referensi Nama Sheet di `Apps-Script/code.gs.js``, `1.2 Konfirmasi Tab "Riwayat"` to the rest of the system?**
   _90 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `html2canvas.min.js` be split into smaller, more focused modules?**
