@@ -304,7 +304,7 @@ main {
   overflow: hidden;
 }
 
-/* ── Qty Input ─────────────────────────────────────────────────────── */
+/* ── Qty Stepper ───────────────────────────────────────────────────── */
 .qty-wrapper {
   display: flex;
   align-items: center;
@@ -313,10 +313,43 @@ main {
   overflow: hidden;
 }
 
-.qty-wrapper input[type="number"] {
-  width: 4rem;
+.qty-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  min-width: 2.5rem;
+  min-height: 2.5rem;
+  padding: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1;
+  color: #ffffff;
+  background-color: #2e7d32;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+.qty-btn:active:not(:disabled) {
+  transform: scale(0.93);
+}
+
+.qty-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background-color: #bdbdbd;
+}
+
+.qty-value {
+  width: 3.25rem;
   min-width: 0;
-  padding: 0.6rem 0.5rem;
+  padding: 0.5rem 0.25rem;
   font-size: 1rem;
   font-weight: 600;
   text-align: center;
@@ -324,23 +357,18 @@ main {
   border-radius: 8px;
   background-color: #f5f5f5;
   color: #1a1a1a;
-  transition: border-color 0.2s;
+  -moz-appearance: textfield;
 }
 
-.qty-wrapper input[type="number"]:not(:disabled):focus {
-  outline: none;
-  border-color: #2e7d32;
-  box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.25);
+.qty-value::-webkit-inner-spin-button,
+.qty-value::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
-.qty-wrapper input[type="number"]:disabled {
+.qty-value:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-}
-
-.qty-wrapper input[type="number"]::-webkit-inner-spin-button,
-.qty-wrapper input[type="number"]::-webkit-outer-spin-button {
-  opacity: 1;
 }
 
 .qty-label {

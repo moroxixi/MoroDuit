@@ -186,9 +186,9 @@
               + '  </div>'
               + '  <div class="produk-harga">' + formatRupiah(p.hargaJual) + '</div>'
               + '  <div class="qty-wrapper">'
-              + '    <input type="number" id="qty_' + idx + '" '
-              + '           data-index="' + idx + '" '
-              + '           min="1" max="999" value="1" disabled>'
+              + '    <button type="button" class="qty-btn qty-minus" id="qtyMinus_' + idx + '" data-index="' + idx + '" disabled aria-label="Kurangi jumlah">−</button>'
+              + '    <input type="number" id="qty_' + idx + '" class="qty-value" data-index="' + idx + '" min="1" max="999" value="1" disabled readonly>'
+              + '    <button type="button" class="qty-btn qty-plus" id="qtyPlus_' + idx + '" data-index="' + idx + '" disabled aria-label="Tambah jumlah">+</button>'
               + '    <span class="qty-label">pcs</span>'
               + '  </div>'
               + '</div>';
@@ -209,6 +209,10 @@
         chk.checked = true;
         qty.disabled = false;
         qty.value = state.qty;
+        var minusBtn = document.getElementById("qtyMinus_" + origIdx);
+        var plusBtn = document.getElementById("qtyPlus_" + origIdx);
+        if (minusBtn) minusBtn.disabled = false;
+        if (plusBtn) plusBtn.disabled = false;
         chk.closest(".produk-card").classList.add("checked");
       }
       attachListeners(origIdx);
@@ -219,6 +223,8 @@
   function attachListeners(index) {
     var checkbox = document.getElementById("chk_" + index);
     var qtyInput = document.getElementById("qty_" + index);
+    var minusBtn = document.getElementById("qtyMinus_" + index);
+    var plusBtn = document.getElementById("qtyPlus_" + index);
 
     if (!produkState[index]) produkState[index] = { checked: false, qty: 1 };
 
@@ -227,11 +233,11 @@
       var card = checkbox.closest(".produk-card");
 
       qtyInput.disabled = !isChecked;
+      minusBtn.disabled = !isChecked;
+      plusBtn.disabled = !isChecked;
 
       if (isChecked) {
         card.classList.add("checked");
-        qtyInput.focus();
-        qtyInput.select();
       } else {
         card.classList.remove("checked");
         qtyInput.value = 1;
@@ -244,9 +250,22 @@
       updateTotal();
     });
 
-    qtyInput.addEventListener("input", function () {
+    minusBtn.addEventListener("click", function () {
       var q = parseInt(qtyInput.value, 10);
-      produkState[index].qty = (isNaN(q) || q < 1) ? 1 : q;
+      if (isNaN(q) || q <= 1) return;
+      q -= 1;
+      qtyInput.value = q;
+      produkState[index].qty = q;
+      updateTotal();
+    });
+
+    plusBtn.addEventListener("click", function () {
+      var q = parseInt(qtyInput.value, 10);
+      if (isNaN(q)) q = 1;
+      if (q >= 999) return;
+      q += 1;
+      qtyInput.value = q;
+      produkState[index].qty = q;
       updateTotal();
     });
   }
