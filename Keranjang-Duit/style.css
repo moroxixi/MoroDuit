@@ -467,6 +467,15 @@ main {
   background-color: #1b5e20;
 }
 
+.btn-danger {
+  background-color: #c62828;
+  color: #ffffff;
+}
+
+.btn-danger:hover {
+  background-color: #b71c1c;
+}
+
 .btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;

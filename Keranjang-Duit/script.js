@@ -15,12 +15,44 @@
   var namaPelangganInput = document.getElementById("namaPelanggan");
   var searchInput = document.getElementById("searchInput");
   var kategoriFilter = document.getElementById("kategoriFilter");
+  var kosongkanBtn = document.getElementById("kosongkanBtn");
+
+  // ── Constants ──────────────────────────────────────────────────────
+  var STORAGE_KEY_SELECTION = "moroduit_selection";
+  var STORAGE_KEY_KERANJANG = "moroduit_keranjang";
 
   // ── State ──────────────────────────────────────────────────────────
   var produkData = []; // Full unfiltered data from API
-  var produkState = {}; // {index: {checked: bool, qty: number}} — survives re-render
+  var produkState = {}; // {namaProduk: {checked: bool, qty: number}} — keyed by product name
 
-  // ── Show status message ───────────────────────────────────────────
+  // ── Helpers ────────────────────────────────────────────────────────
+
+  /**
+   * Convert a product name into a safe HTML element ID.
+   * Normalizes unicode, lowercases, replaces non-alphanumerics with underscore.
+   */
+  function toSafeId(nama) {
+    return "p_"
+      + nama
+        .normalize("NFKD")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "_")
+        .replace(/^_+|_+$/g, "");
+  }
+
+  function formatRupiah(val) {
+    var num = Number(val);
+    if (isNaN(num)) return val;
+    return "Rp " + Math.ceil(num).toLocaleString("id-ID");
+  }
+
+  function escapeHtml(str) {
+    var div = document.createElement("div");
+    div.appendChild(document.createTextNode(str));
+    return div.innerHTML;
+  }
+
+  // ── Show/hide status message ───────────────────────────────────────
   function showStatus(message, type) {
     statusMessage.textContent = message;
     statusMessage.className = "status-message " + type;
@@ -30,17 +62,19 @@
     statusMessage.className = "status-message hidden";
   }
 
-  // ── Save current DOM state to produkState ─────────────────────────
+  // ── Save current DOM state to produkState (keyed by Nama Produk) ──
   function saveState() {
     for (var i = 0; i < produkData.length; i++) {
-      var checkbox = document.getElementById("chk_" + i);
-      var qtyInput = document.getElementById("qty_" + i);
+      var nama = produkData[i].produk;
+      var safeId = toSafeId(nama);
+      var checkbox = document.getElementById("chk_" + safeId);
+      var qtyInput = document.getElementById("qty_" + safeId);
       if (checkbox) {
-        if (!produkState[i]) produkState[i] = { checked: false, qty: 1 };
-        produkState[i].checked = checkbox.checked;
+        if (!produkState[nama]) produkState[nama] = { checked: false, qty: 1 };
+        produkState[nama].checked = checkbox.checked;
         if (qtyInput) {
           var q = parseInt(qtyInput.value, 10);
-          produkState[i].qty = (isNaN(q) || q < 1) ? 1 : q;
+          produkState[nama].qty = (isNaN(q) || q < 1) ? 1 : q;
         }
       }
     }
@@ -51,7 +85,7 @@
     var query = searchInput.value.trim().toLowerCase();
     var selectedKategori = kategoriFilter.value;
 
-    return produkData.filter(function (p, i) {
+    return produkData.filter(function (p) {
       // Search filter: substring match on product name
       if (query !== "") {
         var namaProduk = (p.produk || "").toLowerCase();
@@ -135,6 +169,11 @@
 
         populateKategoriFilter();
         renderProdukList(data);
+
+        // Restore selection state from sessionStorage (survives checkout round-trip)
+        restoreSelectionFromStorage();
+        // Re-render to apply restored state to DOM
+        renderProdukList(produkData);
       })
       .catch(function (err) {
         loadingIndicator.style.display = "none";
@@ -144,10 +183,12 @@
   }
 
   // ── Render product list (grouped by kategori, sorted A-Z) ────────
+  // State is keyed by Nama Produk (not index), so filter changes
+  // do NOT affect which products appear checked.
   function renderProdukList(data) {
     // 1. Group by kategori, preserving original order within each group
     var groups = {};
-    var allIndices = []; // flat list of original indices, in render order
+    var allNames = []; // flat list of product names, in render order
     for (var i = 0; i < data.length; i++) {
       var kategori = (data[i].kategori && data[i].kategori.trim() !== "")
         ? data[i].kategori.trim() : "Lainnya";
@@ -173,22 +214,25 @@
 
       for (var k = 0; k < indices.length; k++) {
         var idx = indices[k];
-        allIndices.push(idx);
         var p = data[idx];
-        html += '<div class="produk-card" data-index="' + idx + '">'
+        var nama = p.produk;
+        var safeId = toSafeId(nama);
+        allNames.push(nama);
+
+        html += '<div class="produk-card" data-nama="' + escapeHtml(nama) + '">'
               + '  <div class="checkbox-wrapper">'
-              + '    <input type="checkbox" id="chk_' + idx + '" '
-              + '           data-index="' + idx + '">'
-              + '    <label class="checkbox-custom" for="chk_' + idx + '"></label>'
+              + '    <input type="checkbox" id="chk_' + safeId + '" '
+              + '           data-nama="' + escapeHtml(nama) + '">'
+              + '    <label class="checkbox-custom" for="chk_' + safeId + '"></label>'
               + '  </div>'
               + '  <div class="produk-info">'
-              + '    <div class="produk-name">' + escapeHtml(p.produk) + '</div>'
+              + '    <div class="produk-name">' + escapeHtml(nama) + '</div>'
               + '  </div>'
               + '  <div class="produk-harga">' + formatRupiah(p.hargaJual) + '</div>'
               + '  <div class="qty-wrapper">'
-              + '    <button type="button" class="qty-btn qty-minus" id="qtyMinus_' + idx + '" data-index="' + idx + '" disabled aria-label="Kurangi jumlah">−</button>'
-              + '    <input type="number" id="qty_' + idx + '" class="qty-value" data-index="' + idx + '" min="1" max="999" value="1" disabled readonly>'
-              + '    <button type="button" class="qty-btn qty-plus" id="qtyPlus_' + idx + '" data-index="' + idx + '" disabled aria-label="Tambah jumlah">+</button>'
+              + '    <button type="button" class="qty-btn qty-minus" id="qtyMinus_' + safeId + '" data-nama="' + escapeHtml(nama) + '" disabled aria-label="Kurangi jumlah">−</button>'
+              + '    <input type="number" id="qty_' + safeId + '" class="qty-value" data-nama="' + escapeHtml(nama) + '" min="1" max="999" value="1" disabled readonly>'
+              + '    <button type="button" class="qty-btn qty-plus" id="qtyPlus_' + safeId + '" data-nama="' + escapeHtml(nama) + '" disabled aria-label="Tambah jumlah">+</button>'
               + '    <span class="qty-label">pcs</span>'
               + '  </div>'
               + '</div>';
@@ -200,33 +244,34 @@
     produkList.innerHTML = html;
 
     // Apply saved state + attach event listeners for rendered items
-    for (var j = 0; j < allIndices.length; j++) {
-      var origIdx = allIndices[j];
-      var state = produkState[origIdx];
-      var chk = document.getElementById("chk_" + origIdx);
-      var qty = document.getElementById("qty_" + origIdx);
+    for (var j = 0; j < allNames.length; j++) {
+      var namaProduk = allNames[j];
+      var safeId2 = toSafeId(namaProduk);
+      var state = produkState[namaProduk];
+      var chk = document.getElementById("chk_" + safeId2);
+      var qty = document.getElementById("qty_" + safeId2);
       if (chk && state && state.checked) {
         chk.checked = true;
         qty.disabled = false;
         qty.value = state.qty;
-        var minusBtn = document.getElementById("qtyMinus_" + origIdx);
-        var plusBtn = document.getElementById("qtyPlus_" + origIdx);
+        var minusBtn = document.getElementById("qtyMinus_" + safeId2);
+        var plusBtn = document.getElementById("qtyPlus_" + safeId2);
         if (minusBtn) minusBtn.disabled = false;
         if (plusBtn) plusBtn.disabled = false;
         chk.closest(".produk-card").classList.add("checked");
       }
-      attachListeners(origIdx);
+      attachListeners(namaProduk, safeId2);
     }
   }
 
   // ── Attach listeners for one product row ──────────────────────────
-  function attachListeners(index) {
-    var checkbox = document.getElementById("chk_" + index);
-    var qtyInput = document.getElementById("qty_" + index);
-    var minusBtn = document.getElementById("qtyMinus_" + index);
-    var plusBtn = document.getElementById("qtyPlus_" + index);
+  function attachListeners(nama, safeId) {
+    var checkbox = document.getElementById("chk_" + safeId);
+    var qtyInput = document.getElementById("qty_" + safeId);
+    var minusBtn = document.getElementById("qtyMinus_" + safeId);
+    var plusBtn = document.getElementById("qtyPlus_" + safeId);
 
-    if (!produkState[index]) produkState[index] = { checked: false, qty: 1 };
+    if (!produkState[nama]) produkState[nama] = { checked: false, qty: 1 };
 
     checkbox.addEventListener("change", function () {
       var isChecked = checkbox.checked;
@@ -243,9 +288,9 @@
         qtyInput.value = 1;
       }
 
-      // Sync to state
-      produkState[index].checked = isChecked;
-      if (!isChecked) produkState[index].qty = 1;
+      // Sync to state (keyed by Nama Produk)
+      produkState[nama].checked = isChecked;
+      if (!isChecked) produkState[nama].qty = 1;
 
       updateTotal();
     });
@@ -255,7 +300,7 @@
       if (isNaN(q) || q <= 1) return;
       q -= 1;
       qtyInput.value = q;
-      produkState[index].qty = q;
+      produkState[nama].qty = q;
       updateTotal();
     });
 
@@ -265,27 +310,83 @@
       if (q >= 999) return;
       q += 1;
       qtyInput.value = q;
-      produkState[index].qty = q;
+      produkState[nama].qty = q;
       updateTotal();
     });
   }
 
-  // ── Update total (live) — reads from produkState for filtered-out items
+  // ── Update total (live) — reads ALL checked items in produkState
+  //    (not just currently rendered ones), so total stays correct
+  //    even when items are filtered out. ──────────────────────────────
   function updateTotal() {
     var total = 0;
+    var hasChecked = false;
 
-    for (var i = 0; i < produkData.length; i++) {
-      var st = produkState[i];
+    // Iterate all keys in produkState (includes items filtered out of view)
+    for (var nama in produkState) {
+      if (!Object.prototype.hasOwnProperty.call(produkState, nama)) continue;
+      var st = produkState[nama];
       if (st && st.checked) {
-        var harga = Number(produkData[i].hargaJual);
-        var qty = st.qty;
-        if (isNaN(qty) || qty < 1) qty = 1;
-        total += harga * qty;
+        hasChecked = true;
+        // Find product in produkData by name
+        for (var i = 0; i < produkData.length; i++) {
+          if (produkData[i].produk === nama) {
+            var harga = Number(produkData[i].hargaJual);
+            var qty = st.qty;
+            if (isNaN(qty) || qty < 1) qty = 1;
+            total += harga * qty;
+            break;
+          }
+        }
       }
     }
 
     totalValue.textContent = formatRupiah(total);
-    checkoutBtn.disabled = (total === 0);
+    checkoutBtn.disabled = !hasChecked;
+  }
+
+  // ── Restore selection state from sessionStorage ───────────────────
+  //    Called after loadKatalog to survive checkout round-trip
+  //    (checkout navigates to Priview/ page, then user may return).
+  function restoreSelectionFromStorage() {
+    try {
+      var raw = sessionStorage.getItem(STORAGE_KEY_SELECTION);
+      if (!raw) return;
+      var saved = JSON.parse(raw);
+      if (!saved || typeof saved !== "object") return;
+      for (var nama in saved) {
+        if (!Object.prototype.hasOwnProperty.call(saved, nama)) continue;
+        var entry = saved[nama];
+        if (entry && typeof entry.checked === "boolean") {
+          produkState[nama] = {
+            checked: entry.checked,
+            qty: (typeof entry.qty === "number" && entry.qty >= 1) ? entry.qty : 1
+          };
+        }
+      }
+    } catch (err) {
+      console.warn("Gagal restore selection dari sessionStorage:", err);
+    }
+  }
+
+  // ── Persist selection state to sessionStorage ─────────────────────
+  //    Called on checkout and on clear-cart, so selections survive
+  //    navigation to Priview/ and back.
+  function persistSelectionToStorage() {
+    try {
+      // Build a clean snapshot of only checked items
+      var snapshot = {};
+      for (var nama in produkState) {
+        if (!Object.prototype.hasOwnProperty.call(produkState, nama)) continue;
+        var st = produkState[nama];
+        if (st && st.checked) {
+          snapshot[nama] = { checked: true, qty: st.qty };
+        }
+      }
+      sessionStorage.setItem(STORAGE_KEY_SELECTION, JSON.stringify(snapshot));
+    } catch (err) {
+      console.error("Gagal simpan selection ke sessionStorage:", err);
+    }
   }
 
   // ── Checkout ──────────────────────────────────────────────────────
@@ -293,19 +394,27 @@
     saveState(); // ensure latest DOM state is captured
     var items = [];
 
-    for (var i = 0; i < produkData.length; i++) {
-      var st = produkState[i];
+    // Build items array from produkState (keyed by Nama Produk)
+    for (var nama in produkState) {
+      if (!Object.prototype.hasOwnProperty.call(produkState, nama)) continue;
+      var st = produkState[nama];
       if (st && st.checked) {
-        var hargaJual = Number(produkData[i].hargaJual);
-        var qty = st.qty;
-        if (isNaN(qty) || qty < 1) qty = 1;
+        // Find product in produkData by name
+        for (var i = 0; i < produkData.length; i++) {
+          if (produkData[i].produk === nama) {
+            var hargaJual = Number(produkData[i].hargaJual);
+            var qty = st.qty;
+            if (isNaN(qty) || qty < 1) qty = 1;
 
-        items.push({
-          produk: produkData[i].produk,
-          qty: qty,
-          hargaSatuan: Math.ceil(hargaJual),
-          subtotal: Math.ceil(hargaJual * qty)
-        });
+            items.push({
+              produk: nama,
+              qty: qty,
+              hargaSatuan: Math.ceil(hargaJual),
+              subtotal: Math.ceil(hargaJual * qty)
+            });
+            break;
+          }
+        }
       }
     }
 
@@ -325,29 +434,68 @@
     };
 
     try {
-      sessionStorage.setItem("moroduit_keranjang", JSON.stringify(keranjangData));
+      sessionStorage.setItem(STORAGE_KEY_KERANJANG, JSON.stringify(keranjangData));
     } catch (err) {
       showStatus("❌ Gagal menyimpan keranjang. Penyimpanan penuh atau tidak tersedia.", "error");
       console.error("sessionStorage error:", err);
       return;
     }
 
+    // Persist selection state so it survives the round-trip to Priview/ and back
+    persistSelectionToStorage();
+
     // Redirect to preview page
     window.location.href = "../Keranjang-Duit/Priview/index.html";
   });
 
-  // ── Helpers ────────────────────────────────────────────────────────
-  function formatRupiah(val) {
-    var num = Number(val);
-    if (isNaN(num)) return val;
-    return "Rp " + Math.ceil(num).toLocaleString("id-ID");
-  }
+  // ── Kosongkan Keranjang button ────────────────────────────────────
+  //    Resets ALL checkboxes + qty across ALL categories,
+  //    clears sessionStorage selection, with confirmation dialog.
+  kosongkanBtn.addEventListener("click", function () {
+    if (!confirm("Yakin ingin mengosongkan keranjang? Semua pilihan akan dihapus.")) {
+      return;
+    }
 
-  function escapeHtml(str) {
-    var div = document.createElement("div");
-    div.appendChild(document.createTextNode(str));
-    return div.innerHTML;
-  }
+    // 1. Clear all state in produkState (all products, all categories)
+    for (var nama in produkState) {
+      if (!Object.prototype.hasOwnProperty.call(produkState, nama)) continue;
+      produkState[nama] = { checked: false, qty: 1 };
+    }
+
+    // 2. Clear sessionStorage selection (persists across page loads)
+    try {
+      sessionStorage.removeItem(STORAGE_KEY_SELECTION);
+    } catch (err) {
+      console.warn("Gagal clear selection dari sessionStorage:", err);
+    }
+
+    // 3. Reset all DOM checkboxes and qty inputs currently rendered
+    var checkboxes = produkList.querySelectorAll('input[type="checkbox"]');
+    for (var c = 0; c < checkboxes.length; c++) {
+      checkboxes[c].checked = false;
+      var card = checkboxes[c].closest(".produk-card");
+      if (card) card.classList.remove("checked");
+    }
+
+    var qtyInputs = produkList.querySelectorAll(".qty-value");
+    for (var q = 0; q < qtyInputs.length; q++) {
+      qtyInputs[q].value = 1;
+      qtyInputs[q].disabled = true;
+    }
+
+    var minusBtns = produkList.querySelectorAll(".qty-minus");
+    for (var m = 0; m < minusBtns.length; m++) {
+      minusBtns[m].disabled = true;
+    }
+
+    var plusBtns = produkList.querySelectorAll(".qty-plus");
+    for (var p = 0; p < plusBtns.length; p++) {
+      plusBtns[p].disabled = true;
+    }
+
+    // 4. Update total to 0
+    updateTotal();
+  });
 
   // ── Filter event listeners ───────────────────────────────────────
   searchInput.addEventListener("input", function () {

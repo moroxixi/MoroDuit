@@ -157,6 +157,7 @@
 
           // Remove from sessionStorage (prevent double-submit)
           sessionStorage.removeItem("moroduit_keranjang");
+          sessionStorage.removeItem("moroduit_selection");
 
           // Show success
           statusMessage.textContent = "\u2705 Berhasil disimpan ke Sheet!";
