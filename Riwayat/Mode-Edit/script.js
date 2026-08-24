@@ -338,7 +338,7 @@
     }
 
     // Redirect ke Priview (belum ada — Fase 3 yang bikin)
-    window.location.href = "../Priview/index.html";
+    window.location.href = "Priview/index.html";
   }
 
   // ── Init: read noNota, fetch data ──────────────────────────────────

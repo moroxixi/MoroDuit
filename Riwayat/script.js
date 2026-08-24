@@ -155,7 +155,7 @@
     }
 
     // Redirect ke Mode-Edit (belum ada — Fase 2 yang bikin)
-    window.location.href = "../Mode-Edit/index.html";
+    window.location.href = "Mode-Edit/index.html";
   }
 
   // ── Fetch riwayat ──────────────────────────────────────────────────
