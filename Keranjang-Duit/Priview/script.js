@@ -140,7 +140,12 @@
         headers: { "Content-Type": "text/plain" },
         body: JSON.stringify(payload)
       })
-        .then(function (res) { return res.json(); })
+        .then(function (res) {
+          if (!res.ok) {
+            throw new Error("HTTP " + res.status + " " + res.statusText);
+          }
+          return res.json();
+        })
         .then(function (response) {
           console.log("[Priview] Server response:", response);
 
@@ -192,9 +197,14 @@
           // Only show error if fetch actually failed (not when location.href
           // navigation aborted the pending fetch after successful response).
           if (!fetchDone) {
-            handlePrintError("Gagal menghubungi server. Periksa koneksi internet.");
+            var errDetail = err.message || err.name || "Unknown error";
+            handlePrintError("Gagal menghubungi server: " + errDetail + ". Periksa koneksi internet.");
           }
-          console.error("[Priview] Print fetch error:", err);
+          console.error("[Priview] Print fetch error:", {
+            name: err.name,
+            message: err.message,
+            fetchDone: fetchDone
+          });
         });
 
     }).catch(function (err) {

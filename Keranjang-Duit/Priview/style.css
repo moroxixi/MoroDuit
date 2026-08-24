@@ -68,6 +68,7 @@ main {
   border-radius: 12px;
   padding: 2rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  overflow-x: auto;
 }
 
 /* ── Nota Header ───────────────────────────────────────────────────── */
@@ -141,9 +142,20 @@ main {
   text-align: center;
 }
 
-.nota-table th.col-qty,
-.nota-table th.col-harga,
+.nota-table th.col-qty {
+  width: 48px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.nota-table th.col-harga {
+  width: 130px;
+  text-align: right;
+  white-space: nowrap;
+}
+
 .nota-table th.col-subtotal {
+  width: 130px;
   text-align: right;
   white-space: nowrap;
 }
@@ -214,10 +226,8 @@ main {
     font-size: 1rem;
   }
 
-  /* Aggressive word-break for cells that can overflow on narrow screens */
-  .nota-table td.col-produk,
-  .nota-table td.col-harga,
-  .nota-table tfoot td.total-value {
+  /* Aggressive word-break for product name (long strings) */
+  .nota-table td.col-produk {
     word-break: break-word;
   }
 
@@ -235,18 +245,17 @@ main {
     overflow-wrap: anywhere;
   }
 
-  /* Allow numeric cells to wrap as fallback on narrow screens. */
+  /* Numeric cells keep nowrap — prevents "Rp 4.757,5" from breaking. */
   .nota-table td.col-qty,
   .nota-table td.col-harga,
   .nota-table td.col-subtotal {
-    white-space: normal;
+    white-space: nowrap;
   }
 
-  /* Remove min-width: 120px (base) that forces table wider than viewport;
-     !important needed to override base .total-value white-space: nowrap !important. */
+  /* Total value: nowrap, min-width: 0 so it doesn't force table wider. */
   .nota-table tfoot td.total-value {
     min-width: 0;
-    white-space: normal !important;
+    white-space: nowrap !important;
     word-break: normal;
     overflow-wrap: anywhere;
     font-size: 1rem;
