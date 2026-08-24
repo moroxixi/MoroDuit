@@ -142,7 +142,14 @@
       })
         .then(function (res) { return res.json(); })
         .then(function (response) {
-          if (response.success && response.tanggal) {
+          console.log("[Priview] Server response:", response);
+
+          // Flexible success check: accept if EITHER response.tanggal OR
+          // response.success is truthy. This handles Apps Script variants
+          // that may not include a "success" flag.
+          var serverConfirmed = response.tanggal || response.success;
+
+          if (serverConfirmed) {
             fetchDone = true;
 
             // ── Re-download with server-assigned noNota + timestamp ──
@@ -159,8 +166,10 @@
             a2.click();
             document.body.removeChild(a2);
 
-            // Update display with real Tanggal
-            tanggalEl.textContent = response.tanggal;
+            // Update display with real Tanggal — fallback to local if missing
+            tanggalEl.textContent = response.tanggal || new Date().toLocaleDateString("id-ID", {
+              weekday: "long", year: "numeric", month: "long", day: "numeric"
+            });
 
             // Remove from sessionStorage (prevent double-submit)
             sessionStorage.removeItem("moroduit_keranjang");
@@ -174,8 +183,9 @@
             location.href = "https://wa.me/" + noWA
               + "?text=" + encodeURIComponent(ringkasan);
           } else {
-            // Server returned failure
-            handlePrintError(response.error || "Gagal menyimpan nota");
+            // Server returned a response but no success indicators
+            console.warn("[Priview] Response missing success/tanggal:", response);
+            handlePrintError(response.error || "Server merespons tapi data tidak terverifikasi. Coba lagi.");
           }
         })
         .catch(function (err) {
@@ -184,7 +194,7 @@
           if (!fetchDone) {
             handlePrintError("Gagal menghubungi server. Periksa koneksi internet.");
           }
-          console.error("Print fetch error:", err);
+          console.error("[Priview] Print fetch error:", err);
         });
 
     }).catch(function (err) {

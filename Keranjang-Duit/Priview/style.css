@@ -68,7 +68,6 @@ main {
   border-radius: 12px;
   padding: 2rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  overflow-x: auto;
 }
 
 /* ── Nota Header ───────────────────────────────────────────────────── */
@@ -211,8 +210,15 @@ main {
 
   .nota-table th,
   .nota-table td {
-    padding: 0.5rem 0.5rem;
+    padding: 0.3rem 0.4rem;
     font-size: 1rem;
+  }
+
+  /* Aggressive word-break for cells that can overflow on narrow screens */
+  .nota-table td.col-produk,
+  .nota-table td.col-harga,
+  .nota-table tfoot td.total-value {
+    word-break: break-word;
   }
 
   .nota {
