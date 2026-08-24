@@ -168,11 +168,10 @@
         });
 
         populateKategoriFilter();
-        renderProdukList(data);
 
-        // Restore selection state from sessionStorage (survives checkout round-trip)
+        // Restore selection state from sessionStorage FIRST,
+        // then render once with state applied (avoids flash of unchecked state)
         restoreSelectionFromStorage();
-        // Re-render to apply restored state to DOM
         renderProdukList(produkData);
       })
       .catch(function (err) {
@@ -508,4 +507,17 @@
 
   // ── Init ───────────────────────────────────────────────────────────
   loadKatalog();
+
+  // ── BFCache handler ───────────────────────────────────────────────
+  // When user navigates back (e.g. browser back button from Priview/),
+  // the browser may restore this page from bfcache WITHOUT re-running
+  // the script. In that case loadKatalog() never fires, so we re-run
+  // the restore + re-render here to bring back checked selections.
+  window.addEventListener("pageshow", function (event) {
+    if (event.persisted && produkData.length > 0) {
+      restoreSelectionFromStorage();
+      renderProdukList(produkData);
+      updateTotal();
+    }
+  });
 })();

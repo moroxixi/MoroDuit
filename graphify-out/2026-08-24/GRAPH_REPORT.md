@@ -1,16 +1,16 @@
 # Graph Report - MoroDuit  (2026-08-24)
 
 ## Corpus Check
-- 13 files · ~18,162 words
+- 13 files · ~18,783 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 204 nodes · 251 edges · 24 communities (17 shown, 7 thin omitted)
+- 207 nodes · 257 edges · 24 communities (17 shown, 7 thin omitted)
 - Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 6 edges (avg confidence: 0.5)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `9db570a2`
+- Built from commit: `6a91add4`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -40,12 +40,12 @@
 ## God Nodes (most connected - your core abstractions)
 1. `MoroDuit — Rencana Proyek & Task Roadmap` - 10 edges
 2. `DISCOVERY: Harga Jual & Priview Mobile — MoroDuit` - 9 edges
-3. `DISCOVERY: Priview Mobile Download Failure & Baseline Spacing Tempura/Wonton` - 7 edges
-4. `doPost()` - 6 edges
-5. `renderProdukList()` - 6 edges
-6. `wA()` - 6 edges
-7. `renderProdukList()` - 6 edges
-8. `loadKatalog()` - 5 edges
+3. `renderProdukList()` - 7 edges
+4. `DISCOVERY: Priview Mobile Download Failure & Baseline Spacing Tempura/Wonton` - 7 edges
+5. `doPost()` - 6 edges
+6. `renderProdukList()` - 6 edges
+7. `wA()` - 6 edges
+8. `loadKatalog()` - 6 edges
 9. `1. Struktur Google Sheet & Tab "Riwayat"` - 5 edges
 10. `2. `doPost()` dan `doGet()` di `code.gs.js`` - 5 edges
 
@@ -62,8 +62,8 @@ Cohesion: 0.15
 Nodes (12): 1. Ringkasan Proyek, 2. Keputusan dari Diskusi (Q&A), 3. Struktur Folder (Final), 4. Struktur Data — Google Sheet "Toko Sembako Online Moro Duit", 5. Alur Kerja Tiap Halaman, 6. Apps Script Endpoints (`code.gs.js`), 7. Hal yang Perlu Dikonfirmasi/Dikoreksi Sebelum Prompt Disusun, 8. Task Breakdown untuk Freebuff (Dipecah Bertahap) (+4 more)
 
 ### Community 1 - "Keranjang-Duit/script.js"
-Cohesion: 0.32
-Nodes (12): applyFilters(), attachListeners(), escapeHtml(), formatRupiah(), getFilteredData(), hideStatus(), loadKatalog(), populateKategoriFilter() (+4 more)
+Cohesion: 0.26
+Nodes (14): applyFilters(), attachListeners(), escapeHtml(), formatRupiah(), getFilteredData(), hideStatus(), loadKatalog(), populateKategoriFilter() (+6 more)
 
 ### Community 2 - "code.gs.js"
 Cohesion: 0.54
