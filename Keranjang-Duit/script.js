@@ -284,17 +284,18 @@
         items.push({
           produk: produkData[i].produk,
           qty: qty,
-          hargaSatuan: hargaJual,
-          subtotal: hargaJual * qty
+          hargaSatuan: Math.ceil(hargaJual),
+          subtotal: Math.ceil(hargaJual * qty)
         });
       }
     }
 
-    // Calculate total from items
+    // Calculate total from items (already ceil'd per-item)
     var total = 0;
     for (var j = 0; j < items.length; j++) {
       total += items[j].subtotal;
     }
+    total = Math.ceil(total);
 
     // Save to sessionStorage
     var namaPelanggan = namaPelangganInput ? namaPelangganInput.value.trim() : "";
@@ -320,7 +321,7 @@
   function formatRupiah(val) {
     var num = Number(val);
     if (isNaN(num)) return val;
-    return "Rp " + num.toLocaleString("id-ID");
+    return "Rp " + Math.ceil(num).toLocaleString("id-ID");
   }
 
   function escapeHtml(str) {

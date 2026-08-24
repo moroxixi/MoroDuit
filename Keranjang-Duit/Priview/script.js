@@ -101,10 +101,6 @@
     var savedShadow = notaEl.style.boxShadow;
     notaEl.style.boxShadow = "none";
 
-    // Track whether fetch completed successfully — prevents false error
-    // message when location.href navigation aborts the pending fetch.
-    var fetchDone = false;
-
     // Step 1: Capture PNG SYNCHRONOUSLY in user-gesture context
     // (avoids popup-blocker for downstream download + wa.me redirect)
     html2canvas(notaEl).then(function (canvas) {
@@ -127,7 +123,29 @@
       a.click();
       document.body.removeChild(a);
 
-      // ── Step 2: POST simpanRiwayat AFTER download triggered ──
+      // ── Show WhatsApp button IMMEDIATELY (direct user action) ──
+      // This happens right after download, BEFORE fetch completes,
+      // so user can proceed to WhatsApp without waiting for server.
+      var noWA = MORODUIT_CONFIG.NOMOR_WA_TOKO.replace(/[^0-9]/g, "");
+      var totalFormatted = formatRupiah(keranjangData.total);
+      var ringkasanPending = "Total: " + totalFormatted
+        + ". Mohon lampirkan foto nota yang baru terunduh.";
+      btnKirimWA.href = "https://wa.me/" + noWA
+        + "?text=" + encodeURIComponent(ringkasanPending);
+
+      // Hide printBtn, show WhatsApp button
+      printBtn.classList.add("hidden");
+      btnKirimWA.classList.remove("hidden");
+
+      // Show success status
+      statusMessage.textContent = "\u2705 Nota berhasil diunduh! Klik tombol di bawah untuk kirim ke WhatsApp.";
+      statusMessage.className = "status-message success";
+
+      // Remove from sessionStorage (prevent double-submit)
+      sessionStorage.removeItem("moroduit_keranjang");
+
+      // ── Background fetch: POST simpanRiwayat (non-blocking) ──
+      // If fetch fails, just log warning — don't block user from WhatsApp.
       var payload = {
         action: "simpanRiwayat",
         token: MORODUIT_CONFIG.TOKEN,
@@ -150,21 +168,19 @@
         .then(function (response) {
           console.log("[Priview] Server response:", response);
 
-          // Flexible success check: accept if EITHER response.tanggal OR
-          // response.success is truthy. This handles Apps Script variants
-          // that may not include a "success" flag.
+          // Update WA link with real noNota if server returned it
           var serverConfirmed = response.tanggal || response.success;
+          if (serverConfirmed && response.noNota) {
+            var safeNoNota = String(response.noNota).replace(/[^A-Za-z0-9_-]/g, "-");
+            var ringkasanFinal = "No Nota: " + response.noNota
+              + ", Total: " + totalFormatted
+              + ". Mohon lampirkan foto nota yang baru terunduh.";
+            btnKirimWA.href = "https://wa.me/" + noWA
+              + "?text=" + encodeURIComponent(ringkasanFinal);
 
-          if (serverConfirmed) {
-            fetchDone = true;
-
-            // ── Re-download with server-assigned noNota + timestamp ──
-            var safeNoNota = response.noNota
-              ? String(response.noNota).replace(/[^A-Za-z0-9_-]/g, "-")
-              : "unknown";
+            // Re-download with server-assigned noNota filename
             var ts = Date.now();
             var finalFilename = "nota-" + safeNoNota + "-" + ts + ".png";
-
             var a2 = document.createElement("a");
             a2.href = dataURL;
             a2.download = finalFilename;
@@ -172,50 +188,16 @@
             a2.click();
             document.body.removeChild(a2);
 
-            // Update display with real Tanggal — fallback to local if missing
+            // Update display with real Tanggal
             tanggalEl.textContent = response.tanggal || new Date().toLocaleDateString("id-ID", {
               weekday: "long", year: "numeric", month: "long", day: "numeric"
             });
-
-            // Remove from sessionStorage (prevent double-submit)
-            sessionStorage.removeItem("moroduit_keranjang");
-
-            // ── Step 2: Show WhatsApp button (direct user action) ──
-            // Using <a href> instead of location.href avoids iOS Safari
-            // popup-blocker issues with async fetch context.
-            var noWA = MORODUIT_CONFIG.NOMOR_WA_TOKO.replace(/[^0-9]/g, "");
-            var totalFormatted = formatRupiah(keranjangData.total);
-            var ringkasan = "No Nota: " + (response.noNota || "-")
-              + ", Total: " + totalFormatted
-              + ". Mohon lampirkan foto nota yang baru terunduh.";
-            btnKirimWA.href = "https://wa.me/" + noWA
-              + "?text=" + encodeURIComponent(ringkasan);
-
-            // Hide printBtn, show WhatsApp button
-            printBtn.classList.add("hidden");
-            btnKirimWA.classList.remove("hidden");
-
-            // Show success status
-            statusMessage.textContent = "\u2705 Pesanan berhasil disimpan! Klik tombol di bawah untuk kirim ke WhatsApp.";
-            statusMessage.className = "status-message success";
-          } else {
-            // Server returned a response but no success indicators
-            console.warn("[Priview] Response missing success/tanggal:", response);
-            handlePrintError(response.error || "Server merespons tapi data tidak terverifikasi. Coba lagi.");
           }
         })
         .catch(function (err) {
-          // Only show error if fetch actually failed (not when location.href
-          // navigation aborted the pending fetch after successful response).
-          if (!fetchDone) {
-            var errDetail = err.message || err.name || "Unknown error";
-            handlePrintError("Gagal menghubungi server: " + errDetail + ". Periksa koneksi internet.");
-          }
-          console.error("[Priview] Print fetch error:", {
-            name: err.name,
-            message: err.message,
-            fetchDone: fetchDone
-          });
+          // Fetch failed but user can still proceed to WhatsApp.
+          // Just log warning — don't show error or block UX.
+          console.warn("[Priview] Background fetch failed (data may not be saved to server):", err.message || err);
         });
 
     }).catch(function (err) {
@@ -298,7 +280,7 @@
   function formatRupiah(val) {
     var num = Number(val);
     if (isNaN(num)) return val;
-    return "Rp " + num.toLocaleString("id-ID");
+    return "Rp " + Math.ceil(num).toLocaleString("id-ID");
   }
 
   function escapeHtml(str) {
