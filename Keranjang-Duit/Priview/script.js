@@ -15,6 +15,7 @@
   var totalValueEl = document.getElementById("totalValue");
   var printBtn = document.getElementById("printBtn");
   var batalBtn = document.getElementById("batalBtn");
+  var btnKirimWA = document.getElementById("btnKirimWA");
   var statusMessage = document.getElementById("statusMessage");
 
   // ── Read sessionStorage ───────────────────────────────────────────
@@ -179,14 +180,24 @@
             // Remove from sessionStorage (prevent double-submit)
             sessionStorage.removeItem("moroduit_keranjang");
 
-            // Redirect to WhatsApp (location.href = same tab, no popup blocker)
+            // ── Step 2: Show WhatsApp button (direct user action) ──
+            // Using <a href> instead of location.href avoids iOS Safari
+            // popup-blocker issues with async fetch context.
             var noWA = MORODUIT_CONFIG.NOMOR_WA_TOKO.replace(/[^0-9]/g, "");
             var totalFormatted = formatRupiah(keranjangData.total);
             var ringkasan = "No Nota: " + (response.noNota || "-")
               + ", Total: " + totalFormatted
               + ". Mohon lampirkan foto nota yang baru terunduh.";
-            location.href = "https://wa.me/" + noWA
+            btnKirimWA.href = "https://wa.me/" + noWA
               + "?text=" + encodeURIComponent(ringkasan);
+
+            // Hide printBtn, show WhatsApp button
+            printBtn.classList.add("hidden");
+            btnKirimWA.classList.remove("hidden");
+
+            // Show success status
+            statusMessage.textContent = "\u2705 Pesanan berhasil disimpan! Klik tombol di bawah untuk kirim ke WhatsApp.";
+            statusMessage.className = "status-message success";
           } else {
             // Server returned a response but no success indicators
             console.warn("[Priview] Response missing success/tanggal:", response);
@@ -226,6 +237,9 @@
   function resetPrintBtn() {
     printBtn.disabled = false;
     printBtn.textContent = "🛒 Kirim Pesanan";
+    printBtn.classList.remove("hidden");
+    btnKirimWA.classList.add("hidden");
+    btnKirimWA.href = "#";
   }
 
   // ── Screenshot & auto-download nota ──────────────────────────────

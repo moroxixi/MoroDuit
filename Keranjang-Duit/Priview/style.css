@@ -324,6 +324,19 @@ main {
   background-color: #bdbdbd;
 }
 
+.btn-wa {
+  background-color: #25d366;
+  color: #ffffff;
+}
+
+.btn-wa:hover {
+  background-color: #1da851;
+}
+
+.btn.hidden {
+  display: none;
+}
+
 .btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
