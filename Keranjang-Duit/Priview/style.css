@@ -333,6 +333,15 @@ main {
   background-color: #1da851;
 }
 
+.btn-sheet {
+  background-color: #1565c0;
+  color: #ffffff;
+}
+
+.btn-sheet:hover {
+  background-color: #0d47a1;
+}
+
 .btn.hidden {
   display: none;
 }

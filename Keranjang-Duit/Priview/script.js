@@ -1,6 +1,9 @@
 /* ══════════════════════════════════════════════════════════════════════
    MoroDuit Priview — Script
-   Baca sessionStorage, tampilkan nota draft, POST simpanRiwayat saat Print
+   Baca sessionStorage, tampilkan nota draft, 3 aksi independen:
+   1. Simpan ke Sheet (fetch POST)
+   2. Download Gambar Nota (html2canvas)
+   3. Kirim ke WhatsApp (direct link)
    ══════════════════════════════════════════════════════════════════════ */
 
 (function () {
@@ -13,9 +16,10 @@
   var tanggalEl = document.getElementById("tanggal");
   var notaItemsEl = document.getElementById("notaItems");
   var totalValueEl = document.getElementById("totalValue");
-  var printBtn = document.getElementById("printBtn");
-  var batalBtn = document.getElementById("batalBtn");
+  var btnSimpanSheet = document.getElementById("btnSimpanSheet");
+  var btnDownloadNota = document.getElementById("btnDownloadNota");
   var btnKirimWA = document.getElementById("btnKirimWA");
+  var batalBtn = document.getElementById("batalBtn");
   var statusMessage = document.getElementById("statusMessage");
 
   // ── Read sessionStorage ───────────────────────────────────────────
@@ -44,6 +48,7 @@
   // ── Data valid — render nota ──────────────────────────────────────
   showNota();
   renderNota(keranjangData);
+  initWhatsAppLink();
 
   // ── Show error state ──────────────────────────────────────────────
   function showError() {
@@ -55,6 +60,16 @@
   function showNota() {
     errorState.classList.add("hidden");
     notaContainer.classList.remove("hidden");
+  }
+
+  // ── Initialize WhatsApp link on page load ─────────────────────────
+  function initWhatsAppLink() {
+    var noWA = MORODUIT_CONFIG.NOMOR_WA_TOKO.replace(/[^0-9]/g, "");
+    var totalFormatted = formatRupiah(keranjangData.total);
+    var ringkasan = "Total: " + totalFormatted
+      + ". Mohon lampirkan foto nota yang baru terunduh.";
+    btnKirimWA.href = "https://wa.me/" + noWA
+      + "?text=" + encodeURIComponent(ringkasan);
   }
 
   // ── Render nota ───────────────────────────────────────────────────
@@ -91,28 +106,96 @@
     totalValueEl.textContent = formatRupiah(data.total);
   }
 
-  // ── Print button click handler ───────────────────────────────────
-  printBtn.addEventListener("click", function () {
+  // ══════════════════════════════════════════════════════════════════
+  //  ACTION 1: Simpan ke Sheet (fetch POST)
+  // ══════════════════════════════════════════════════════════════════
+  btnSimpanSheet.addEventListener("click", function () {
     // Disable button (prevent double-click)
-    printBtn.disabled = true;
-    printBtn.textContent = "⏳ Menyimpan & Mengirim...";
+    btnSimpanSheet.disabled = true;
+    btnSimpanSheet.textContent = "⏳ Menyimpan...";
+
+    var payload = {
+      action: "simpanRiwayat",
+      token: MORODUIT_CONFIG.TOKEN,
+      items: keranjangData.items,
+      total: keranjangData.total,
+      namaPelanggan: keranjangData.namaPelanggan || ""
+    };
+
+    fetch(MORODUIT_CONFIG.APPS_SCRIPT_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain" },
+      body: JSON.stringify(payload)
+    })
+      .then(function (res) {
+        if (!res.ok) {
+          throw new Error("HTTP " + res.status + " " + res.statusText);
+        }
+        return res.json();
+      })
+      .then(function (response) {
+        console.log("[Priview] Server response:", response);
+
+        var serverConfirmed = response.tanggal || response.success;
+
+        if (serverConfirmed) {
+          // Update display with real Tanggal
+          tanggalEl.textContent = response.tanggal || new Date().toLocaleDateString("id-ID", {
+            weekday: "long", year: "numeric", month: "long", day: "numeric"
+          });
+
+          // Update WhatsApp link with real noNota
+          if (response.noNota) {
+            var noWA = MORODUIT_CONFIG.NOMOR_WA_TOKO.replace(/[^0-9]/g, "");
+            var totalFormatted = formatRupiah(keranjangData.total);
+            var ringkasanFinal = "No Nota: " + response.noNota
+              + ", Total: " + totalFormatted
+              + ". Mohon lampirkan foto nota yang baru terunduh.";
+            btnKirimWA.href = "https://wa.me/" + noWA
+              + "?text=" + encodeURIComponent(ringkasanFinal);
+          }
+
+          // Remove from sessionStorage (prevent double-submit)
+          sessionStorage.removeItem("moroduit_keranjang");
+
+          // Show success
+          statusMessage.textContent = "\u2705 Berhasil disimpan ke Sheet!";
+          statusMessage.className = "status-message success";
+
+          btnSimpanSheet.disabled = false;
+          btnSimpanSheet.textContent = "\uD83D\uDCCA Simpan ke Sheet";
+        } else {
+          console.warn("[Priview] Response missing success/tanggal:", response);
+          statusMessage.textContent = "\u26A0\uFE0F Server merespons tapi data tidak terverifikasi.";
+          statusMessage.className = "status-message error";
+          btnSimpanSheet.disabled = false;
+          btnSimpanSheet.textContent = "\uD83D\uDCCA Simpan ke Sheet";
+        }
+      })
+      .catch(function (err) {
+        console.error("[Priview] Simpan sheet error:", err.message || err);
+        statusMessage.textContent = "\u274C Gagal menyimpan: " + (err.message || "Periksa koneksi internet.");
+        statusMessage.className = "status-message error";
+        btnSimpanSheet.disabled = false;
+        btnSimpanSheet.textContent = "\uD83D\uDCCA Simpan ke Sheet";
+      });
+  });
+
+  // ══════════════════════════════════════════════════════════════════
+  //  ACTION 2: Download Gambar Nota (html2canvas)
+  // ══════════════════════════════════════════════════════════════════
+  btnDownloadNota.addEventListener("click", function () {
+    btnDownloadNota.disabled = true;
+    btnDownloadNota.textContent = "⏳ Membuat gambar...";
 
     var notaEl = document.getElementById("nota");
     var savedShadow = notaEl.style.boxShadow;
     notaEl.style.boxShadow = "none";
 
-    // Step 1: Capture PNG SYNCHRONOUSLY in user-gesture context
-    // (avoids popup-blocker for downstream download + wa.me redirect)
     html2canvas(notaEl).then(function (canvas) {
       notaEl.style.boxShadow = savedShadow;
 
-      // Generate data URL while still in user-gesture context
       var dataURL = canvas.toDataURL("image/png");
-
-      // ── Step 1: Auto-download PNG IMMEDIATELY (1-level nesting) ──
-      // This must happen in the SAME .then() as toDataURL, BEFORE fetch(),
-      // so iOS Safari/Chrome retains the "trusted user gesture" for
-      // programmatic download. (Same pattern as Tempura/Wonton proven on iPhone.)
       var timestamp = Date.now();
       var filename = "nota-" + timestamp + ".png";
 
@@ -123,152 +206,26 @@
       a.click();
       document.body.removeChild(a);
 
-      // ── Show WhatsApp button IMMEDIATELY (direct user action) ──
-      // This happens right after download, BEFORE fetch completes,
-      // so user can proceed to WhatsApp without waiting for server.
-      var noWA = MORODUIT_CONFIG.NOMOR_WA_TOKO.replace(/[^0-9]/g, "");
-      var totalFormatted = formatRupiah(keranjangData.total);
-      var ringkasanPending = "Total: " + totalFormatted
-        + ". Mohon lampirkan foto nota yang baru terunduh.";
-      btnKirimWA.href = "https://wa.me/" + noWA
-        + "?text=" + encodeURIComponent(ringkasanPending);
-
-      // Hide printBtn, show WhatsApp button
-      printBtn.classList.add("hidden");
-      btnKirimWA.classList.remove("hidden");
-
-      // Show success status
-      statusMessage.textContent = "\u2705 Nota berhasil diunduh! Klik tombol di bawah untuk kirim ke WhatsApp.";
+      statusMessage.textContent = "\u2705 Gambar nota berhasil diunduh!";
       statusMessage.className = "status-message success";
 
-      // Remove from sessionStorage (prevent double-submit)
-      sessionStorage.removeItem("moroduit_keranjang");
-
-      // ── Background fetch: POST simpanRiwayat (non-blocking) ──
-      // If fetch fails, just log warning — don't block user from WhatsApp.
-      var payload = {
-        action: "simpanRiwayat",
-        token: MORODUIT_CONFIG.TOKEN,
-        items: keranjangData.items,
-        total: keranjangData.total,
-        namaPelanggan: keranjangData.namaPelanggan || ""
-      };
-
-      fetch(MORODUIT_CONFIG.APPS_SCRIPT_URL, {
-        method: "POST",
-        headers: { "Content-Type": "text/plain" },
-        body: JSON.stringify(payload)
-      })
-        .then(function (res) {
-          if (!res.ok) {
-            throw new Error("HTTP " + res.status + " " + res.statusText);
-          }
-          return res.json();
-        })
-        .then(function (response) {
-          console.log("[Priview] Server response:", response);
-
-          // Update WA link with real noNota if server returned it
-          var serverConfirmed = response.tanggal || response.success;
-          if (serverConfirmed && response.noNota) {
-            var safeNoNota = String(response.noNota).replace(/[^A-Za-z0-9_-]/g, "-");
-            var ringkasanFinal = "No Nota: " + response.noNota
-              + ", Total: " + totalFormatted
-              + ". Mohon lampirkan foto nota yang baru terunduh.";
-            btnKirimWA.href = "https://wa.me/" + noWA
-              + "?text=" + encodeURIComponent(ringkasanFinal);
-
-            // Re-download with server-assigned noNota filename
-            var ts = Date.now();
-            var finalFilename = "nota-" + safeNoNota + "-" + ts + ".png";
-            var a2 = document.createElement("a");
-            a2.href = dataURL;
-            a2.download = finalFilename;
-            document.body.appendChild(a2);
-            a2.click();
-            document.body.removeChild(a2);
-
-            // Update display with real Tanggal
-            tanggalEl.textContent = response.tanggal || new Date().toLocaleDateString("id-ID", {
-              weekday: "long", year: "numeric", month: "long", day: "numeric"
-            });
-          }
-        })
-        .catch(function (err) {
-          // Fetch failed but user can still proceed to WhatsApp.
-          // Just log warning — don't show error or block UX.
-          console.warn("[Priview] Background fetch failed (data may not be saved to server):", err.message || err);
-        });
-
+      btnDownloadNota.disabled = false;
+      btnDownloadNota.textContent = "\uD83D\uDCE5 Download Gambar Nota";
     }).catch(function (err) {
       notaEl.style.boxShadow = savedShadow;
-      console.error("html2canvas render failed:", err);
-      handlePrintError("Gagal membuat screenshot nota.");
+      console.error("[Priview] html2canvas render failed:", err);
+      statusMessage.textContent = "\u274C Gagal membuat gambar nota.";
+      statusMessage.className = "status-message error";
+      btnDownloadNota.disabled = false;
+      btnDownloadNota.textContent = "\uD83D\uDCE5 Download Gambar Nota";
     });
   });
 
-  function handlePrintError(message) {
-    resetPrintBtn();
-
-    statusMessage.textContent = "❌ " + message;
-    statusMessage.className = "status-message error";
-
-    // DO NOT remove sessionStorage — user can retry
-  }
-
-  function resetPrintBtn() {
-    printBtn.disabled = false;
-    printBtn.textContent = "🛒 Kirim Pesanan";
-    printBtn.classList.remove("hidden");
-    btnKirimWA.classList.add("hidden");
-    btnKirimWA.href = "#";
-  }
-
-  // ── Screenshot & auto-download nota ──────────────────────────────
-  function captureAndDownloadNota(noNota) {
-    var notaEl = document.getElementById("nota");
-    if (!notaEl || typeof html2canvas === "undefined") {
-      console.warn("html2canvas not loaded or nota element not found, skipping screenshot");
-      return Promise.resolve();
-    }
-
-    // Sanitize noNota for filename
-    var safeNoNota = noNota ? String(noNota).replace(/[^A-Za-z0-9_-]/g, "-") : null;
-    var timestamp = Date.now();
-    var filename = safeNoNota
-      ? "Nota-" + safeNoNota + "-" + timestamp + ".png"
-      : "Nota-" + timestamp + ".png";
-
-    // Bug #1 fix: temporarily remove box-shadow to prevent html2canvas
-    // rendering artifacts (belang/faded gradient)
-    var savedShadow = notaEl.style.boxShadow;
-    notaEl.style.boxShadow = "none";
-
-    return html2canvas(notaEl)
-      .then(function (canvas) {
-        canvas.toBlob(function (blob) {
-          if (!blob) {
-            console.warn("Failed to create blob for screenshot");
-            return;
-          }
-          var url = URL.createObjectURL(blob);
-          var a = document.createElement("a");
-          a.href = url;
-          a.download = filename;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          URL.revokeObjectURL(url);
-        }, "image/png");
-      })
-      .catch(function (err) {
-        console.error("html2canvas render failed:", err);
-      })
-      .finally(function () {
-        // Restore box-shadow after capture
-        notaEl.style.boxShadow = savedShadow;
-      });
-  }
+  // ══════════════════════════════════════════════════════════════════
+  //  ACTION 3: Kirim ke WhatsApp (direct <a href> — no handler needed)
+  // ══════════════════════════════════════════════════════════════════
+  // btnKirimWA is an <a> tag with href set in initWhatsAppLink().
+  // No click handler needed — browser navigates directly.
 
   // ── Batal button click handler ───────────────────────────────────
   batalBtn.addEventListener("click", function () {
