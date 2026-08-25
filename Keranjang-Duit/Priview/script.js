@@ -195,7 +195,7 @@
       });
       var pesanWA = "Nota tanggal " + tanggalWA + ", Total: "
         + formatRupiah(keranjangData.total)
-        + ". Mohon lampirkan foto nota yang baru terunduh.";
+        + ". Mohon lampirkan foto nota yang tadi diunduh.";
       var noWA = MORODUIT_CONFIG.NOMOR_WA_TOKO.replace(/[^0-9]/g, "");
       btnKirimWA.href = "https://wa.me/" + noWA
         + "?text=" + encodeURIComponent(pesanWA);
