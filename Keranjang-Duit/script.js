@@ -227,12 +227,18 @@
         var safeId = toSafeId(nama);
         allNames.push(nama);
 
+        var fotoSrc = p.fotoPath ? ('../assets/images/' + p.fotoPath) : '';
+        var fotoEl = fotoSrc
+          ? '<img class="produk-foto-img" src="' + fotoSrc + '" alt="' + escapeHtml(nama) + '" loading="lazy">'
+          : '<svg class="produk-foto-placeholder" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>';
+
         html += '<div class="produk-card" data-nama="' + escapeHtml(nama) + '">'
               + '  <div class="checkbox-wrapper">'
               + '    <input type="checkbox" id="chk_' + safeId + '" '
               + '           data-nama="' + escapeHtml(nama) + '">'
               + '    <label class="checkbox-custom" for="chk_' + safeId + '"></label>'
               + '  </div>'
+              + '  <div class="produk-foto">' + fotoEl + '</div>'
               + '  <div class="produk-info">'
               + '    <div class="produk-name">' + escapeHtml(nama) + '</div>'
               + '  </div>'
