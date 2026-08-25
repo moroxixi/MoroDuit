@@ -144,17 +144,6 @@
             weekday: "long", year: "numeric", month: "long", day: "numeric"
           });
 
-          // Update WhatsApp link with real noNota
-          if (response.noNota) {
-            var noWA = MORODUIT_CONFIG.NOMOR_WA_TOKO.replace(/[^0-9]/g, "");
-            var totalFormatted = formatRupiah(keranjangData.total);
-            var ringkasanFinal = "No Nota: " + response.noNota
-              + ", Total: " + totalFormatted
-              + ". Mohon lampirkan foto nota yang baru terunduh.";
-            btnKirimWA.href = "https://wa.me/" + noWA
-              + "?text=" + encodeURIComponent(ringkasanFinal);
-          }
-
           // Remove from sessionStorage (prevent double-submit)
           sessionStorage.removeItem("moroduit_keranjang");
           sessionStorage.removeItem("moroduit_selection");
@@ -199,6 +188,19 @@
 
       var dataURL = canvas.toDataURL("image/png");
       var timestamp = Date.now();
+
+      // Build WA message with Indonesian date (no weekday)
+      var tanggalWA = new Date().toLocaleDateString("id-ID", {
+        day: "numeric", month: "long", year: "numeric"
+      });
+      var pesanWA = "Nota tanggal " + tanggalWA + ", Total: "
+        + formatRupiah(keranjangData.total)
+        + ". Mohon lampirkan foto nota yang baru terunduh.";
+      var noWA = MORODUIT_CONFIG.NOMOR_WA_TOKO.replace(/[^0-9]/g, "");
+      btnKirimWA.href = "https://wa.me/" + noWA
+        + "?text=" + encodeURIComponent(pesanWA);
+      btnKirimWA.dataset.ready = "true";
+
       var filename = "nota-" + timestamp + ".png";
 
       var a = document.createElement("a");
@@ -224,10 +226,14 @@
   });
 
   // ══════════════════════════════════════════════════════════════════
-  //  ACTION 3: Kirim ke WhatsApp (direct <a href> — no handler needed)
+  //  ACTION 3: Kirim ke WhatsApp (gated by dataset.ready)
   // ══════════════════════════════════════════════════════════════════
-  // btnKirimWA is an <a> tag with href set in initWhatsAppLink().
-  // No click handler needed — browser navigates directly.
+  btnKirimWA.addEventListener("click", function (e) {
+    if (btnKirimWA.dataset.ready !== "true") {
+      e.preventDefault();
+      alert("Download nota dulu, ya!");
+    }
+  });
 
   // ── Batal button click handler ───────────────────────────────────
   batalBtn.addEventListener("click", function () {
