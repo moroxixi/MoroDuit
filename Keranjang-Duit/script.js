@@ -136,7 +136,7 @@
     produkList.innerHTML = "";
 
     var url = MORODUIT_CONFIG.APPS_SCRIPT_URL
-      + "?action=getKatalog"
+      + "?action=getKatalogFull"
       + "&token=" + encodeURIComponent(MORODUIT_CONFIG.TOKEN);
 
     fetch(url)

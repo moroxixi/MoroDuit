@@ -22,7 +22,7 @@
   function formatRupiah(val) {
     var num = Number(val);
     if (isNaN(num)) return val;
-    return "Rp " + num.toLocaleString("id-ID");
+    return "Rp " + Math.ceil(num).toLocaleString("id-ID");
   }
 
   function escapeHtml(str) {
