@@ -53,6 +53,15 @@ function ensureHeaders_() {
       riwayat.insertColumnBefore(2);
       riwayat.getRange(1, 2).setValue("Nama Pelanggan");
     }
+
+    // Idempotent: tambah kolom "Sumber" di kolom K (index 11) kalau belum ada
+    var hasSumber = false;
+    for (var h2 = 0; h2 < headers.length; h2++) {
+      if (String(headers[h2]).trim().toLowerCase() === "sumber") { hasSumber = true; break; }
+    }
+    if (!hasSumber) {
+      riwayat.getRange(1, 11).setValue("Sumber");
+    }
   }
 }
 
@@ -264,6 +273,65 @@ function doGet(e) {
   return jsonResponse_({success: false, error: "unknown action"});
 }
 
+// ── Helper: Gemini OCR Nota ─────────────────────────────────────────
+var GEMINI_MODEL_NOTA_ = "gemini-3.5-flash";
+var JUMLAH_API_KEY_NOTA_ = 6;
+
+function getGeminiApiKeysNota_() {
+  var props = PropertiesService.getScriptProperties();
+  var keys = [];
+  for (var i = 1; i <= JUMLAH_API_KEY_NOTA_; i++) {
+    var k = props.getProperty("GEMINI_API_KEY_" + i);
+    if (k) keys.push(k);
+  }
+  if (keys.length === 0) {
+    throw new Error("Tidak ada GEMINI_API_KEY_1..." + JUMLAH_API_KEY_NOTA_ + " di Script Properties MoroDuit.");
+  }
+  return keys;
+}
+
+function callGeminiGenerateContentNota_(payload) {
+  var keys = getGeminiApiKeysNota_();
+  var lastError = null;
+  for (var i = 0; i < keys.length; i++) {
+    var url = "https://generativelanguage.googleapis.com/v1beta/models/" + GEMINI_MODEL_NOTA_ + ":generateContent?key=" + keys[i];
+    var res;
+    try {
+      res = UrlFetchApp.fetch(url, { method: "post", contentType: "application/json", payload: JSON.stringify(payload), muteHttpExceptions: true });
+    } catch (fetchErr) {
+      lastError = "Key ke-" + (i + 1) + " gagal fetch: " + fetchErr;
+      continue;
+    }
+    var code = res.getResponseCode();
+    var text = res.getContentText();
+    if (code === 200) return JSON.parse(text);
+    var isRetryable = code === 429 || code === 503 || text.indexOf("high demand") !== -1 || text.indexOf("quota") !== -1 || text.indexOf("RESOURCE_EXHAUSTED") !== -1 || text.indexOf("UNAVAILABLE") !== -1;
+    lastError = "Key ke-" + (i + 1) + " gagal (HTTP " + code + "): " + text;
+    if (!isRetryable) throw new Error(lastError);
+  }
+  throw new Error("Semua " + keys.length + " API key Gemini gagal. Error terakhir: " + lastError);
+}
+
+function callGeminiOCRNota_(imageBase64, mimeType) {
+  var prompt = "Ini foto nota belanja dari toko sembako MoroDuit. Format nota: ada baris 'Nama Pelanggan: ...' di header, " +
+    "lalu tabel kolom No/Produk/Qty/Harga Satuan/Subtotal, lalu baris Total Nota di bawah. " +
+    "Balas HANYA dengan JSON object (tanpa markdown, tanpa penjelasan), format persis: " +
+    '{"namaPelanggan":"nama atau string kosong kalau tidak ada/tertulis -","items":[{"produk":"nama barang","qty":angka,"hargaSatuan":angka,"subtotal":angka}],"total":angka}. ' +
+    "Semua angka = angka murni tanpa titik/koma/Rp. Kalau ada baris tidak jelas/tidak terbaca, lewati baris itu, jangan mengarang.";
+  var payload = {
+    contents: [{ parts: [{ text: prompt }, { inline_data: { mime_type: mimeType, data: imageBase64 } }] }],
+    generationConfig: { temperature: 0 }
+  };
+  var data = callGeminiGenerateContentNota_(payload);
+  if (data.error) throw new Error("Gemini error: " + data.error.message);
+  var text = data.candidates[0].content.parts[0].text.trim();
+  text = text.replace(/^```json/i, "").replace(/^```/, "").replace(/```$/, "").trim();
+  var start = text.indexOf("{");
+  var end = text.lastIndexOf("}");
+  if (start === -1 || end === -1) throw new Error("Gemini tidak mengembalikan JSON object yang valid.");
+  return JSON.parse(text.substring(start, end + 1));
+}
+
 // ══════════════════════════════════════════════════════════════════════
 // POST ENDPOINT
 // ══════════════════════════════════════════════════════════════════════
@@ -405,6 +473,13 @@ function doPost(e) {
       }
       sheet.getRange(startRow, 9, rows.length, 1).setFormulas(formulasI);
       sheet.getRange(startRow, 10, rows.length, 1).setFormulas(formulasJ);
+
+      // ── Tulis kolom K (Sumber) hanya kalau sumber diisi ──
+      if (body.sumber) {
+        var sumberCol = [];
+        for (var s = 0; s < rows.length; s++) sumberCol.push([body.sumber]);
+        sheet.getRange(startRow, 11, rows.length, 1).setValues(sumberCol);
+      }
     }
 
     return jsonResponse_({success: true, noNota: noNota, tanggal: tanggal});
@@ -495,7 +570,34 @@ function doPost(e) {
     });
   }
 
+  // ── scanNota (OCR nota belanja) ──
+  if (action === "scanNota") {
+    if (!body.imageBase64) return jsonResponse_({success: false, error: "imageBase64 wajib diisi"});
+    var mimeType = body.mimeType || "image/png";
+    var ocrResult;
+    try {
+      ocrResult = callGeminiOCRNota_(body.imageBase64, mimeType);
+    } catch (ocrErr) {
+      return jsonResponse_({success: false, error: "OCR gagal: " + ocrErr.message});
+    }
+    var katalogSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Katalog");
+    var rawItems = ocrResult.items || [];
+    var matchedItems = [];
+    for (var mi = 0; mi < rawItems.length; mi++) {
+      var it = rawItems[mi];
+      var rowIdx = findProdukRow_(katalogSheet, it.produk);
+      matchedItems.push({
+        produk: it.produk,
+        qty: it.qty,
+        hargaSatuan: it.hargaSatuan,
+        subtotal: it.subtotal,
+        matched: rowIdx !== -1,
+        matchedProduk: rowIdx !== -1 ? katalogSheet.getRange(rowIdx, 2).getValue() : null
+      });
+    }
+    return jsonResponse_({success: true, namaPelanggan: ocrResult.namaPelanggan || "", items: matchedItems});
+  }
+
   return jsonResponse_({success: false, error: "unknown action"});
 }
-
 
