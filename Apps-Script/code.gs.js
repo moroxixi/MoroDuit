@@ -165,7 +165,18 @@ function doGet(e) {
     var data = sheet.getDataRange().getValues();
     var result = [];
 
+    // Cari indeks kolom "FotoPath" dari header (defensif — kolom mungkin belum ada)
+    var headers = data.length > 0 ? data[0] : [];
+    var fotoPathIdx = -1;
+    for (var h = 0; h < headers.length; h++) {
+      if (String(headers[h]).trim().toLowerCase() === "fotopath") {
+        fotoPathIdx = h;
+        break;
+      }
+    }
+
     for (var i = 1; i < data.length; i++) {
+      var fotoPath = fotoPathIdx >= 0 && fotoPathIdx < data[i].length ? String(data[i][fotoPathIdx] || "").trim() : "";
       result.push({
         produk: String(data[i][1]).trim(),
         kategori: String(data[i][2] || ""),
@@ -173,7 +184,8 @@ function doGet(e) {
         hargaPromo: data[i][4],
         hargaJual: data[i][5],
         status: String(data[i][6]).trim(),
-        catatan: String(data[i][7] || "")
+        catatan: String(data[i][7] || ""),
+        fotoPath: fotoPath
       });
     }
 
@@ -189,16 +201,28 @@ function doGet(e) {
     var data = sheet.getDataRange().getValues();
     var result = [];
 
+    // Cari indeks kolom "FotoPath" dari header (defensif — kolom mungkin belum ada)
+    var headers = data.length > 0 ? data[0] : [];
+    var fotoPathIdx = -1;
+    for (var h = 0; h < headers.length; h++) {
+      if (String(headers[h]).trim().toLowerCase() === "fotopath") {
+        fotoPathIdx = h;
+        break;
+      }
+    }
+
     for (var i = 1; i < data.length; i++) {
       // Kolom J (index 9) mungkin belum ada — defensif
       var tandai = data[i].length > 9 ? String(data[i][9] || "").trim() : "";
       var status = String(data[i][6]).trim();
       if (tandai === "Perkenalan" && status === "Ada") {
+        var fotoPath = fotoPathIdx >= 0 && fotoPathIdx < data[i].length ? String(data[i][fotoPathIdx] || "").trim() : "";
         result.push({
           produk: String(data[i][1]).trim(),
           kategori: String(data[i][2] || ""),
           hargaJual: data[i][5],
-          catatan: String(data[i][7] || "")
+          catatan: String(data[i][7] || ""),
+          fotoPath: fotoPath
         });
       }
     }
