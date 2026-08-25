@@ -249,7 +249,7 @@
   // ── Batal button click handler ───────────────────────────────────
   // Redirect ke Mode-Edit/index.html (../ = Riwayat/Mode-Edit/)
   batalBtn.addEventListener("click", function () {
-    sessionStorage.removeItem(STORAGE_KEY_EDIT);
+    // JANGAN hapus STORAGE_KEY_EDIT — user kembali untuk melanjutkan edit
     window.location.href = "../index.html";
   });
 

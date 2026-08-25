@@ -72,10 +72,18 @@
     }
 
     result.sort(function (a, b) {
-      // Parse tanggal string "yyyy-MM-dd HH:mm:ss" to Date
-      var dateA = new Date(a.tanggal.replace(" ", "T") + "+07:00");
-      var dateB = new Date(b.tanggal.replace(" ", "T") + "+07:00");
-      return dateB - dateA; // DESCENDING (newest first)
+      // Primary: sort by tanggal DESCENDING
+      var tA = a.tanggal || "";
+      var tB = b.tanggal || "";
+      var dateA = tA ? new Date(tA.replace(" ", "T") + "+07:00") : NaN;
+      var dateB = tB ? new Date(tB.replace(" ", "T") + "+07:00") : NaN;
+
+      if (!isNaN(dateA) && !isNaN(dateB)) return dateB - dateA;
+      if (!isNaN(dateA)) return -1;
+      if (!isNaN(dateB)) return 1;
+
+      // Fallback: noNota descending (MD-YYYYMMDD-XXX sorts chronologically)
+      return b.noNota > a.noNota ? 1 : b.noNota < a.noNota ? -1 : 0;
     });
 
     return result;

@@ -354,6 +354,42 @@
     }
 
     noNota = noNota.trim();
+
+    // ── Restore in-progress edit session (e.g. returned from Priview) ──
+    try {
+      var savedEdit = sessionStorage.getItem(STORAGE_KEY_EDIT);
+      if (savedEdit) {
+        var parsed = JSON.parse(savedEdit);
+        if (parsed && parsed.noNota === noNota && Array.isArray(parsed.items) && parsed.items.length > 0) {
+          editState = {
+            noNota: parsed.noNota,
+            namaPelanggan: parsed.namaPelanggan || "",
+            items: [],
+            total: 0
+          };
+          for (var si = 0; si < parsed.items.length; si++) {
+            var s = parsed.items[si];
+            editState.items.push({
+              produk: s.produk,
+              qty: Number(s.qty) || 1,
+              hargaSatuan: Number(s.hargaSatuan) || 0,
+              subtotal: Number(s.subtotal) || 0,
+              _priceChanged: false
+            });
+          }
+
+          displayNoNota.textContent = noNota;
+          displayPelanggan.textContent = editState.namaPelanggan || "-";
+          headerSubtitle.textContent = "Nota " + noNota;
+
+          recalcAndRender();
+          showEditor();
+          loadKatalog();
+          return;
+        }
+      }
+    } catch (err) { /* ignore — fall through to server fetch */ }
+
     loadingIndicator.style.display = "block";
 
     // Fetch getRiwayat
