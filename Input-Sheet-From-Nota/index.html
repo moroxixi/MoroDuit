@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MoroDuit — Input dari Nota Foto</title>
+  <link rel="stylesheet" href="../Input/style.css">
+  <style>
+    /* ── Scoped styles for this page ─────────────────────────────── */
+    .photo-zone {
+      border: 2px dashed #bdbdbd;
+      border-radius: 10px;
+      padding: 1.5rem;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    .photo-zone:hover { border-color: #2e7d32; }
+    .photo-zone input[type="file"] { display: none; }
+    .photo-zone .file-label {
+      display: inline-block;
+      padding: 0.75rem 1.25rem;
+      background-color: #2e7d32;
+      color: #fff;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    .photo-zone .file-label:hover { background-color: #1b5e20; }
+    .photo-preview {
+      margin-top: 1rem;
+    }
+    .photo-preview img {
+      max-width: 100%;
+      max-height: 300px;
+      border-radius: 8px;
+      border: 1px solid #e0e0e0;
+    }
+
+    /* ── Result area ─────────────────────────────────────────────── */
+    #resultArea { display: none; }
+    .field-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+    .field-row label {
+      font-size: 0.95rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .field-row input {
+      flex: 1;
+      padding: 0.5rem 0.75rem;
+      font-size: 1rem;
+      border: 2px solid #bdbdbd;
+      border-radius: 8px;
+    }
+    .field-row input:focus {
+      outline: none;
+      border-color: #2e7d32;
+      box-shadow: 0 0 0 3px rgba(46,125,50,0.25);
+    }
+
+    /* ── Item rows ───────────────────────────────────────────────── */
+    .item-row {
+      background-color: #fafafa;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 0.75rem;
+      transition: border-color 0.2s;
+    }
+    .item-row:hover { border-color: #2e7d32; }
+    .item-row-top {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .item-row-top select {
+      flex: 1;
+      padding: 0.5rem 0.75rem;
+      font-size: 1rem;
+      border: 2px solid #bdbdbd;
+      border-radius: 8px;
+      background: #fff;
+    }
+    .item-row-top select:focus {
+      outline: none;
+      border-color: #2e7d32;
+      box-shadow: 0 0 0 3px rgba(46,125,50,0.25);
+    }
+    .badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.15rem 0.5rem;
+      border-radius: 6px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .badge-ok {
+      background-color: #e8f5e9;
+      color: #1b5e20;
+    }
+    .badge-warn {
+      background-color: #fff3e0;
+      color: #e65100;
+    }
+    .item-row-fields {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+    }
+    .item-row-fields .f {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+    .item-row-fields .f label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #666;
+    }
+    .item-row-fields .f input {
+      width: 100%;
+      padding: 0.4rem 0.6rem;
+      font-size: 1rem;
+      border: 2px solid #bdbdbd;
+      border-radius: 6px;
+    }
+    .item-row-fields .f input:focus {
+      outline: none;
+      border-color: #2e7d32;
+    }
+    .item-subtotal {
+      margin-top: 0.4rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #2e7d32;
+      text-align: right;
+    }
+    .btn-hapus-baris {
+      background: none;
+      border: none;
+      color: #c62828;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 0.3rem 0.5rem;
+      border-radius: 4px;
+      transition: background-color 0.2s;
+      white-space: nowrap;
+    }
+    .btn-hapus-baris:hover { background-color: #ffebee; }
+
+    /* ── Total ───────────────────────────────────────────────────── */
+    .total-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 1.25rem;
+      background-color: #e8f5e9;
+      border-radius: 10px;
+      margin-bottom: 1rem;
+    }
+    .total-bar .total-label {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #1a1a1a;
+    }
+    .total-bar .total-value {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #2e7d32;
+    }
+
+    /* ── Success card ────────────────────────────────────────────── */
+    .success-card {
+      background-color: #e8f5e9;
+      border: 2px solid #2e7d32;
+      border-radius: 10px;
+      padding: 1.5rem;
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    .success-card h3 {
+      color: #1b5e20;
+      margin-bottom: 0.5rem;
+    }
+    .success-card p {
+      color: #2e7d32;
+      font-size: 0.95rem;
+    }
+
+    /* ── Responsive ──────────────────────────────────────────────── */
+    @media (max-width: 520px) {
+      .item-row-fields {
+        flex-wrap: wrap;
+      }
+      .item-row-fields .f {
+        flex: 1 1 45%;
+        min-width: 100px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>📷 Input dari Nota Foto</h1>
+    <p class="subtitle">Foto nota belanja → scan otomatis → review → simpan ke Riwayat</p>
+  </header>
+
+  <main>
+    <!-- Status message -->
+    <div id="statusMessage" class="status-message hidden" role="alert" aria-live="polite"></div>
+
+    <!-- Upload section -->
+    <section class="form-section" aria-label="Upload Foto Nota">
+      <div class="photo-zone" id="photoZone">
+        <label class="file-label" for="fileInput">Pilih Foto Nota</label>
+        <input type="file" id="fileInput" accept="image/*" capture="environment">
+        <div class="photo-preview" id="photoPreview"></div>
+      </div>
+      <button class="btn btn-primary" id="scanBtn" style="margin-top:14px;" disabled>Scan Nota</button>
+      <div id="scanStatus" style="color:#666;font-size:0.9rem;margin-top:0.5rem;"></div>
+    </section>
+
+    <!-- Result area (hidden until scan done) -->
+    <section class="form-section" id="resultArea" aria-label="Hasil Scan">
+      <div class="field-row">
+        <label for="namaPelanggan">Nama Pelanggan</label>
+        <input type="text" id="namaPelanggan" placeholder="Nama pelanggan (opsional)">
+      </div>
+
+      <div id="itemList"></div>
+
+      <div class="total-bar">
+        <span class="total-label">Total (<span id="itemCount">0</span> barang)</span>
+        <span class="total-value" id="grandTotal">Rp 0</span>
+      </div>
+
+      <button class="btn btn-secondary" id="addRowBtn" style="width:100%;">+ Tambah Baris Manual</button>
+      <button class="btn btn-primary" id="saveBtn" style="width:100%;margin-top:8px;" disabled>Simpan ke Riwayat</button>
+      <div id="saveStatus" style="margin-top:0.5rem;"></div>
+    </section>
+
+    <!-- Success message (shown after save) -->
+    <div id="successCard" class="success-card" style="display:none;">
+      <h3>✅ Berhasil Disimpan!</h3>
+      <p id="successDetail"></p>
+      <button class="btn btn-secondary" id="scanAgainBtn" style="margin-top:1rem;width:100%;">Scan Nota Lain</button>
+    </div>
+  </main>
+
+  <footer>
+    <p>MoroDuit &mdash; Toko Sembako Online</p>
+  </footer>
+
+  <script src="../config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
