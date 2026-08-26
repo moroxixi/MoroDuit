@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Database Surya — Katalog Harga Referensi</title>
+  <title>MoroDuit — Input dari Nota Foto</title>
   <link rel="stylesheet" href="../Input/style.css">
   <style>
-    /* ── Scoped styles for Database-Surya ─────────────────────────── */
+    /* ── Scoped styles for this page ─────────────────────────────── */
     main {
       max-width: 800px;
       margin: 0 auto;
@@ -44,6 +44,34 @@
       border: 1px solid #e0e0e0;
     }
 
+    /* ── Result area ─────────────────────────────────────────────── */
+    #resultArea { display: none; }
+    .field-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+    .field-row label {
+      font-size: 0.95rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .field-row input {
+      flex: 1;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 0.5rem 0.75rem;
+      font-size: 1rem;
+      border: 2px solid #bdbdbd;
+      border-radius: 8px;
+    }
+    .field-row input:focus {
+      outline: none;
+      border-color: #2e7d32;
+      box-shadow: 0 0 0 3px rgba(46,125,50,0.25);
+    }
+
     /* ── Item rows ───────────────────────────────────────────────── */
     .item-row {
       background-color: #fafafa;
@@ -60,7 +88,7 @@
       gap: 0.5rem;
       margin-bottom: 0.5rem;
     }
-    .item-row-top input[type="text"] {
+    .item-row-top select {
       flex: 1;
       width: 100%;
       box-sizing: border-box;
@@ -68,8 +96,9 @@
       font-size: 1rem;
       border: 2px solid #bdbdbd;
       border-radius: 8px;
+      background: #fff;
     }
-    .item-row-top input[type="text"]:focus {
+    .item-row-top select:focus {
       outline: none;
       border-color: #2e7d32;
       box-shadow: 0 0 0 3px rgba(46,125,50,0.25);
@@ -108,8 +137,7 @@
       font-weight: 600;
       color: #666;
     }
-    .item-row-fields .f input,
-    .item-row-fields .f select {
+    .item-row-fields .f input {
       width: 100%;
       box-sizing: border-box;
       min-width: 0;
@@ -117,12 +145,17 @@
       font-size: 1rem;
       border: 2px solid #bdbdbd;
       border-radius: 6px;
-      background: #fff;
     }
-    .item-row-fields .f input:focus,
-    .item-row-fields .f select:focus {
+    .item-row-fields .f input:focus {
       outline: none;
       border-color: #2e7d32;
+    }
+    .item-subtotal {
+      margin-top: 0.4rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #2e7d32;
+      text-align: right;
     }
     .btn-hapus-baris {
       background: none;
@@ -138,20 +171,25 @@
     }
     .btn-hapus-baris:hover { background-color: #ffebee; }
 
-    /* ── Summary bar ─────────────────────────────────────────────── */
-    .summary-bar {
+    /* ── Total ───────────────────────────────────────────────────── */
+    .total-bar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 0.75rem 1.25rem;
+      padding: 1rem 1.25rem;
       background-color: #e8f5e9;
       border-radius: 10px;
       margin-bottom: 1rem;
     }
-    .summary-bar .summary-label {
+    .total-bar .total-label {
       font-size: 1rem;
       font-weight: 700;
       color: #1a1a1a;
+    }
+    .total-bar .total-value {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #2e7d32;
     }
 
     /* ── Success card ────────────────────────────────────────────── */
@@ -173,6 +211,62 @@
     }
 
     /* ── Responsive ──────────────────────────────────────────────── */
+    /* ── Qty Stepper (replicated from Keranjang-Duit) ──────────────── */
+    .qty-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      flex-shrink: 0;
+    }
+    .qty-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 2rem;
+      height: 2rem;
+      min-width: 2rem;
+      min-height: 2rem;
+      padding: 0;
+      font-size: 1.1rem;
+      font-weight: 700;
+      line-height: 1;
+      color: #ffffff;
+      background-color: #2e7d32;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.2s, transform 0.1s;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      touch-action: manipulation;
+    }
+    .qty-btn:active:not(:disabled) {
+      transform: scale(0.93);
+    }
+    .qty-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      background-color: #bdbdbd;
+    }
+    .qty-value {
+      min-width: 3.5rem;
+      padding: 0.35rem 0.4rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-align: center;
+      border: 2px solid #bdbdbd;
+      border-radius: 6px;
+      background-color: #f5f5f5;
+      color: #1a1a1a;
+      -moz-appearance: textfield;
+    }
+    .qty-value::-webkit-inner-spin-button,
+    .qty-value::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    /* ── Responsive ──────────────────────────────────────────────── */
     @media (max-width: 520px) {
       .item-row-fields {
         flex-wrap: wrap;
@@ -186,8 +280,8 @@
 </head>
 <body>
   <header>
-    <h1>🏪 Database Surya — Katalog Harga Referensi</h1>
-    <p class="subtitle">Foto nota Surya Toserba → scan otomatis → review → simpan ke Katalog-Surya</p>
+    <h1>📷 Input dari Nota Foto</h1>
+    <p class="subtitle">Foto nota belanja → scan otomatis → review → simpan ke Riwayat</p>
   </header>
 
   <main>
@@ -195,9 +289,9 @@
     <div id="statusMessage" class="status-message hidden" role="alert" aria-live="polite"></div>
 
     <!-- Upload section -->
-    <section class="form-section" aria-label="Upload Foto Nota Surya">
+    <section class="form-section" aria-label="Upload Foto Nota">
       <div class="photo-zone" id="photoZone">
-        <label class="file-label" for="fileInput">Pilih Foto Nota Surya</label>
+        <label class="file-label" for="fileInput">Pilih Foto Nota</label>
         <input type="file" id="fileInput" accept="image/*">
         <div class="photo-preview" id="photoPreview"></div>
       </div>
@@ -207,14 +301,20 @@
 
     <!-- Result area (hidden until scan done) -->
     <section class="form-section" id="resultArea" aria-label="Hasil Scan">
+      <div class="field-row">
+        <label for="namaPelanggan">Nama Pelanggan</label>
+        <input type="text" id="namaPelanggan" placeholder="Nama pelanggan (opsional)">
+      </div>
+
       <div id="itemList"></div>
 
-      <div class="summary-bar">
-        <span class="summary-label">Total (<span id="itemCount">0</span> item)</span>
+      <div class="total-bar">
+        <span class="total-label">Total (<span id="itemCount">0</span> barang)</span>
+        <span class="total-value" id="grandTotal">Rp 0</span>
       </div>
 
       <button class="btn btn-secondary" id="addRowBtn" style="width:100%;">+ Tambah Baris Manual</button>
-      <button class="btn btn-primary" id="saveBtn" style="width:100%;margin-top:8px;" disabled>Simpan ke Katalog-Surya</button>
+      <button class="btn btn-primary" id="saveBtn" style="width:100%;margin-top:8px;" disabled>Simpan ke Riwayat</button>
       <div id="saveStatus" style="margin-top:0.5rem;"></div>
     </section>
 
@@ -227,10 +327,10 @@
   </main>
 
   <footer>
-    <p>MoroDuit &mdash; Database Harga Referensi Surya Toserba</p>
+    <p>MoroDuit &mdash; Toko Sembako Online</p>
   </footer>
 
-  <script src="../config.js"></script>
+  <script src="../../config.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

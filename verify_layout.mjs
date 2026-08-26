@@ -17,7 +17,7 @@ import { chromium } from 'playwright';
     const jsErrors = [];
     page.on('pageerror', err => jsErrors.push(err.message));
 
-    await page.goto(`http://localhost:8765/Keranjang-Duit/index.html`, {
+    await page.goto(`http://localhost:8765/Customer/Keranjang-Duit/index.html`, {
       waitUntil: 'networkidle',
       timeout: 30000
     });
