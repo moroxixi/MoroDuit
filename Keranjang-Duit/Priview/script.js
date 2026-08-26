@@ -150,17 +150,17 @@
           sessionStorage.removeItem("moroduit_nama_pelanggan");
 
           // Show success
-          statusMessage.textContent = "\u2705 Berhasil disimpan ke Sheet!";
+          statusMessage.textContent = "\u2705 Riwayat Pesanan Berhasil disimpan!";
           statusMessage.className = "status-message success";
 
           btnSimpanSheet.disabled = false;
-          btnSimpanSheet.textContent = "\uD83D\uDCCA Simpan ke Sheet";
+          btnSimpanSheet.textContent = "1. \uD83D\uDCCA Simpan Riwayat Pesanan";
         } else {
           console.warn("[Priview] Response missing success/tanggal:", response);
           statusMessage.textContent = "\u26A0\uFE0F Server merespons tapi data tidak terverifikasi.";
           statusMessage.className = "status-message error";
           btnSimpanSheet.disabled = false;
-          btnSimpanSheet.textContent = "\uD83D\uDCCA Simpan ke Sheet";
+          btnSimpanSheet.textContent = "1. \uD83D\uDCCA Simpan Riwayat Pesanan";
         }
       })
       .catch(function (err) {
@@ -168,7 +168,7 @@
         statusMessage.textContent = "\u274C Gagal menyimpan: " + (err.message || "Periksa koneksi internet.");
         statusMessage.className = "status-message error";
         btnSimpanSheet.disabled = false;
-        btnSimpanSheet.textContent = "\uD83D\uDCCA Simpan ke Sheet";
+        btnSimpanSheet.textContent = "1. \uD83D\uDCCA Simpan Riwayat Pesanan";
       });
   });
 
@@ -214,14 +214,14 @@
       statusMessage.className = "status-message success";
 
       btnDownloadNota.disabled = false;
-      btnDownloadNota.textContent = "\uD83D\uDCE5 Download Gambar Nota";
+      btnDownloadNota.textContent = "2. \uD83D\uDCE5 Download Gambar Nota";
     }).catch(function (err) {
       notaEl.style.boxShadow = savedShadow;
       console.error("[Priview] html2canvas render failed:", err);
       statusMessage.textContent = "\u274C Gagal membuat gambar nota.";
       statusMessage.className = "status-message error";
       btnDownloadNota.disabled = false;
-      btnDownloadNota.textContent = "\uD83D\uDCE5 Download Gambar Nota";
+      btnDownloadNota.textContent = "2. \uD83D\uDCE5 Download Gambar Nota";
     });
   });
 
