@@ -146,7 +146,11 @@
         '<div class="item-row-fields">' +
           '<div class="f" style="flex:0 1 80px;">' +
             '<label>Qty</label>' +
-            '<input type="number" step="any" min="0" class="item-qty" data-index="' + i + '" value="' + (item.qty || "") + '">' +
+            '<div class="qty-wrapper">' +
+              '<button type="button" class="qty-btn qty-minus" data-index="' + i + '"' + ((item.qty || 1) <= 1 ? ' disabled' : '') + ' aria-label="Kurangi jumlah">−</button>' +
+              '<input type="number" class="qty-value item-qty" data-index="' + i + '" min="1" max="999" value="' + (item.qty || 1) + '" readonly>' +
+              '<button type="button" class="qty-btn qty-plus" data-index="' + i + '" aria-label="Tambah jumlah">+</button>' +
+            '</div>' +
           '</div>' +
           '<div class="f" style="flex:1 1 120px;">' +
             '<label>Harga Satuan</label>' +
@@ -164,14 +168,19 @@
       dropdowns[d].addEventListener("change", handleDropdownChange);
     }
 
-    var qtyInputs = itemListEl.querySelectorAll(".item-qty");
-    for (var q = 0; q < qtyInputs.length; q++) {
-      qtyInputs[q].addEventListener("input", handleFieldChange);
-    }
-
     var hargaInputs = itemListEl.querySelectorAll(".item-harga");
     for (var h = 0; h < hargaInputs.length; h++) {
       hargaInputs[h].addEventListener("input", handleFieldChange);
+    }
+
+    var qtyMinusBtns = itemListEl.querySelectorAll(".qty-minus");
+    for (var m = 0; m < qtyMinusBtns.length; m++) {
+      qtyMinusBtns[m].addEventListener("click", handleQtyMinus);
+    }
+
+    var qtyPlusBtns = itemListEl.querySelectorAll(".qty-plus");
+    for (var p = 0; p < qtyPlusBtns.length; p++) {
+      qtyPlusBtns[p].addEventListener("click", handleQtyPlus);
     }
 
     var hapusBtns = itemListEl.querySelectorAll(".btn-hapus-baris");
@@ -201,25 +210,90 @@
       }
     }
 
+    // Auto-isi Harga Satuan dari Katalog (selalu overwrite)
+    var hargaInput = row.querySelector(".item-harga");
+    if (e.target.value && katalogData.length > 0) {
+      for (var k = 0; k < katalogData.length; k++) {
+        if (katalogData[k].produk === e.target.value) {
+          var hargaJual = Number(katalogData[k].hargaJual) || 0;
+          itemList[idx].hargaSatuan = hargaJual;
+          if (hargaInput) hargaInput.value = hargaJual;
+          break;
+        }
+      }
+    }
+
+    // Hitung ulang subtotal row
+    var subtotalEl = row.querySelector(".item-subtotal");
+    var qty = Number(itemList[idx].qty) || 0;
+    var harga = Number(itemList[idx].hargaSatuan) || 0;
+    if (subtotalEl) subtotalEl.textContent = formatRupiah(qty * harga);
+
+    updateTotals();
     validateSubmit();
   }
 
-  // ── Event: qty/harga input changed ─────────────────────────────────
+  // ── Event: harga input changed ─────────────────────────────────────
   function handleFieldChange(e) {
     var idx = Number(e.target.dataset.index);
-    var isQty = e.target.classList.contains("item-qty");
-
-    if (isQty) {
-      itemList[idx].qty = Number(e.target.value) || 0;
-    } else {
-      itemList[idx].hargaSatuan = Number(e.target.value) || 0;
-    }
+    itemList[idx].hargaSatuan = Number(e.target.value) || 0;
 
     // Update subtotal display
     var row = e.target.closest(".item-row");
     var subtotalEl = row.querySelector(".item-subtotal");
     var subtotal = (Number(itemList[idx].qty) || 0) * (Number(itemList[idx].hargaSatuan) || 0);
     subtotalEl.textContent = formatRupiah(subtotal);
+
+    updateTotals();
+  }
+
+  // ── Event: qty stepper minus ───────────────────────────────────────
+  function handleQtyMinus(e) {
+    var idx = Number(e.target.dataset.index);
+    var q = parseInt(itemList[idx].qty, 10);
+    if (isNaN(q) || q <= 1) return;
+    q -= 1;
+    itemList[idx].qty = q;
+
+    var row = e.target.closest(".item-row");
+    var qtyInput = row.querySelector(".item-qty");
+    if (qtyInput) qtyInput.value = q;
+
+    // Disable minus if qty === 1
+    if (q <= 1) e.target.disabled = true;
+    // Re-enable plus if it was disabled (qty < 999)
+    var plusBtn = row.querySelector(".qty-plus");
+    if (plusBtn) plusBtn.disabled = false;
+
+    var subtotalEl = row.querySelector(".item-subtotal");
+    var subtotal = q * (Number(itemList[idx].hargaSatuan) || 0);
+    if (subtotalEl) subtotalEl.textContent = formatRupiah(subtotal);
+
+    updateTotals();
+  }
+
+  // ── Event: qty stepper plus ────────────────────────────────────────
+  function handleQtyPlus(e) {
+    var idx = Number(e.target.dataset.index);
+    var q = parseInt(itemList[idx].qty, 10);
+    if (isNaN(q)) q = 1;
+    if (q >= 999) return;
+    q += 1;
+    itemList[idx].qty = q;
+
+    var row = e.target.closest(".item-row");
+    var qtyInput = row.querySelector(".item-qty");
+    if (qtyInput) qtyInput.value = q;
+
+    // Re-enable minus
+    var minusBtn = row.querySelector(".qty-minus");
+    if (minusBtn) minusBtn.disabled = false;
+    // Disable plus if qty === 999
+    if (q >= 999) e.target.disabled = true;
+
+    var subtotalEl = row.querySelector(".item-subtotal");
+    var subtotal = q * (Number(itemList[idx].hargaSatuan) || 0);
+    if (subtotalEl) subtotalEl.textContent = formatRupiah(subtotal);
 
     updateTotals();
   }
