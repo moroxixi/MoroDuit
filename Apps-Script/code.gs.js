@@ -65,6 +65,19 @@ function ensureHeaders_() {
   }
 }
 
+// ── Helper: Pastikan tab "Katalog-Surya" & header ada ────────────────
+// Tab baru untuk Database Surya (harga referensi pasar dari nota Surya Toserba).
+function ensureKatalogSuryaHeaders_() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName("Katalog-Surya");
+  if (!sheet) {
+    sheet = ss.insertSheet("Katalog-Surya");
+  }
+  if (sheet.getLastRow() === 0) {
+    sheet.getRange(1, 1, 1, 4).setValues([["Tanggal Scan", "Nama Produk", "Harga Satuan", "Status"]]);
+  }
+}
+
 // ── Helper: Validasi token ────────────────────────────────────────────
 function validateToken_(token) {
   return token === TOKEN;
@@ -270,6 +283,30 @@ function doGet(e) {
     return jsonResponse_(result);
   }
 
+  // ── getKatalogSurya ──
+  // Return seluruh isi tab "Katalog-Surya" — dipakai populate dropdown "cocok"
+  // dan referensi harga terakhir di frontend Database-Surya.
+  if (action === "getKatalogSurya") {
+    ensureKatalogSuryaHeaders_();
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = ss.getSheetByName("Katalog-Surya");
+    var data = sheet.getDataRange().getValues();
+    var result = [];
+
+    for (var i = 1; i < data.length; i++) {
+      // Skip baris kosong (semua cell kosong)
+      if (!data[i][0] && !data[i][1]) continue;
+      result.push({
+        tanggalScan: String(data[i][0] || ""),
+        namaProduk: String(data[i][1] || ""),
+        hargaSatuan: data[i][2],
+        status: String(data[i][3] || "")
+      });
+    }
+
+    return jsonResponse_(result);
+  }
+
   return jsonResponse_({success: false, error: "unknown action"});
 }
 
@@ -322,6 +359,36 @@ function callGeminiOCRNota_(imageBase64, mimeType) {
     contents: [{ parts: [{ text: prompt }, { inline_data: { mime_type: mimeType, data: imageBase64 } }] }],
     generationConfig: { temperature: 0 }
   };
+  var data = callGeminiGenerateContentNota_(payload);
+  if (data.error) throw new Error("Gemini error: " + data.error.message);
+  var text = data.candidates[0].content.parts[0].text.trim();
+  text = text.replace(/^```json/i, "").replace(/^```/, "").replace(/```$/, "").trim();
+  var start = text.indexOf("{");
+  var end = text.lastIndexOf("}");
+  if (start === -1 || end === -1) throw new Error("Gemini tidak mengembalikan JSON object yang valid.");
+  return JSON.parse(text.substring(start, end + 1));
+}
+
+// ── Helper: Gemini OCR Nota Surya Toserba ─────────────────────────────
+// Prompt dikustomisasi khusus format nota Surya Toserba: barcode + nama
+// barang, kadang baris "( Harga PROMO )", lalu qty X harga_satuan subtotal.
+// TIDAK reuse/modify callGeminiOCRNota_() existing.
+function callGeminiOCRNotaSurya_(imageBase64, mimeType) {
+  var prompt = "Ini foto nota belanja dari toko \"Surya Toserba\". " +
+    "Format nota Surya Toserba: tiap item biasanya punya barcode di atas, lalu nama barang, " +
+    "kadang ada baris \"( Harga PROMO )\" di bawah nama produk jika sedang promo, " +
+    "lalu baris qty X harga_satuan subtotal. " +
+    "Balas HANYA dengan JSON object (tanpa markdown, tanpa penjelasan), format persis: " +
+    '{"items":[{"namaProduk":"nama barang","hargaSatuan":angka,"isPromo":true/false}]}. ' +
+    "Harga satuan = harga PER UNIT (bukan subtotal). Semua angka = angka murni tanpa titik/koma/Rp. " +
+    "Kalau ada baris tidak jelas/tidak terbaca, lewati baris itu, jangan mengarang. " +
+    "Flag isPromo = true kalau item itu punya baris \"( Harga PROMO )\" menyertainya, false jika tidak.";
+  var payload = {
+    contents: [{ parts: [{ text: prompt }, { inline_data: { mime_type: mimeType, data: imageBase64 } }] }],
+    generationConfig: { temperature: 0 }
+  };
+  // Reuse callGeminiGenerateContentNota_() sebagai shared API helper (key rotation),
+  // BUKAN memodifikasi fungsi OCR existing.
   var data = callGeminiGenerateContentNota_(payload);
   if (data.error) throw new Error("Gemini error: " + data.error.message);
   var text = data.candidates[0].content.parts[0].text.trim();
@@ -596,6 +663,81 @@ function doPost(e) {
       });
     }
     return jsonResponse_({success: true, namaPelanggan: ocrResult.namaPelanggan || "", items: matchedItems});
+  }
+
+  // ── scanNotaSurya (OCR nota Surya Toserba untuk Database-Surya) ──
+  if (action === "scanNotaSurya") {
+    if (!body.imageBase64) return jsonResponse_({success: false, error: "imageBase64 wajib diisi"});
+    var mimeType = body.mimeType || "image/png";
+    var ocrResult;
+    try {
+      ocrResult = callGeminiOCRNotaSurya_(body.imageBase64, mimeType);
+    } catch (ocrErr) {
+      return jsonResponse_({success: false, error: "OCR Surya gagal: " + ocrErr.message});
+    }
+    var items = ocrResult.items || [];
+    var result = [];
+    for (var si = 0; si < items.length; si++) {
+      var s = items[si];
+      result.push({
+        namaProduk: s.namaProduk || "",
+        hargaSatuan: s.hargaSatuan || 0,
+        status: s.isPromo ? "Promo" : "Normal"
+      });
+    }
+    return jsonResponse_({success: true, items: result});
+  }
+
+  // ── simpanKatalogSurya (Database Surya — harga referensi pasar) ──
+  // Terima array item {namaProduk, hargaSatuan, status, tanggalScan}.
+  // Model append-only/history log: skip kalau harga & status SAMA dengan
+  // entri terakhir produk itu, append kalau BEDA.
+  if (action === "simpanKatalogSurya") {
+    ensureKatalogSuryaHeaders_();
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = ss.getSheetByName("Katalog-Surya");
+    var items = body.items || [];
+    if (items.length === 0) {
+      return jsonResponse_({success: false, error: "items tidak boleh kosong"});
+    }
+    var tanggal = Utilities.formatDate(new Date(), "Asia/Jakarta", "yyyy-MM-dd HH:mm:ss");
+    var saved = 0;
+    var skipped = 0;
+    for (var k = 0; k < items.length; k++) {
+      var item = items[k];
+      var namaProduk = String(item.namaProduk || "").trim();
+      var hargaSatuan = Number(item.hargaSatuan) || 0;
+      var status = String(item.status || "Normal").trim();
+      if (!namaProduk) continue;
+      // Cari entri TERAKHIR (baris paling bawah) untuk namaProduk yang PERSIS sama.
+      // Matching sudah dikonfirmasi manual dari dropdown UI,
+      // backend tidak fuzzy-match sendiri.
+      var lastHarga = null;
+      var lastStatus = null;
+      if (sheet.getLastRow() > 1) {
+        var data = sheet.getRange(2, 1, sheet.getLastRow() - 1, 4).getValues();
+        for (var d = 0; d < data.length; d++) {
+          if (String(data[d][1]).trim().toLowerCase() === namaProduk.toLowerCase()) {
+            lastHarga = Number(data[d][2]);
+            lastStatus = String(data[d][3]).trim();
+          }
+        }
+      }
+      if (lastHarga === null) {
+        // Belum ada entri sama sekali → append baris baru.
+        sheet.appendRow([tanggal, namaProduk, hargaSatuan, status]);
+        saved++;
+      } else if (lastHarga === hargaSatuan && lastStatus.toLowerCase() === status.toLowerCase()) {
+        // Entri terakhir ADA, hargaSatuan SAMA dan status SAMA → SKIP.
+        skipped++;
+      } else {
+        // Entri terakhir ADA tapi hargaSatuan BEDA atau status BEDA → APPEND.
+        // Model append-only/history log — JANGAN overwrite baris lama.
+        sheet.appendRow([tanggal, namaProduk, hargaSatuan, status]);
+        saved++;
+      }
+    }
+    return jsonResponse_({success: true, saved: saved, skipped: skipped});
   }
 
   return jsonResponse_({success: false, error: "unknown action"});
