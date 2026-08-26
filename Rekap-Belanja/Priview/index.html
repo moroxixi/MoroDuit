@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MoroDuit — Rekap Belanja</title>
+  <style>
+    /* ── Reset & Base ──────────────────────────────────────────────────── */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      padding: 1rem;
+      font-family: "Segoe UI", "Noto Sans", Arial, sans-serif;
+      color: #1a1a1a;
+      background-color: #f5f0e8;
+    }
+
+    main {
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    /* ── Error state ──────────────────────────────────────────────── */
+    .error-state { text-align: center; padding: 2rem 1rem; }
+    .error-state.hidden { display: none; }
+    .error-icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+    .error-text { font-size: 0.95rem; color: #666666; margin-bottom: 1rem; }
+    .error-link {
+      display: inline-block;
+      padding: 0.75rem 1.25rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #ffffff;
+      background-color: #2e7d32;
+      border-radius: 10px;
+      text-decoration: none;
+    }
+    .error-link:hover { background-color: #1b5e20; }
+
+    /* ── Rekap container ──────────────────────────────────────────── */
+    .rekap-container { padding: 0; }
+    .rekap-container.hidden { display: none; }
+
+    .rekap {
+      background-color: #ffffff;
+      border: 2px solid #2e7d32;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      overflow-x: auto;
+    }
+
+    .rekap-header { margin-bottom: 1rem; }
+
+    .rekap-toko {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #2e7d32;
+      text-align: center;
+      margin-bottom: 0.75rem;
+    }
+
+    .rekap-badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: #ffffff;
+      background-color: #1565c0;
+      border-radius: 4px;
+      padding: 0.15rem 0.5rem;
+      margin-left: 0.35rem;
+      vertical-align: middle;
+    }
+
+    .rekap-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.15rem 0;
+    }
+
+    .rekap-label {
+      font-size: 0.85rem;
+      color: #666666;
+    }
+
+    .rekap-value {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #1a1a1a;
+    }
+
+    /* ── Table ────────────────────────────────────────────────────── */
+    .rekap-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1rem;
+    }
+
+    .rekap-table th,
+    .rekap-table td {
+      padding: 0.6rem 0.75rem;
+      font-size: 0.85rem;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .rekap-table th {
+      background-color: #f1f8e9;
+      font-weight: 700;
+      color: #1a1a1a;
+      text-align: left;
+    }
+
+    .rekap-table td.col-no,
+    .rekap-table td.col-qty { text-align: center; }
+    .rekap-table td.col-harga,
+    .rekap-table td.col-subtotal { text-align: right; white-space: nowrap; }
+    .rekap-table td.col-asal { font-size: 0.8rem; color: #666; }
+
+    .rekap-table tfoot td {
+      font-weight: 700;
+      border-top: 2px solid #2e7d32;
+      padding-top: 0.75rem;
+    }
+
+    /* ── Badge harga tidak ditemukan ─────────────────────────────── */
+    .badge-na {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: #ffffff;
+      background-color: #c62828;
+      border-radius: 4px;
+      padding: 0.1rem 0.4rem;
+      vertical-align: middle;
+    }
+
+    /* ── Rekap footer ─────────────────────────────────────────────── */
+    .rekap-footer {
+      text-align: center;
+      font-size: 0.8rem;
+      color: #666666;
+      margin-top: 0.5rem;
+    }
+
+    /* ── Actions ──────────────────────────────────────────────────── */
+    .rekap-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    .rekap-actions .btn {
+      flex: 1;
+      min-width: 140px;
+      text-align: center;
+    }
+
+    .btn {
+      padding: 0.75rem 1rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.2s, transform 0.1s;
+      min-height: 48px;
+      white-space: nowrap;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn:active:not(:disabled) { transform: scale(0.97); }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .btn-primary { background-color: #2e7d32; color: #ffffff; }
+    .btn-primary:hover { background-color: #1b5e20; }
+    .btn-secondary { background-color: #ffffff; color: #1a1a1a; border: 2px solid #bdbdbd; }
+    .btn-secondary:hover { background-color: #f5f5f5; }
+
+    /* ── Status message ─────────────────────────────────────────────── */
+    .status-message {
+      padding: 0.75rem 1rem;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-top: 0.75rem;
+      text-align: center;
+    }
+    .status-message.hidden { display: none; }
+    .status-message.success { background-color: #e8f5e9; color: #1b5e20; border: 2px solid #2e7d32; }
+    .status-message.error { background-color: #ffebee; color: #c62828; border: 2px solid #c62828; }
+
+    /* ── Mobile ────────────────────────────────────────────────────── */
+    @media (max-width: 520px) {
+      .rekap { padding: 1rem; }
+      .rekap-actions { flex-direction: column; }
+      .rekap-actions .btn { min-width: 0; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <!-- Error state (shown if no data) -->
+    <div id="errorState" class="error-state hidden">
+      <div class="error-icon">📋</div>
+      <p class="error-text" id="errorText">Tidak ada data rekap belanja.</p>
+      <a href="../index.html" class="error-link">← Kembali ke Rekap Belanja</a>
+    </div>
+
+    <!-- Rekap -->
+    <div id="rekapContainer" class="rekap-container hidden">
+      <div class="rekap" id="rekap">
+        <!-- Rekap Header -->
+        <div class="rekap-header">
+          <h1 class="rekap-toko">Toko Sembako Online Moro Duit <span class="rekap-badge">REKAP</span></h1>
+          <div class="rekap-meta">
+            <div class="rekap-row">
+              <span class="rekap-label">Tanggal:</span>
+              <span class="rekap-value" id="tanggal">—</span>
+            </div>
+            <div class="rekap-row">
+              <span class="rekap-label">Jumlah Nota:</span>
+              <span class="rekap-value" id="jumlahNota">—</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Rekap Items -->
+        <table class="rekap-table">
+          <thead>
+            <tr>
+              <th class="col-no">No</th>
+              <th class="col-produk">Nama Barang</th>
+              <th class="col-qty">Total Qty</th>
+              <th class="col-asal">Asal Nota</th>
+              <th class="col-harga">Harga Normal</th>
+              <th class="col-subtotal">Subtotal</th>
+            </tr>
+          </thead>
+          <tbody id="rekapItems"></tbody>
+          <tfoot>
+            <tr>
+              <td colspan="5" class="total-label">Grand Total</td>
+              <td class="total-value" id="grandTotal">Rp 0</td>
+            </tr>
+          </tfoot>
+        </table>
+
+        <!-- Rekap Footer -->
+        <div class="rekap-footer">
+          <p>Harga normal terkini dari katalog • Estimasi belanja pribadi</p>
+        </div>
+      </div>
+
+      <!-- Status message -->
+      <div id="statusMessage" class="status-message hidden" role="alert" aria-live="polite"></div>
+
+      <!-- Action buttons -->
+      <div class="rekap-actions" id="rekapActions">
+        <button id="btnDownload" class="btn btn-primary">
+          📥 Download Gambar Rekap
+        </button>
+        <button id="btnKembali" class="btn btn-secondary">
+          ← Kembali
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <script src="../../config.js"></script>
+  <script src="vendor/html2canvas/html2canvas.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
