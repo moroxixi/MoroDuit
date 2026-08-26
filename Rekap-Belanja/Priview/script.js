@@ -149,15 +149,20 @@
       height: rekapEl.scrollHeight,
       windowWidth: rekapEl.scrollWidth,
       onclone: function (clonedDoc) {
-        // Lift overflow constraint so full table width renders in the clone
-        var clonedRekap = clonedDoc.getElementById("rekap");
-        if (clonedRekap) {
-          clonedRekap.style.overflow = "visible";
-        }
         // Remove main max-width so the clone can expand to full table width
         var mainEl = clonedDoc.querySelector("main");
         if (mainEl) {
           mainEl.style.maxWidth = "none";
+        }
+        // Expand rekap-container and #rekap (green border) to full content width
+        var clonedContainer = clonedDoc.getElementById("rekapContainer");
+        if (clonedContainer) {
+          clonedContainer.style.width = rekapEl.scrollWidth + "px";
+        }
+        var clonedRekap = clonedDoc.getElementById("rekap");
+        if (clonedRekap) {
+          clonedRekap.style.overflow = "visible";
+          clonedRekap.style.width = rekapEl.scrollWidth + "px";
         }
       }
     }).then(function (canvas) {
