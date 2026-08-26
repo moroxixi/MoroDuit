@@ -144,7 +144,23 @@
     var savedShadow = rekapEl.style.boxShadow;
     rekapEl.style.boxShadow = "none";
 
-    html2canvas(rekapEl).then(function (canvas) {
+    html2canvas(rekapEl, {
+      width: rekapEl.scrollWidth,
+      height: rekapEl.scrollHeight,
+      windowWidth: rekapEl.scrollWidth,
+      onclone: function (clonedDoc) {
+        // Lift overflow constraint so full table width renders in the clone
+        var clonedRekap = clonedDoc.getElementById("rekap");
+        if (clonedRekap) {
+          clonedRekap.style.overflow = "visible";
+        }
+        // Remove main max-width so the clone can expand to full table width
+        var mainEl = clonedDoc.querySelector("main");
+        if (mainEl) {
+          mainEl.style.maxWidth = "none";
+        }
+      }
+    }).then(function (canvas) {
       rekapEl.style.boxShadow = savedShadow;
 
       var dataURL = canvas.toDataURL("image/png");
