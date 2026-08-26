@@ -469,7 +469,7 @@
       items: backendItems,
       total: total,
       namaPelanggan: namaPelangganInput.value.trim(),
-      sumber: "Riwayat dari Foto"
+      sumber: "Nota"
     };
 
     saveBtn.disabled = true;

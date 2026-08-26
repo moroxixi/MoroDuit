@@ -35,9 +35,10 @@ function ensureHeaders_() {
     riwayat = ss.insertSheet("Riwayat");
   }
   if (riwayat.getLastRow() === 0) {
-    riwayat.getRange(1, 1, 1, 8).setValues([[
+    riwayat.getRange(1, 1, 1, 12).setValues([[
       "No Nota", "Nama Pelanggan", "Tanggal", "Produk", "Qty",
-      "Harga Satuan", "Subtotal", "Total Nota"
+      "Harga Satuan", "Subtotal", "Total Nota",
+      "Harga Normal", "Lagi Promo", "Profit / Baris", "Sumber"
     ]]);
   } else {
     // Idempotent: tambah kolom "Nama Pelanggan" kalau belum ada
@@ -54,13 +55,19 @@ function ensureHeaders_() {
       riwayat.getRange(1, 2).setValue("Nama Pelanggan");
     }
 
-    // Idempotent: tambah kolom "Sumber" di kolom K (index 11) kalau belum ada
-    var hasSumber = false;
-    for (var h2 = 0; h2 < headers.length; h2++) {
-      if (String(headers[h2]).trim().toLowerCase() === "sumber") { hasSumber = true; break; }
-    }
-    if (!hasSumber) {
-      riwayat.getRange(1, 11).setValue("Sumber");
+    // Idempotent: tambah kolom "Harga Normal" (I), "Lagi Promo" (J), "Profit / Baris" (K), "Sumber" (L) kalau belum ada
+    var newHeaders = [
+      { name: "Harga Normal", col: 9 },
+      { name: "Lagi Promo", col: 10 },
+      { name: "Profit / Baris", col: 11 },
+      { name: "Sumber", col: 12 }
+    ];
+    for (var nh = 0; nh < newHeaders.length; nh++) {
+      var found = false;
+      for (var h2 = 0; h2 < headers.length; h2++) {
+        if (String(headers[h2]).trim().toLowerCase() === newHeaders[nh].name.toLowerCase()) { found = true; break; }
+      }
+      if (!found) { riwayat.getRange(1, newHeaders[nh].col).setValue(newHeaders[nh].name); }
     }
   }
 }
@@ -527,25 +534,29 @@ function doPost(e) {
       var startRow = sheet.getLastRow() + 1;
       sheet.getRange(startRow, 1, rows.length, 8).setValues(rows);
 
-      // ── Auto-fill formula kolom I (Harga Normal) & J (Profit per baris) ──
-      // CATATAN: Pemisah argumen pakai koma (,) — konvensi API setFormulas()
-      // Apps Script, BUKAN locale sheet. User WAJIB verify setelah deploy manual
-      // apakah formula tampil benar (locale sheet tertentu bisa pakai titik koma).
+      // ── Auto-fill formula kolom I (Harga Normal), J (Lagi Promo), K (Profit / Baris) ──
+      // Kolom I: Harga Normal (VLOOKUP ke Katalog $B:$D kolom 3)
+      // Kolom J: Lagi Promo — cek apakah harga promo di Katalog lebih mahal dari Harga Satuan
+      // Kolom K: Profit / Baris — (Harga Satuan - Harga Normal atau Promo) * Qty
+      // CATATAN: Pemisah argumen pakai titik koma (;) — konsisten locale sheet.
       var formulasI = [];
       var formulasJ = [];
+      var formulasK = [];
       for (var f = 0; f < rows.length; f++) {
         var r = startRow + f;
         formulasI.push(["=IFERROR(VLOOKUP(D" + r + ";Katalog!$B:$D;3;FALSE);\"\")"]);
-        formulasJ.push(["=IF(I" + r + "=\"\";\"\";G" + r + "-(I" + r + "*E" + r + "))"]);
+        formulasJ.push(["=IFERROR(IF(VLOOKUP(D" + r + ";Katalog!$B:$H;7;FALSE)>C" + r + ";VLOOKUP(D" + r + ";Katalog!$B:$H;4;FALSE);\"\");\"\")"]);
+        formulasK.push(["=(F" + r + "-IF(J" + r + "<>\"\";J" + r + ";I" + r + "))*E" + r]);
       }
       sheet.getRange(startRow, 9, rows.length, 1).setFormulas(formulasI);
       sheet.getRange(startRow, 10, rows.length, 1).setFormulas(formulasJ);
+      sheet.getRange(startRow, 11, rows.length, 1).setFormulas(formulasK);
 
-      // ── Tulis kolom K (Sumber) hanya kalau sumber diisi ──
+      // ── Tulis kolom L (Sumber) hanya kalau sumber diisi ──
       if (body.sumber) {
         var sumberCol = [];
         for (var s = 0; s < rows.length; s++) sumberCol.push([body.sumber]);
-        sheet.getRange(startRow, 11, rows.length, 1).setValues(sumberCol);
+        sheet.getRange(startRow, 12, rows.length, 1).setValues(sumberCol);
       }
     }
 
@@ -615,17 +626,20 @@ function doPost(e) {
       var startRow = sheet.getLastRow() + 1;
       sheet.getRange(startRow, 1, rows.length, 8).setValues(rows);
 
-      // ── Auto-fill formula kolom I (Harga Normal) & J (Profit per baris) ──
+      // ── Auto-fill formula kolom I (Harga Normal), J (Lagi Promo), K (Profit / Baris) ──
       // REUSE pola yang SAMA dengan simpanRiwayat.
       var formulasI = [];
       var formulasJ = [];
+      var formulasK = [];
       for (var f = 0; f < rows.length; f++) {
         var r = startRow + f;
         formulasI.push(["=IFERROR(VLOOKUP(D" + r + ";Katalog!$B:$D;3;FALSE);\"\")"]);
-        formulasJ.push(["=IF(I" + r + "=\"\";\"\";G" + r + "-(I" + r + "*E" + r + "))"]);
+        formulasJ.push(["=IFERROR(IF(VLOOKUP(D" + r + ";Katalog!$B:$H;7;FALSE)>C" + r + ";VLOOKUP(D" + r + ";Katalog!$B:$H;4;FALSE);\"\");\"\")"]);
+        formulasK.push(["=(F" + r + "-IF(J" + r + "<>\"\";J" + r + ";I" + r + "))*E" + r]);
       }
       sheet.getRange(startRow, 9, rows.length, 1).setFormulas(formulasI);
       sheet.getRange(startRow, 10, rows.length, 1).setFormulas(formulasJ);
+      sheet.getRange(startRow, 11, rows.length, 1).setFormulas(formulasK);
     }
 
     return jsonResponse_({
@@ -742,4 +756,3 @@ function doPost(e) {
 
   return jsonResponse_({success: false, error: "unknown action"});
 }
-
