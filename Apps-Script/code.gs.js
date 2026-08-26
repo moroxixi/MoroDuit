@@ -534,23 +534,46 @@ function doPost(e) {
       var startRow = sheet.getLastRow() + 1;
       sheet.getRange(startRow, 1, rows.length, 8).setValues(rows);
 
-      // ── Auto-fill formula kolom I (Harga Normal), J (Lagi Promo), K (Profit / Baris) ──
-      // Kolom I: Harga Normal (VLOOKUP ke Katalog $B:$D kolom 3)
-      // Kolom J: Lagi Promo — cek apakah harga promo di Katalog lebih mahal dari Harga Satuan
-      // Kolom K: Profit / Baris — (Harga Satuan - Harga Normal atau Promo) * Qty
-      // CATATAN: Pemisah argumen pakai titik koma (;) — konsisten locale sheet.
-      var formulasI = [];
-      var formulasJ = [];
-      var formulasK = [];
+      // ── Snapshot value kolom I (Harga Normal), J (Lagi Promo), K (Profit / Baris) ──
+      // Dihitung sekali saat disimpan — data historis tidak berubah walau Katalog diupdate.
+      var katalogSheet = ss.getSheetByName("Katalog");
+      var valuesI = [];
+      var valuesJ = [];
+      var valuesK = [];
       for (var f = 0; f < rows.length; f++) {
-        var r = startRow + f;
-        formulasI.push(["=IFERROR(VLOOKUP(D" + r + ";Katalog!$B:$D;3;FALSE);\"\")"]);
-        formulasJ.push(["=IFERROR(IF(VLOOKUP(D" + r + ";Katalog!$B:$H;7;FALSE)>C" + r + ";VLOOKUP(D" + r + ";Katalog!$B:$H;4;FALSE);\"\");\"\")"]);
-        formulasK.push(["=(F" + r + "-IF(J" + r + "<>\"\";J" + r + ";I" + r + "))*E" + r]);
+        var produkName = rows[f][3];
+        var qty = rows[f][4];
+        var hargaSatuan = rows[f][5];
+        var katalogRow = findProdukRow_(katalogSheet, produkName);
+
+        var hargaNormal = "";
+        var lagiPromo = "";
+        var profitBaris = "";
+
+        if (katalogRow > 0) {
+          hargaNormal = katalogSheet.getRange(katalogRow, 4).getValue();
+          var hargaPromo = katalogSheet.getRange(katalogRow, 5).getValue();
+          var tanggalPromo = katalogSheet.getRange(katalogRow, 8).getValue();
+
+          if (tanggalPromo) {
+            var promoDate = (tanggalPromo instanceof Date) ? tanggalPromo : new Date(tanggalPromo);
+            var txDate = new Date(tanggal);
+            if (!isNaN(promoDate.getTime()) && promoDate > txDate) {
+              lagiPromo = hargaPromo;
+            }
+          }
+
+          var hargaRef = (lagiPromo !== "") ? lagiPromo : hargaNormal;
+          profitBaris = (hargaSatuan - hargaRef) * qty;
+        }
+
+        valuesI.push([hargaNormal]);
+        valuesJ.push([lagiPromo]);
+        valuesK.push([profitBaris]);
       }
-      sheet.getRange(startRow, 9, rows.length, 1).setFormulas(formulasI);
-      sheet.getRange(startRow, 10, rows.length, 1).setFormulas(formulasJ);
-      sheet.getRange(startRow, 11, rows.length, 1).setFormulas(formulasK);
+      sheet.getRange(startRow, 9, rows.length, 1).setValues(valuesI);
+      sheet.getRange(startRow, 10, rows.length, 1).setValues(valuesJ);
+      sheet.getRange(startRow, 11, rows.length, 1).setValues(valuesK);
 
       // ── Tulis kolom L (Sumber) hanya kalau sumber diisi ──
       if (body.sumber) {
@@ -626,20 +649,47 @@ function doPost(e) {
       var startRow = sheet.getLastRow() + 1;
       sheet.getRange(startRow, 1, rows.length, 8).setValues(rows);
 
-      // ── Auto-fill formula kolom I (Harga Normal), J (Lagi Promo), K (Profit / Baris) ──
+      // ── Snapshot value kolom I (Harga Normal), J (Lagi Promo), K (Profit / Baris) ──
+      // Dihitung sekali saat disimpan — data historis tidak berubah walau Katalog diupdate.
       // REUSE pola yang SAMA dengan simpanRiwayat.
-      var formulasI = [];
-      var formulasJ = [];
-      var formulasK = [];
+      var katalogSheet = ss.getSheetByName("Katalog");
+      var valuesI = [];
+      var valuesJ = [];
+      var valuesK = [];
       for (var f = 0; f < rows.length; f++) {
-        var r = startRow + f;
-        formulasI.push(["=IFERROR(VLOOKUP(D" + r + ";Katalog!$B:$D;3;FALSE);\"\")"]);
-        formulasJ.push(["=IFERROR(IF(VLOOKUP(D" + r + ";Katalog!$B:$H;7;FALSE)>C" + r + ";VLOOKUP(D" + r + ";Katalog!$B:$H;4;FALSE);\"\");\"\")"]);
-        formulasK.push(["=(F" + r + "-IF(J" + r + "<>\"\";J" + r + ";I" + r + "))*E" + r]);
+        var produkName = rows[f][3];
+        var qty = rows[f][4];
+        var hargaSatuan = rows[f][5];
+        var katalogRow = findProdukRow_(katalogSheet, produkName);
+
+        var hargaNormal = "";
+        var lagiPromo = "";
+        var profitBaris = "";
+
+        if (katalogRow > 0) {
+          hargaNormal = katalogSheet.getRange(katalogRow, 4).getValue();
+          var hargaPromo = katalogSheet.getRange(katalogRow, 5).getValue();
+          var tanggalPromo = katalogSheet.getRange(katalogRow, 8).getValue();
+
+          if (tanggalPromo) {
+            var promoDate = (tanggalPromo instanceof Date) ? tanggalPromo : new Date(tanggalPromo);
+            var txDate = new Date(tanggal);
+            if (!isNaN(promoDate.getTime()) && promoDate > txDate) {
+              lagiPromo = hargaPromo;
+            }
+          }
+
+          var hargaRef = (lagiPromo !== "") ? lagiPromo : hargaNormal;
+          profitBaris = (hargaSatuan - hargaRef) * qty;
+        }
+
+        valuesI.push([hargaNormal]);
+        valuesJ.push([lagiPromo]);
+        valuesK.push([profitBaris]);
       }
-      sheet.getRange(startRow, 9, rows.length, 1).setFormulas(formulasI);
-      sheet.getRange(startRow, 10, rows.length, 1).setFormulas(formulasJ);
-      sheet.getRange(startRow, 11, rows.length, 1).setFormulas(formulasK);
+      sheet.getRange(startRow, 9, rows.length, 1).setValues(valuesI);
+      sheet.getRange(startRow, 10, rows.length, 1).setValues(valuesJ);
+      sheet.getRange(startRow, 11, rows.length, 1).setValues(valuesK);
     }
 
     return jsonResponse_({
