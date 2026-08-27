@@ -51,6 +51,32 @@
     return div.innerHTML;
   }
 
+  // ── Format angka dengan titik ribuan (1000 → "1.000")
+  function formatRibuanInput(str) {
+    var raw = String(str).replace(/[^0-9]/g, "");
+    if (!raw) return "";
+    return raw.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  }
+
+  // ── Strip semua karakter non-digit ("1.000" → "1000")
+  function parseRibuanInput(str) {
+    return String(str).replace(/[^0-9]/g, "");
+  }
+
+  // ── Post-render: ubah harga inputs dari type=number ke text + format
+  function postRenderFormatHarga() {
+    var hargaInputs = itemListEl.querySelectorAll(".item-harga");
+    for (var i = 0; i < hargaInputs.length; i++) {
+      var input = hargaInputs[i];
+      input.type = "text";
+      input.inputMode = "numeric";
+      var raw = input.value;
+      if (raw !== "" && raw != null) {
+        input.value = formatRibuanInput(String(raw));
+      }
+    }
+  }
+
   // ── Compress image (polari dari Scan-Struk/script.js) ─────────────
   // maxPixels: 1.200.000, quality: 0.82 JPEG
   function compressImage(file, maxPixels) {
@@ -217,7 +243,7 @@
         if (katalogData[k].produk === e.target.value) {
           var hargaJual = Number(katalogData[k].hargaJual) || 0;
           itemList[idx].hargaSatuan = hargaJual;
-          if (hargaInput) hargaInput.value = hargaJual;
+          if (hargaInput) hargaInput.value = formatRibuanInput(String(hargaJual));
           break;
         }
       }
@@ -235,11 +261,39 @@
 
   // ── Event: harga input changed ─────────────────────────────────────
   function handleFieldChange(e) {
-    var idx = Number(e.target.dataset.index);
-    itemList[idx].hargaSatuan = Number(e.target.value) || 0;
+    var input = e.target;
+    var cursorPos = input.selectionStart;
+    var value = input.value;
+
+    // Hitung jumlah digit sebelum cursor
+    var digitsBefore = 0;
+    for (var i = 0; i < cursorPos; i++) {
+      if (value[i] >= "0" && value[i] <= "9") digitsBefore++;
+    }
+
+    // Format tampilan
+    var formatted = formatRibuanInput(value);
+    input.value = formatted;
+
+    // Restore cursor
+    var newPos = 0;
+    var digitCount = 0;
+    for (var j = 0; j < formatted.length; j++) {
+      if (formatted[j] !== ".") digitCount++;
+      if (digitCount >= digitsBefore) {
+        newPos = j + 1;
+        break;
+      }
+    }
+    if (digitCount < digitsBefore) newPos = formatted.length;
+    input.setSelectionRange(newPos, newPos);
+
+    // Update state (strip titik dulu)
+    var idx = Number(input.dataset.index);
+    itemList[idx].hargaSatuan = Number(parseRibuanInput(value)) || 0;
 
     // Update subtotal display
-    var row = e.target.closest(".item-row");
+    var row = input.closest(".item-row");
     var subtotalEl = row.querySelector(".item-subtotal");
     var subtotal = (Number(itemList[idx].qty) || 0) * (Number(itemList[idx].hargaSatuan) || 0);
     subtotalEl.textContent = formatRupiah(subtotal);
@@ -303,6 +357,7 @@
     var idx = Number(e.target.dataset.index);
     itemList.splice(idx, 1);
     renderItems();
+    postRenderFormatHarga();
   }
 
   // ── Update totals ──────────────────────────────────────────────────
@@ -404,6 +459,7 @@
         }
 
         renderItems();
+        postRenderFormatHarga();
         resultArea.style.display = "block";
         scanStatus.textContent = rawItems.length + " barang terbaca. Review di bawah sebelum simpan.";
         scanStatus.style.color = "#2e7d32";
@@ -429,6 +485,7 @@
       selectedProduk: ""
     });
     renderItems();
+    postRenderFormatHarga();
     // Focus the new dropdown
     var lastDropdown = itemListEl.querySelector(".item-row:last-child .item-dropdown");
     if (lastDropdown) lastDropdown.focus();

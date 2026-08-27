@@ -184,10 +184,10 @@
     var status = el.getAttribute("data-status");
     var catatan = el.getAttribute("data-catatan");
 
-    inputProduk.value = produk;
+    inputProduk.value = capitalizeWords(produk);
     inputKategori.value = kategori;
-    inputHargaNormal.value = hargaNormal;
-    inputHargaPromo.value = hargaPromo;
+    inputHargaNormal.value = formatRibuanInput(String(hargaNormal));
+    inputHargaPromo.value = hargaPromo ? formatRibuanInput(String(hargaPromo)) : "";
     inputCatatan.value = catatan;
     checkboxStokHabis.checked = (status === "Tidak Ada");
 
@@ -215,6 +215,8 @@
     var kategori = inputKategori.value;
     var catatan = inputCatatan.value.trim();
     var status = checkboxStokHabis.checked ? "Tidak Ada" : "Ada";
+    var hargaNormalParsed = Number(parseRibuanInput(hargaNormal));
+    var hargaPromoParsed = hargaPromo !== "" ? Number(parseRibuanInput(hargaPromo)) : "";
 
     if (!produk) {
       showStatus("⚠️ Nama produk wajib diisi!", "error");
@@ -239,14 +241,14 @@
       token: MORODUIT_CONFIG.TOKEN,
       produk: produk,
       kategori: kategori,
-      hargaNormal: Number(hargaNormal),
+      hargaNormal: hargaNormalParsed,
       status: status,
       catatan: catatan
     };
 
     // Only include hargaPromo if it has a value
-    if (hargaPromo !== "") {
-      payload.hargaPromo = Number(hargaPromo);
+    if (hargaPromoParsed !== "") {
+      payload.hargaPromo = hargaPromoParsed;
     }
 
     submitBtn.disabled = true;
@@ -294,6 +296,67 @@
     div.appendChild(document.createTextNode(str));
     return div.innerHTML;
   }
+
+  // ── Auto-capitalize: setiap awal kata jadi huruf besar (Title Case)
+  function capitalizeWords(str) {
+    return str.replace(/\b\w/g, function (c) { return c.toUpperCase(); });
+  }
+
+  // ── Format angka dengan titik ribuan (1000 → "1.000")
+  function formatRibuanInput(str) {
+    var raw = String(str).replace(/[^0-9]/g, "");
+    if (!raw) return "";
+    return raw.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  }
+
+  // ── Strip semua karakter non-digit ("1.000" → "1000")
+  function parseRibuanInput(str) {
+    return String(str).replace(/[^0-9]/g, "");
+  }
+
+  // ── Apply formatRibuanInput + preserve cursor position
+  function handleRibuanInput(e) {
+    var input = e.target;
+    var cursorPos = input.selectionStart;
+    var value = input.value;
+
+    // Hitung jumlah digit sebelum cursor
+    var digitsBefore = 0;
+    for (var i = 0; i < cursorPos; i++) {
+      if (value[i] >= "0" && value[i] <= "9") digitsBefore++;
+    }
+
+    // Format
+    var formatted = formatRibuanInput(value);
+    input.value = formatted;
+
+    // Restore cursor: cari posisi di formatted string yang sesuai
+    var newPos = 0;
+    var digitCount = 0;
+    for (var j = 0; j < formatted.length; j++) {
+      if (formatted[j] !== ".") digitCount++;
+      if (digitCount >= digitsBefore) {
+        newPos = j + 1;
+        break;
+      }
+    }
+    if (digitCount < digitsBefore) newPos = formatted.length;
+    input.setSelectionRange(newPos, newPos);
+  }
+
+  // ── Apply capitalizeWords + preserve cursor position
+  function handleCapitalizeInput(e) {
+    var input = e.target;
+    var cursorPos = input.selectionStart;
+    input.value = capitalizeWords(input.value);
+    // capitalizeWords tidak mengubah panjang string
+    input.setSelectionRange(cursorPos, cursorPos);
+  }
+
+  // ── Auto-capitalize + auto-format event listeners ───────────────
+  inputProduk.addEventListener("input", handleCapitalizeInput);
+  inputHargaNormal.addEventListener("input", handleRibuanInput);
+  inputHargaPromo.addEventListener("input", handleRibuanInput);
 
   // ── Filter event listeners ───────────────────────────────────────
   searchInput.addEventListener("input", function () {

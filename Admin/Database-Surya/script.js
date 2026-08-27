@@ -49,6 +49,37 @@
     return div.innerHTML;
   }
 
+  // ── Auto-capitalize: setiap awal kata jadi huruf besar (Title Case)
+  function capitalizeWords(str) {
+    return str.replace(/\b\w/g, function (c) { return c.toUpperCase(); });
+  }
+
+  // ── Format angka dengan titik ribuan (1000 → "1.000")
+  function formatRibuanInput(str) {
+    var raw = String(str).replace(/[^0-9]/g, "");
+    if (!raw) return "";
+    return raw.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  }
+
+  // ── Strip semua karakter non-digit ("1.000" → "1000")
+  function parseRibuanInput(str) {
+    return String(str).replace(/[^0-9]/g, "");
+  }
+
+  // ── Post-render: ubah harga inputs dari type=number ke text + format
+  function postRenderFormatHarga() {
+    var hargaInputs = itemListEl.querySelectorAll(".item-harga");
+    for (var i = 0; i < hargaInputs.length; i++) {
+      var input = hargaInputs[i];
+      input.type = "text";
+      input.inputMode = "numeric";
+      var raw = input.value;
+      if (raw !== "" && raw != null) {
+        input.value = formatRibuanInput(String(raw));
+      }
+    }
+  }
+
   // ── Compress image ─────────────────────────────────────────────────
   // maxPixels: 1.200.000, quality: 0.82 JPEG (polari dari Scan-Struk/script.js)
   function compressImage(file, maxPixels) {
@@ -232,7 +263,7 @@
       }
       itemList[idx].hargaSatuan = latestHarga;
       var hargaInput = row.querySelector(".item-harga");
-      if (hargaInput) hargaInput.value = latestHarga;
+      if (hargaInput) hargaInput.value = formatRibuanInput(String(latestHarga));
     }
 
     validateSubmit();
@@ -240,12 +271,20 @@
 
   // ── Event: nama produk text input changed ───────────────────────────
   function handleNameChange(e) {
-    var idx = Number(e.target.dataset.index);
-    itemList[idx].namaProduk = e.target.value;
+    var input = e.target;
+    var cursorPos = input.selectionStart;
+
+    // Auto-capitalize
+    var capitalized = capitalizeWords(input.value);
+    input.value = capitalized;
+    input.setSelectionRange(cursorPos, cursorPos);
+
+    var idx = Number(input.dataset.index);
+    itemList[idx].namaProduk = capitalized;
     itemList[idx].selectedProduk = ""; // reset dropdown match
 
     // Update badge
-    var row = e.target.closest(".item-row");
+    var row = input.closest(".item-row");
     var oldBadge = row.querySelector(".badge");
     if (oldBadge) {
       oldBadge.className = "badge badge-warn";
@@ -261,8 +300,36 @@
 
   // ── Event: harga input changed ─────────────────────────────────────
   function handleFieldChange(e) {
-    var idx = Number(e.target.dataset.index);
-    itemList[idx].hargaSatuan = Number(e.target.value) || 0;
+    var input = e.target;
+    var cursorPos = input.selectionStart;
+    var value = input.value;
+
+    // Hitung jumlah digit sebelum cursor
+    var digitsBefore = 0;
+    for (var i = 0; i < cursorPos; i++) {
+      if (value[i] >= "0" && value[i] <= "9") digitsBefore++;
+    }
+
+    // Format tampilan
+    var formatted = formatRibuanInput(value);
+    input.value = formatted;
+
+    // Restore cursor
+    var newPos = 0;
+    var digitCount = 0;
+    for (var j = 0; j < formatted.length; j++) {
+      if (formatted[j] !== ".") digitCount++;
+      if (digitCount >= digitsBefore) {
+        newPos = j + 1;
+        break;
+      }
+    }
+    if (digitCount < digitsBefore) newPos = formatted.length;
+    input.setSelectionRange(newPos, newPos);
+
+    // Update state (strip titik dulu)
+    var idx = Number(input.dataset.index);
+    itemList[idx].hargaSatuan = Number(parseRibuanInput(value)) || 0;
   }
 
   // ── Event: status select changed ───────────────────────────────────
@@ -276,6 +343,7 @@
     var idx = Number(e.target.dataset.index);
     itemList.splice(idx, 1);
     renderItems();
+    postRenderFormatHarga();
   }
 
   // ── Update totals ──────────────────────────────────────────────────
@@ -365,6 +433,7 @@
         }
 
         renderItems();
+        postRenderFormatHarga();
         resultArea.style.display = "block";
         scanStatus.textContent = rawItems.length + " barang terbaca. Review di bawah sebelum simpan.";
         scanStatus.style.color = "#2e7d32";
@@ -387,6 +456,7 @@
       selectedProduk: ""
     });
     renderItems();
+    postRenderFormatHarga();
     // Focus the new name input
     var lastInput = itemListEl.querySelector(".item-row:last-child .item-name");
     if (lastInput) lastInput.focus();
