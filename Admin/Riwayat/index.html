@@ -16,6 +16,21 @@
     <!-- Status / error message -->
     <div id="statusMessage" class="status-message hidden" role="alert" aria-live="polite"></div>
 
+    <!-- Navigation bar -->
+    <div class="nav-bar">
+      <button type="button" id="btnModeToggle" class="nav-btn">📅 Bulanan</button>
+      <button type="button" id="btnPrev" class="nav-btn nav-btn-arrow">&laquo;</button>
+      <span id="periodeLabel" class="periode-label">Memuat...</span>
+      <button type="button" id="btnNext" class="nav-btn nav-btn-arrow">&raquo;</button>
+      <button type="button" id="btnGoToToday" class="nav-btn nav-btn-primary">Hari Ini</button>
+    </div>
+
+    <!-- Profit summary for active period -->
+    <div id="profitSummary" class="profit-summary hidden">
+      <span class="profit-summary-label">Profit periode ini:</span>
+      <span id="profitSummaryValue" class="profit-value">0</span>
+    </div>
+
     <!-- Loading indicator -->
     <div id="loadingIndicator" class="loading">Memuat riwayat transaksi...</div>
 

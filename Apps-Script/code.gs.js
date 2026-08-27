@@ -262,8 +262,9 @@ function doGet(e) {
   // ── getRiwayat ──
   // Ambil SEMUA baris dari sheet "Riwayat" (skip header row 1).
   // Return array of object per baris: { noNota, namaPelanggan, tanggal,
-  //   produk, qty, hargaSatuan, subtotal, total }.
+  //   produk, qty, hargaSatuan, subtotal, total, profitBaris }.
   // Field "total" = kolom H "Total Nota" (sama untuk semua baris 1 nota).
+  // Field "profitBaris" = kolom K "Profit / Baris" (snapshot value per item).
   // Grouping by noNota dilakukan di client (Riwayat/script.js).
   if (action === "getRiwayat") {
     var ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -283,7 +284,8 @@ function doGet(e) {
         qty: row[4],
         hargaSatuan: row[5],
         subtotal: row[6],
-        total: row[7]
+        total: row[7],
+        profitBaris: row[10]
       });
     }
 

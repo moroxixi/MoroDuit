@@ -79,6 +79,103 @@ main {
   border: 2px solid #c62828;
 }
 
+/* ── Navigation Bar ───────────────────────────────────────────────── */
+.nav-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.nav-btn {
+  padding: 0.4rem 0.75rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  background-color: #ffffff;
+  color: #1a1a1a;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.nav-btn:hover {
+  border-color: #2e7d32;
+  background-color: #f1f8e9;
+}
+
+.nav-btn:active {
+  background-color: #e8f5e9;
+}
+
+.nav-btn-arrow {
+  font-size: 1rem;
+  padding: 0.4rem 0.6rem;
+  min-width: 2.2rem;
+  text-align: center;
+}
+
+.nav-btn-primary {
+  background-color: #2e7d32;
+  color: #ffffff;
+  border-color: #2e7d32;
+}
+
+.nav-btn-primary:hover {
+  background-color: #1b5e20;
+  border-color: #1b5e20;
+}
+
+.periode-label {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  min-width: 12rem;
+  text-align: center;
+}
+
+/* ── Profit Summary ──────────────────────────────────────────────── */
+.profit-summary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  margin-bottom: 1rem;
+  background-color: #ffffff;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 0.9rem;
+}
+
+.profit-summary.hidden {
+  display: none;
+}
+
+.profit-summary-label {
+  color: #666666;
+  font-weight: 600;
+}
+
+.profit-value {
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.profit-positive {
+  color: #2e7d32;
+}
+
+.profit-negative {
+  color: #c62828;
+}
+
+.profit-zero {
+  color: #666666;
+}
+
 /* ── Loading ───────────────────────────────────────────────────────── */
 .loading {
   text-align: center;
@@ -167,6 +264,26 @@ main {
   color: #666666;
 }
 
+/* ── Card Profit Row ──────────────────────────────────────────────── */
+.riwayat-profit-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.25rem;
+  padding: 0.2rem 0;
+}
+
+.riwayat-profit-label {
+  font-size: 0.8rem;
+  color: #666666;
+  font-weight: 600;
+}
+
+.riwayat-profit-value {
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
 /* ── Card Summary: Jumlah item ─────────────────────────────────────── */
 .riwayat-summary {
   font-size: 0.8rem;
@@ -185,6 +302,21 @@ main {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.1rem;
+  }
+
+  .riwayat-profit-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.1rem;
+  }
+
+  .nav-bar {
+    gap: 0.3rem;
+  }
+
+  .periode-label {
+    font-size: 0.85rem;
+    min-width: 8rem;
   }
 }
 
