@@ -279,7 +279,9 @@ function doGet(e) {
       result.push({
         noNota: String(row[0] || ""),
         namaPelanggan: String(row[1] || ""),
-        tanggal: String(row[2] || ""),
+        tanggal: row[2] instanceof Date
+            ? Utilities.formatDate(row[2], "Asia/Jakarta", "yyyy-MM-dd HH:mm:ss")
+            : String(row[2] || ""),
         produk: String(row[3] || ""),
         qty: row[4],
         hargaSatuan: row[5],
