@@ -1,0 +1,369 @@
+/* ══════════════════════════════════════════════════════════════════════
+   MoroDuit Opening — Halaman Depan / Landing Page
+   Aksesibel untuk ibu-ibu / lansia: font besar, kontras tinggi,
+   touch target ≥ 44px, fokus keyboard jelas.
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* ── Reset & Base ──────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  font-family: "Segoe UI", "Noto Sans", Arial, sans-serif;
+  font-size: 1rem;
+  line-height: 1.65;
+  color: #1a1a1a;
+  background: linear-gradient(170deg, #f5f0e8 0%, #eef7eb 100%);
+  min-height: 100vh;
+  padding: 1rem;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* ── Hero / Header ─────────────────────────────────────────────────── */
+.hero {
+  text-align: center;
+  padding: 2rem 1.25rem 1.75rem;
+  background-color: #2e7d32;
+  color: #ffffff;
+  border-radius: 16px;
+  margin: 0.75rem auto 1.5rem;
+  max-width: 640px;
+}
+
+.hero-icon {
+  font-size: 2.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.hero h1 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+
+.hero-sub {
+  font-size: 0.9rem;
+  line-height: 1.7;
+  opacity: 0.95;
+  max-width: 480px;
+  margin: 0 auto 0.75rem;
+}
+
+.hero-owner {
+  font-size: 0.85rem;
+  opacity: 0.85;
+  margin-top: 0.5rem;
+}
+
+/* ── Main ──────────────────────────────────────────────────────────── */
+main {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+/* ── Steps / Cara Pesan ────────────────────────────────────────────── */
+.steps {
+  margin-bottom: 1.5rem;
+}
+
+.steps h2 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 1rem;
+  padding-left: 0.25rem;
+}
+
+.steps-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.steps-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background-color: #ffffff;
+  border: 2px solid #c8e6c9;
+  border-radius: 12px;
+  transition: border-color 0.2s;
+}
+
+.steps-list li:focus-within {
+  border-color: #2e7d32;
+  box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.2);
+}
+
+.step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.5rem;
+  height: 2.5rem;
+  background-color: #2e7d32;
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 700;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.steps-list li strong {
+  font-size: 0.95rem;
+  display: block;
+  margin-bottom: 0.2rem;
+  color: #1a1a1a;
+}
+
+.steps-list li p {
+  font-size: 0.85rem;
+  color: #444444;
+  line-height: 1.5;
+}
+
+/* ── Badges ────────────────────────────────────────────────────────── */
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.badge {
+  flex: 1 1 260px;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  background-color: #ffffff;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+}
+
+.badge-icon {
+  font-size: 1.35rem;
+  flex-shrink: 0;
+  line-height: 1;
+  margin-top: 0.15rem;
+}
+
+.badge strong {
+  font-size: 0.9rem;
+  display: block;
+  margin-bottom: 0.15rem;
+  color: #1a1a1a;
+}
+
+.badge p {
+  font-size: 0.85rem;
+  color: #555555;
+  line-height: 1.45;
+}
+
+/* ── CTA Button ────────────────────────────────────────────────────── */
+.cta-section {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.cta-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem 2.5rem;
+  min-height: 56px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #ffffff;
+  background-color: #2e7d32;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
+  box-shadow: 0 4px 14px rgba(46, 125, 50, 0.35);
+}
+
+.cta-btn:hover {
+  background-color: #1b5e20;
+  box-shadow: 0 6px 20px rgba(46, 125, 50, 0.45);
+}
+
+.cta-btn:active {
+  transform: scale(0.97);
+}
+
+.cta-btn:focus-visible {
+  outline: 3px solid #1b5e20;
+  outline-offset: 3px;
+  box-shadow: 0 0 0 5px rgba(46, 125, 50, 0.3);
+}
+
+/* ── Produk Favorit Section ───────────────────────────────────────── */
+.produk-favorit-section {
+  margin-bottom: 1.5rem;
+}
+
+.produk-favorit-section h2 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 0.25rem;
+  padding-left: 0.25rem;
+}
+
+.produk-favorit-sub {
+  font-size: 0.85rem;
+  color: #555555;
+  margin-bottom: 1rem;
+  padding-left: 0.25rem;
+}
+
+.loading-perkenalan {
+  text-align: center;
+  padding: 1rem;
+  color: #2e7d32;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.produk-perkenalan-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.produk-favorit-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.9rem 1.25rem;
+  background-color: #ffffff;
+  border: 2px solid #c8e6c9;
+  border-radius: 12px;
+  transition: border-color 0.2s;
+}
+
+.produk-favorit-card:hover {
+  border-color: #2e7d32;
+}
+
+/* ── Produk Favorit Foto ─────────────────────────────────────────── */
+.produk-favorit-foto {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 6px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background-color: #f5f5f5;
+  border: 1px solid #e0e0e0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.produk-favorit-foto-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.produk-favorit-foto-placeholder {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: #bdbdbd;
+}
+
+.produk-favorit-nama {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.produk-favorit-harga {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #2e7d32;
+  white-space: nowrap;
+}
+
+/* ── Footer ────────────────────────────────────────────────────────── */
+footer {
+  text-align: center;
+  padding: 1.5rem 1rem;
+  color: #888888;
+  font-size: 0.95rem;
+}
+
+/* ── Focus-visible global (keyboard accessibility) ─────────────────── */
+a:focus-visible,
+button:focus-visible {
+  outline: 3px solid #1b5e20;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ── Mobile tweaks ─────────────────────────────────────────────────── */
+@media (max-width: 520px) {
+  .hero {
+    border-radius: 0;
+    margin-left: -1rem;
+    margin-right: -1rem;
+    padding: 1.75rem 1rem 1.5rem;
+  }
+
+  .hero h1 {
+    font-size: 1.1rem;
+  }
+
+  .steps-list li {
+    padding: 0.85rem 1rem;
+  }
+
+  .cta-btn {
+    width: 100%;
+    padding: 1rem 1.5rem;
+    font-size: 0.95rem;
+  }
+}
+
+/* ── High contrast mode support ────────────────────────────────────── */
+@media (prefers-contrast: high) {
+  .steps-list li,
+  .badge {
+    border-width: 3px;
+    border-color: #1a1a1a;
+  }
+
+  .cta-btn {
+    border: 2px solid #ffffff;
+  }
+}
+
+/* ── Reduced motion ────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+  }
+}

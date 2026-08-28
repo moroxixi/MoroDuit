@@ -222,7 +222,8 @@ function doGet(e) {
   }
 
   // ── getKatalogPerkenalan ──
-  // Filter produk yang ditandai "Perkenalan" di kolom J (index 9)
+  // Filter produk berdasarkan tag "b2c" di kolom J (index 9),
+  // supports multi-value semicolon-separated (mis. "b2c;b2b").
   // DAN status "Ada" di kolom G (index 6).
   if (action === "getKatalogPerkenalan") {
     var ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -242,9 +243,50 @@ function doGet(e) {
 
     for (var i = 1; i < data.length; i++) {
       // Kolom J (index 9) mungkin belum ada — defensif
-      var tandai = data[i].length > 9 ? String(data[i][9] || "").trim() : "";
+      var tandaiRaw = data[i].length > 9 ? String(data[i][9] || "").trim() : "";
+      var tandaiTags = tandaiRaw.split(";").map(function(t) { return t.trim().toLowerCase(); });
       var status = String(data[i][6]).trim();
-      if (tandai === "Perkenalan" && status === "Ada") {
+      if (tandaiTags.indexOf("b2c") !== -1 && status === "Ada") {
+        var fotoPath = fotoPathIdx >= 0 && fotoPathIdx < data[i].length ? String(data[i][fotoPathIdx] || "").trim() : "";
+        result.push({
+          produk: String(data[i][1]).trim(),
+          kategori: String(data[i][2] || ""),
+          hargaJual: data[i][5],
+          catatan: String(data[i][7] || ""),
+          fotoPath: fotoPath
+        });
+      }
+    }
+
+    return jsonResponse_(result);
+  }
+
+  // ── getKatalogOpening ──
+  // Filter produk berdasarkan tag "b2b" di kolom J (index 9),
+  // supports multi-value semicolon-separated (mis. "b2b;b2c").
+  // DAN status "Ada" di kolom G (index 6).
+  if (action === "getKatalogOpening") {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = ss.getSheetByName("Katalog");
+    var data = sheet.getDataRange().getValues();
+    var result = [];
+
+    // Cari indeks kolom "FotoPath" dari header (defensif — kolom mungkin belum ada)
+    var headers = data.length > 0 ? data[0] : [];
+    var fotoPathIdx = -1;
+    for (var h = 0; h < headers.length; h++) {
+      if (String(headers[h]).trim().toLowerCase() === "fotopath") {
+        fotoPathIdx = h;
+        break;
+      }
+    }
+
+    for (var i = 1; i < data.length; i++) {
+      // Kolom J (index 9) mungkin belum ada — defensif
+      var tandaiRaw = data[i].length > 9 ? String(data[i][9] || "").trim() : "";
+      var tandaiTags = tandaiRaw.split(";").map(function(t) { return t.trim().toLowerCase(); });
+      var status = String(data[i][6]).trim();
+      if (tandaiTags.indexOf("b2b") !== -1 && status === "Ada") {
         var fotoPath = fotoPathIdx >= 0 && fotoPathIdx < data[i].length ? String(data[i][fotoPathIdx] || "").trim() : "";
         result.push({
           produk: String(data[i][1]).trim(),
