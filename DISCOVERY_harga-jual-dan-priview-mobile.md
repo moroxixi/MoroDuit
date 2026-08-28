@@ -614,7 +614,7 @@ checkoutBtn.addEventListener("click", function () {
   <div class="nota" id="nota">
     <!-- Nota Header -->
     <div class="nota-header">
-      <h1 class="nota-toko">Toko Sembako Online Moro Duit</h1>
+      <h1 class="nota-toko">Toserba Online Moro Duit</h1>
       <div class="nota-meta">
         <div class="nota-row">
           <span class="nota-label">Nama Pelanggan:</span>

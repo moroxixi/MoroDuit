@@ -14,7 +14,7 @@
 1. **Input** — Rofi input/update produk (nama, harga normal, harga promo, catatan, status stok) → tersimpan ke Google Sheet.
 2. **Keranjang-Duit** — halaman checklist: tampilkan katalog produk yang tersedia, Rofi centang produk + isi qty, lihat total, lalu checkout.
 3. **Keranjang-Duit/Priview** — halaman nota: render nota lengkap (header toko, nomor nota, tanggal, list item), tombol print, dan saat print → riwayat transaksi tersimpan ke Sheet.
-4. **Apps Script** — backend tunggal untuk baca/tulis Google Sheet ("Toko Sembako Online Moro Duit").
+4. **Apps Script** — backend tunggal untuk baca/tulis Google Sheet ("Toserba Online Moro Duit").
 
 Hosting: **GitHub Pages** (publik). Akses halaman Input **tidak** diproteksi password (cukup URL tidak disebar).
 
@@ -63,7 +63,7 @@ ekstensi `.gs.js` dari awal supaya ke-scan graphify.
 
 ---
 
-## 4. Struktur Data — Google Sheet "Toko Sembako Online Moro Duit"
+## 4. Struktur Data — Google Sheet "Toserba Online Moro Duit"
 
 ### Tab 1 — `Katalog`
 | Kolom | Keterangan |
@@ -111,7 +111,7 @@ ekstensi `.gs.js` dari awal supaya ke-scan graphify.
 
 **Priview** (`Keranjang-Duit/Priview/index.html`)
 - Baca data keranjang dari `sessionStorage`.
-- Render nota: header "Toko Sembako Online Moro Duit", nomor nota (tampil "DRAFT" dulu sebelum print), tanggal, list item (nama, qty, harga satuan, subtotal), total.
+- Render nota: header "Toserba Online Moro Duit", nomor nota (tampil "DRAFT" dulu sebelum print), tanggal, list item (nama, qty, harga satuan, subtotal), total.
 - Tombol **Print**:
   1. POST ke Apps Script (`action: simpanRiwayat`) dengan item + total → Apps Script generate No Nota asli & append ke tab Riwayat → return No Nota.
   2. Update tampilan nota dengan No Nota asli.

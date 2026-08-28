@@ -27,7 +27,7 @@
 - **Header/brand:**
   - **h1** (baris 11): `🛒 Input Produk MoroDuit`
   - **subtitle** (baris 12): `Tambah atau ubah data produk sembako`
-  - **footer** (baris 113): `MoroDuit &mdash; Toko Sembako Online`
+  - **footer** (baris 113): `MoroDuit &mdash; Toserba Online`
 - **Meta description / og:title / og:description:** TIDAK ADA
 - **Sumber:** Hardcoded di index.html
 
@@ -40,7 +40,7 @@
 - **Header/brand:**
   - **h1** (baris 282): `📷 Input dari Nota Foto`
   - **subtitle** (baris 283): `Foto nota belanja → scan otomatis → review → simpan ke Riwayat`
-  - **footer** (baris 330): `MoroDuit &mdash; Toko Sembako Online`
+  - **footer** (baris 330): `MoroDuit &mdash; Toserba Online`
 - **Meta description / og:title / og:description:** TIDAK ADA
 - **Sumber:** Hardcoded di index.html
 - **⚠️ Catatan:** Tidak ada kata "MoroDuit" di `<h1>` — hanya di `<title>` dan footer.
@@ -54,7 +54,7 @@
 - **Header/brand:**
   - **h1** (baris 11): `📊 Rekap Belanja`
   - **subtitle** (baris 12): `Pilih nota untuk melihat rekap belanja`
-  - **footer** (baris 33): `MoroDuit &mdash; Toko Sembako Online`
+  - **footer** (baris 33): `MoroDuit &mdash; Toserba Online`
 - **Meta description / og:title / og:description:** TIDAK ADA
 - **Sumber:** Hardcoded di index.html
 - **⚠️ Catatan:** Tidak ada kata "MoroDuit" di `<h1>` — hanya di `<title>` dan footer.
@@ -66,7 +66,7 @@
 - **Path:** `Admin/Rekap-Belanja/Priview/index.html`
 - **`<title>`:** `MoroDuit — Rekap Belanja`
 - **Header/brand:**
-  - **nota-toko h1** (baris 224): `Toko Sembako Online Moro Duit <span class="rekap-badge">REKAP</span>`
+  - **nota-toko h1** (baris 224): `Toserba Online Moro Duit <span class="rekap-badge">REKAP</span>`
   - **rekap-footer** (baris 268): `Harga normal terkini dari katalog • Estimasi belanja pribadi`
 - **Meta description / og:title / og:description:** TIDAK ADA
 - **Sumber:** Hardcoded di index.html
@@ -81,7 +81,7 @@
 - **Header/brand:**
   - **h1** (baris 11): `📋 Riwayat Transaksi`
   - **subtitle** (baris 12): `Daftar semua nota belanja`
-  - **footer** (baris 42): `MoroDuit &mdash; Toko Sembako Online`
+  - **footer** (baris 42): `MoroDuit &mdash; Toserba Online`
 - **Meta description / og:title / og:description:** TIDAK ADA
 - **Sumber:** Hardcoded di index.html
 - **⚠️ Catatan:** Tidak ada kata "MoroDuit" di `<h1>` — hanya di `<title>` dan footer.
@@ -106,7 +106,7 @@
 - **Path:** `Admin/Riwayat/Mode-Edit/Priview/index.html`
 - **`<title>`:** `MoroDuit — Nota Edit`
 - **Header/brand:**
-  - **nota-toko h1** (baris 197): `Toko Sembako Online Moro Duit <span class="nota-edit-badge">EDIT</span>`
+  - **nota-toko h1** (baris 197): `Toserba Online Moro Duit <span class="nota-edit-badge">EDIT</span>`
   - **nota-footer** (baris 236): `Terima kasih sudah belanja di Moro Duit! 🙏`
 - **Meta description / og:title / og:description:** TIDAK ADA
 - **Sumber:** Hardcoded di index.html
@@ -121,7 +121,7 @@
 - **Header/brand:**
   - **h1** (baris 218): `📦 Katalog Produk`
   - **subtitle** (baris 219): `Lihat daftar produk yang tersedia`
-  - **footer** (baris 243): `MoroDuit &mdash; Toko Sembako Online`
+  - **footer** (baris 243): `MoroDuit &mdash; Toserba Online`
 - **Meta description / og:title / og:description:** TIDAK ADA
 - **Sumber:** Hardcoded di index.html
 - **⚠️ Catatan:** Tidak ada kata "MoroDuit" di `<h1>` — hanya di `<title>` dan footer.
@@ -135,7 +135,7 @@
 - **Header/brand:**
   - **h1** (baris 11): `🛒 Keranjang Duit`
   - **subtitle** (baris 12): `Pilih produk yang mau dibeli`
-  - **footer** (baris 60): `MoroDuit &mdash; Toko Sembako Online`
+  - **footer** (baris 60): `MoroDuit &mdash; Toserba Online`
 - **Meta description / og:title / og:description:** TIDAK ADA
 - **Sumber:** Hardcoded di index.html
 
@@ -146,7 +146,7 @@
 - **Path:** `Customer/Keranjang-Duit/Priview/index.html`
 - **`<title>`:** `MoroDuit — Nota Belanja`
 - **Header/brand:**
-  - **nota-toko h1** (baris 23): `Toko Sembako Online Moro Duit`
+  - **nota-toko h1** (baris 23): `Toserba Online Moro Duit`
   - **nota-footer** (baris 58): `Terima kasih sudah belanja di Moro Duit! 🙏`
 - **Meta description / og:title / og:description:** TIDAK ADA
 - **Sumber:** Hardcoded di index.html
@@ -162,12 +162,12 @@
   - **h1** (baris 14): `Halo, Selamat Datang!`
   - **hero-sub** (baris 15-18): `Belanja kebutuhan sehari-hari jadi lebih gampang. Ini layanan belanja sembako online, siap bantu belanjain apa yang kamu butuhkan.`
   - **hero-owner** (baris 19-21): `Dikelola oleh Rofi`
-  - **footer** (baris 99): `MoroDuit &mdash; Toko Sembako Online.`
+  - **footer** (baris 99): `MoroDuit &mdash; Toserba Online.`
 - **Meta description / og:title / og:description:** TIDAK ADA
 - **Sumber:** Hardcoded di index.html
 - **⚠️ Catatan:**
   - Tidak ada kata "MoroDuit" di `<h1>` atau hero-sub — hanya di `<title>` dan footer.
-  - Footer punya titik di akhir (`"MoroDuit — Toko Sembako Online."`) — beda dari halaman lain yang tanpa titik.
+  - Footer punya titik di akhir (`"MoroDuit — Toserba Online."`) — beda dari halaman lain yang tanpa titik.
   - `script.js` baris 13 punya string hardcoded: `"Halo Rofi, saya ingin bertanya tentang Belanja Online MoroDuit. "` — ini template WhatsApp, bukan tagline yang tampil di halaman.
 
 ---
@@ -187,7 +187,7 @@
 
 | No | Teks | Lokasi | Tipe |
 |----|------|--------|------|
-| 1 | `Toko Sembako Online` | Footer di 10 halaman (Input, Input-Sheet-From-Nota, Rekap-Belanja, Riwayat, Katalog, Keranjang-Duit) + Perkenalan (dengan titik) | Footer |
+| 1 | `Toserba Online` | Footer di 10 halaman (Input, Input-Sheet-From-Nota, Rekap-Belanja, Riwayat, Katalog, Keranjang-Duit) + Perkenalan (dengan titik) | Footer |
 | 2 | `Database Harga Referensi Surya Toserba` | Footer di Database-Surya | Footer |
 | 3 | `Tambah atau ubah data produk sembako` | subtitle di Input (baris 12) | Subtitle |
 | 4 | `Foto nota belanja → scan otomatis → review → simpan ke Riwayat` | subtitle di Input-Sheet-From-Nota (baris 283) | Subtitle |
@@ -208,7 +208,7 @@
 1. **Brand "MoroDuit" vs "Moro Duit"** — 3 halaman Priview pakai "Moro Duit" (ada spasi), sementara 9 halaman lain pakai "MoroDuit" (tanpa spasi).
 2. **Database-Surya tidak punya "MoroDuit" di `<title>` maupun `<h1>`** — hanya di footer.
 3. **8 dari 12 halaman tidak menampilkan "MoroDuit" di `<h1>`** — brand hanya muncul di `<title>` browser tab dan footer.
-4. **Footer Perkenalan ada titik di akhir** (`"MoroDuit — Toko Sembako Online."`) — beda dari 10 halaman lain yang tanpa titik.
+4. **Footer Perkenalan ada titik di akhir** (`"MoroDuit — Toserba Online."`) — beda dari 10 halaman lain yang tanpa titik.
 5. **Tidak ada `<meta name="description">` atau `og:title`/`og:description` di semua 12 halaman.**
 6. **Dynamic subtitle** hanya ada di 1 halaman: `Admin/Riwayat/Mode-Edit/index.html` (`headerSubtitle` diisi dari `script.js` baris 383/445).
 
