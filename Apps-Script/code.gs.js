@@ -111,6 +111,141 @@ function getKategoriListFromMargin_() {
   return result;
 }
 
+// ── Helper: Baca seluruh sheet "Margin" (kategori + margin) ───────────
+// Return array of {kategori, margin} mulai baris 2. Skip baris dengan
+// kolom A kosong (pola sama dengan getKategoriListFromMargin_).
+// Margin dikembalikan apa adanya — data existing berbentuk teks persen
+// seperti "4%" (bukan angka desimal).
+function getMarginListFromMargin_() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName("Margin");
+  if (!sheet) {
+    return [];
+  }
+  var lastRow = sheet.getLastRow();
+  if (lastRow < 2) {
+    return [];
+  }
+  var values = sheet.getRange(2, 1, lastRow - 1, 2).getValues();
+  var result = [];
+  for (var i = 0; i < values.length; i++) {
+    var nama = String(values[i][0] || "").trim();
+    if (nama === "") {
+      continue;
+    }
+    result.push({
+      kategori: nama,
+      margin: String(values[i][1] || "").trim()
+    });
+  }
+  return result;
+}
+
+// ── Helper: Normalisasi input margin ke teks persen ───────────────────
+// Terima bentuk "4", "4%", "4.5", "4,5%" (atau angka). Validasi bagian
+// numeriknya, kembalikan teks persen seperti data existing ("4%" / "4,5%")
+// — simbol % ditambahkan kalau belum ada. Return null kalau tidak valid.
+function normalizeMarginText_(raw) {
+  if (raw === undefined || raw === null) {
+    return null;
+  }
+  var s = String(raw).trim();
+  if (s === "") {
+    return null;
+  }
+  if (s.charAt(s.length - 1) === "%") {
+    s = s.substring(0, s.length - 1).trim();
+  }
+  var num = Number(s.replace(",", "."));
+  if (isNaN(num) || !isFinite(num) || num < 0) {
+    return null;
+  }
+  return s + "%";
+}
+
+// ── Helper: Cari baris kategori di sheet "Margin" ─────────────────────
+// Cocokkan kolom A (trim + case-insensitive — keputusan user untuk
+// konsistensi cek pemakaian vs kolom Kategori Katalog).
+// Return nomor baris (1-indexed) atau -1 kalau tidak ketemu.
+function findMarginRow_(sheet, nama) {
+  if (!sheet) {
+    return -1;
+  }
+  var lastRow = sheet.getLastRow();
+  if (lastRow < 2) {
+    return -1;
+  }
+  var values = sheet.getRange(2, 1, lastRow - 1, 1).getValues();
+  var search = String(nama).trim().toLowerCase();
+  for (var i = 0; i < values.length; i++) {
+    if (String(values[i][0] || "").trim().toLowerCase() === search) {
+      return i + 2; // 1-indexed
+    }
+  }
+  return -1;
+}
+
+// ── Helper: Hitung pemakaian kategori di kolom Kategori (C) Katalog ──
+// Scan SELURUH kolom C sekali (getValues batch), cocokkan trim +
+// case-insensitive. Return jumlah baris produk yang masih memakai nama ini.
+function hitungProdukPakaiKategori_(nama) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var katalog = ss.getSheetByName("Katalog");
+  if (!katalog) {
+    return 0;
+  }
+  var lastRow = katalog.getLastRow();
+  if (lastRow < 2) {
+    return 0;
+  }
+  var values = katalog.getRange(2, 3, lastRow - 1, 1).getValues();
+  var search = String(nama).trim().toLowerCase();
+  var count = 0;
+  for (var i = 0; i < values.length; i++) {
+    if (values[i][0] === null || values[i][0] === undefined) {
+      continue;
+    }
+    if (String(values[i][0]).trim().toLowerCase() === search) {
+      count++;
+    }
+  }
+  return count;
+}
+
+// ── Helper: Cascade rename kolom Kategori (C) di sheet Katalog ───────
+// HANYA kolom C yang diubah — kolom lain di baris tersebut tidak disentuh.
+// Batch: getValues sekali, proses di memory, setValues sekali.
+// Cocokkan trim + case-insensitive. Return jumlah produk yang ter-update.
+function renameProdukKategori_(namaLama, namaBaru) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var katalog = ss.getSheetByName("Katalog");
+  if (!katalog) {
+    return 0;
+  }
+  var lastRow = katalog.getLastRow();
+  if (lastRow < 2) {
+    return 0;
+  }
+  var range = katalog.getRange(2, 3, lastRow - 1, 1);
+  var values = range.getValues();
+  var search = String(namaLama).trim().toLowerCase();
+  var target = String(namaBaru).trim();
+  var count = 0;
+  for (var i = 0; i < values.length; i++) {
+    if (values[i][0] === null || values[i][0] === undefined) {
+      continue;
+    }
+    if (String(values[i][0]).trim().toLowerCase() === search) {
+      values[i][0] = target;
+      count++;
+    }
+  }
+  if (count > 0) {
+    range.setValues(values);
+  }
+  return count;
+}
+
 // ── Helper: Validasi token ────────────────────────────────────────────
 function validateToken_(token) {
   return token === TOKEN;
@@ -393,6 +528,16 @@ function doGet(e) {
     return jsonResponse_(getKategoriListFromMargin_());
   }
 
+  // ── getMarginList ──
+  // Ambil daftar kategori BESERTA margin dari sheet "Margin".
+  // Return array of object {kategori, margin}, mis.
+  // [{kategori: "Mie Instan", margin: "4%"}, ...].
+  // Dipakai halaman Admin/Input "Settingan Kategori".
+  // getKategoriList di atas tetap return array of string — JANGAN digabung.
+  if (action === "getMarginList") {
+    return jsonResponse_(getMarginListFromMargin_());
+  }
+
   return jsonResponse_({success: false, error: "unknown action"});
 }
 
@@ -571,6 +716,105 @@ function doPost(e) {
       "=IF(E" + row + "=\"\";\"\";(E" + row + "-D" + row + ")/D" + row + ")"
     );
 
+    return jsonResponse_({success: true});
+  }
+
+  // ── addKategori (sheet Margin) ──
+  if (action === "addKategori") {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = ss.getSheetByName("Margin");
+    var kategori = String(body.kategori || "").trim();
+    if (!kategori) {
+      return jsonResponse_({success: false, error: "kategori wajib diisi"});
+    }
+    var marginText = normalizeMarginText_(body.margin);
+    if (marginText === null) {
+      return jsonResponse_({success: false, error: "margin wajib diisi angka persen yang valid (mis. 4 atau 4.5)"});
+    }
+    // Sheet Margin mungkin belum ada / masih kosong → siapkan header dulu
+    // (pola sama dengan ensureKatalogSuryaHeaders_).
+    if (!sheet) {
+      sheet = ss.insertSheet("Margin");
+    }
+    if (sheet.getLastRow() === 0) {
+      sheet.getRange(1, 1, 1, 2).setValues([["Kategori", "Margin"]]);
+    }
+    // Duplicate check nama (trim + case-insensitive)
+    if (findMarginRow_(sheet, kategori) !== -1) {
+      return jsonResponse_({success: false, error: "kategori \"" + kategori + "\" sudah ada di sheet Margin"});
+    }
+    sheet.appendRow([kategori, marginText]);
+    return jsonResponse_({success: true, kategori: kategori, margin: marginText});
+  }
+
+  // ── updateKategori (sheet Margin) ──
+  // Rename kategori → CASCADE: semua produk di sheet Katalog yang memakai
+  // nama lama ikut di-update kolom Kategorinya (batch, kolom lain aman).
+  if (action === "updateKategori") {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = ss.getSheetByName("Margin");
+    if (!sheet) {
+      return jsonResponse_({success: false, error: "sheet Margin belum ada"});
+    }
+    var namaLama = String(body.namaLama || "").trim();
+    var kategoriBaru = String(body.kategori || "").trim();
+    if (!namaLama) {
+      return jsonResponse_({success: false, error: "namaLama wajib diisi"});
+    }
+    if (!kategoriBaru) {
+      return jsonResponse_({success: false, error: "kategori wajib diisi"});
+    }
+    var marginText = normalizeMarginText_(body.margin);
+    if (marginText === null) {
+      return jsonResponse_({success: false, error: "margin wajib diisi angka persen yang valid (mis. 4 atau 4.5)"});
+    }
+    var row = findMarginRow_(sheet, namaLama);
+    if (row === -1) {
+      return jsonResponse_({success: false, error: "kategori lama \"" + namaLama + "\" tidak ditemukan di sheet Margin"});
+    }
+    // Nama baru tidak boleh duplikat dengan kategori lain (row berbeda)
+    var dupRow = findMarginRow_(sheet, kategoriBaru);
+    if (dupRow !== -1 && dupRow !== row) {
+      return jsonResponse_({success: false, error: "kategori \"" + kategoriBaru + "\" sudah ada di sheet Margin"});
+    }
+    // Tulis nama + margin baru di baris yang sama
+    sheet.getRange(row, 1, 1, 2).setValues([[kategoriBaru, marginText]]);
+
+    // Kalau nama berubah (byte-level, termasuk cuma beda kapital) → cascade
+    // update kolom Kategori di sheet Katalog, sekali getRange read + write.
+    var produkUpdated = 0;
+    if (namaLama !== kategoriBaru) {
+      produkUpdated = renameProdukKategori_(namaLama, kategoriBaru);
+    }
+    return jsonResponse_({success: true, produkUpdated: produkUpdated});
+  }
+
+  // ── deleteKategori (sheet Margin) ──
+  // SEBELUM hapus: cek pemakaian di sheet Katalog. Kalau masih dipakai
+  // produk mana pun → BLOCK, jangan hapus apa pun.
+  if (action === "deleteKategori") {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = ss.getSheetByName("Margin");
+    if (!sheet) {
+      return jsonResponse_({success: false, error: "sheet Margin belum ada"});
+    }
+    var kategori = String(body.kategori || "").trim();
+    if (!kategori) {
+      return jsonResponse_({success: false, error: "kategori wajib diisi"});
+    }
+    var row = findMarginRow_(sheet, kategori);
+    if (row === -1) {
+      return jsonResponse_({success: false, error: "kategori \"" + kategori + "\" tidak ditemukan di sheet Margin"});
+    }
+    var produkDipakai = hitungProdukPakaiKategori_(kategori);
+    if (produkDipakai > 0) {
+      return jsonResponse_({
+        success: false,
+        error: "Kategori masih dipakai " + produkDipakai + " produk di Katalog. Pindahkan atau rename produk itu dulu sebelum menghapus kategori.",
+        produkDipakai: produkDipakai
+      });
+    }
+    sheet.deleteRow(row);
     return jsonResponse_({success: true});
   }
 

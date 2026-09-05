@@ -430,3 +430,193 @@ footer {
     text-align: right;
   }
 }
+
+/* ── Settingan Kategori (sheet Margin) ─────────────────────────────── */
+.settings-section {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  margin-top: 2rem;
+}
+
+.settings-section h2 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 0.5rem;
+}
+
+/* Form tambah/edit kategori — satu baris responsif */
+.kategori-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 1rem;
+  padding: 1rem;
+  background-color: #fafafa;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  margin-bottom: 1.25rem;
+}
+
+.kategori-field {
+  flex: 1 1 220px;
+}
+
+.kategori-field-margin {
+  flex: 0 1 180px;
+}
+
+.kategori-field label {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 0.4rem;
+}
+
+.kategori-field input[type="text"] {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  font-size: 1rem;
+  border: 2px solid #bdbdbd;
+  border-radius: 8px;
+  background-color: #ffffff;
+  color: #1a1a1a;
+}
+
+.kategori-field input:focus {
+  outline: none;
+  border-color: #2e7d32;
+  box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.25);
+}
+
+.kategori-field input::placeholder {
+  color: #999999;
+}
+
+.margin-input-wrap {
+  position: relative;
+}
+
+.margin-input-wrap input {
+  padding-right: 2rem;
+}
+
+.margin-suffix {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #666666;
+  font-weight: 600;
+  pointer-events: none;
+}
+
+.kategori-form-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex: 0 0 auto;
+}
+
+.kategori-form-actions .btn {
+  flex: 0 1 auto;
+  min-height: 44px;
+  padding: 0.75rem 1.25rem;
+}
+
+/* List kategori */
+.kategori-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.kategori-item {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  padding: 0.75rem 1.25rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  background-color: #fafafa;
+  min-height: 60px;
+  min-width: 0;
+}
+
+.kategori-item .kategori-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+.kategori-item .kategori-margin {
+  font-size: 0.9rem;
+  color: #666666;
+  white-space: nowrap;
+  padding: 0.15rem 0.5rem;
+  background-color: #f0f0f0;
+  border-radius: 4px;
+}
+
+.kategori-item .kategori-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.kategori-item .btn-kategori-edit,
+.kategori-item .btn-kategori-hapus {
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  min-height: 40px;
+}
+
+.kategori-item .btn-kategori-edit {
+  background-color: #e8f5e9;
+  color: #1b5e20;
+}
+
+.kategori-item .btn-kategori-edit:hover {
+  background-color: #c8e6c9;
+}
+
+.kategori-item .btn-kategori-hapus {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+.kategori-item .btn-kategori-hapus:hover {
+  background-color: #ffcdd2;
+}
+
+.kategori-item.selected {
+  border-color: #1565c0;
+  background-color: #e3f2fd;
+}
+
+/* Mobile: tombol form & aksi kategori dirapikan */
+@media (max-width: 520px) {
+  .kategori-form-actions {
+    width: 100%;
+  }
+
+  .kategori-form-actions .btn {
+    flex: 1 1 0;
+  }
+
+  .kategori-item .kategori-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}

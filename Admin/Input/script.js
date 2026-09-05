@@ -26,6 +26,14 @@
   var searchInput = document.getElementById("searchInput");
   var kategoriFilter = document.getElementById("kategoriFilter");
 
+  // DOM refs — Settingan Kategori (sheet Margin)
+  var kategoriForm = document.getElementById("kategoriForm");
+  var kategoriNamaInput = document.getElementById("kategoriNamaInput");
+  var kategoriMarginInput = document.getElementById("kategoriMarginInput");
+  var kategoriSimpanBtn = document.getElementById("kategoriSimpanBtn");
+  var kategoriBatalBtn = document.getElementById("kategoriBatalBtn");
+  var kategoriList = document.getElementById("kategoriList");
+
   // ── Show status message ───────────────────────────────────────────
   function showStatus(message, type) {
     statusMessage.textContent = message;
@@ -441,7 +449,267 @@
     applyFilters();
   });
 
+  // ══════════════════════════════════════════════════════════════════
+  // Settingan Kategori (sheet Margin) — tambah/edit/hapus kategori & margin
+  // ══════════════════════════════════════════════════════════════════
+
+  // ── State ────────────────────────────────────────────────────────
+  var kategoriData = [];           // [{kategori, margin}] dari getMarginList
+  var editingKategoriNama = null;  // nama lama saat edit, null = mode tambah
+
+  // ── Ambil bagian angka dari teks margin ("4%"/"4,5%" → "4"/"4,5") ──
+  function marginAngkaInput(raw) {
+    var s = String(raw || "").trim();
+    if (s.charAt(s.length - 1) === "%") {
+      s = s.substring(0, s.length - 1).trim();
+    }
+    return s;
+  }
+
+  // ── Validasi margin → angka (terima koma desimal), NaN kalau invalid ──
+  function marginKeAngka(raw) {
+    var s = marginAngkaInput(raw);
+    if (s === "") return NaN;
+    return Number(s.replace(",", "."));
+  }
+
+  // ── Reset form kategori ke mode tambah ───────────────────────────
+  function resetKategoriForm() {
+    kategoriForm.reset();
+    editingKategoriNama = null;
+    kategoriSimpanBtn.textContent = "➕ Tambah Kategori";
+    kategoriBatalBtn.hidden = true;
+
+    // Hapus highlight row yang sedang diedit
+    var rows = kategoriList.querySelectorAll(".kategori-item.selected");
+    for (var r = 0; r < rows.length; r++) {
+      rows[r].classList.remove("selected");
+    }
+  }
+
+  // ── Render list kategori (mirror gaya list produk) ───────────────
+  function renderKategoriList() {
+    if (!kategoriData || kategoriData.length === 0) {
+      kategoriList.innerHTML = '<div class="empty-state">Belum ada kategori di sheet Margin. Tambahkan lewat form di atas.</div>';
+      return;
+    }
+
+    var html = "";
+    for (var i = 0; i < kategoriData.length; i++) {
+      var k = kategoriData[i];
+      var nama = String(k.kategori || "").trim();
+      var marginText = String(k.margin || "").trim();
+      html += '<div class="kategori-item" role="listitem" data-nama="' + escapeHtml(nama) + '">'
+        + '<span class="kategori-name">' + escapeHtml(nama) + '</span>'
+        + '<span class="kategori-margin">Margin ' + escapeHtml(marginText || "-") + '</span>'
+        + '<span class="kategori-actions">'
+        + '<button type="button" class="btn-kategori-edit" data-nama="' + escapeHtml(nama) + '">✏️ Edit</button>'
+        + '<button type="button" class="btn-kategori-hapus" data-nama="' + escapeHtml(nama) + '">🗑️ Hapus</button>'
+        + '</span>'
+        + '</div>';
+    }
+    kategoriList.innerHTML = html;
+
+    var editBtns = kategoriList.querySelectorAll(".btn-kategori-edit");
+    for (var e = 0; e < editBtns.length; e++) {
+      editBtns[e].addEventListener("click", handleEditKategori);
+    }
+    var hapusBtns = kategoriList.querySelectorAll(".btn-kategori-hapus");
+    for (var h = 0; h < hapusBtns.length; h++) {
+      hapusBtns[h].addEventListener("click", handleHapusKategori);
+    }
+  }
+
+  // ── Fetch & render daftar kategori + margin (action=getMarginList) ──
+  function loadMarginList() {
+    var url = MORODUIT_CONFIG.APPS_SCRIPT_URL
+      + "?action=getMarginList"
+      + "&token=" + encodeURIComponent(MORODUIT_CONFIG.TOKEN);
+
+    fetch(url)
+      .then(function (res) { return res.json(); })
+      .then(function (data) {
+        if (!Array.isArray(data)) {
+          throw new Error("Response bukan array");
+        }
+        kategoriData = data;
+        // Sort A-Z case-insensitive, pola sama dengan sort produk
+        kategoriData.sort(function (a, b) {
+          var namaA = (a.kategori || "").toLowerCase();
+          var namaB = (b.kategori || "").toLowerCase();
+          return namaA.localeCompare(namaB, "id");
+        });
+        renderKategoriList();
+      })
+      .catch(function (err) {
+        console.error("Gagal fetch daftar margin kategori:", err);
+        kategoriList.innerHTML = '<div class="empty-state">Gagal memuat settingan kategori. Coba muat ulang halaman.</div>';
+      });
+  }
+
+  // ── Tombol Edit → isi form dengan data kategori itu ──────────────
+  function handleEditKategori(e) {
+    var btn = e.currentTarget;
+    var nama = btn.getAttribute("data-nama");
+    var item = null;
+    for (var i = 0; i < kategoriData.length; i++) {
+      if (String(kategoriData[i].kategori || "").trim() === nama) {
+        item = kategoriData[i];
+        break;
+      }
+    }
+    if (!item) return;
+
+    editingKategoriNama = nama;
+    kategoriNamaInput.value = nama;
+    kategoriMarginInput.value = marginAngkaInput(item.margin);
+    kategoriSimpanBtn.textContent = "💾 Simpan Kategori";
+    kategoriBatalBtn.hidden = false;
+
+    // Highlight row yang sedang diedit
+    var rows = kategoriList.querySelectorAll(".kategori-item");
+    for (var r = 0; r < rows.length; r++) {
+      rows[r].classList.remove("selected");
+      if (rows[r].getAttribute("data-nama") === nama) {
+        rows[r].classList.add("selected");
+      }
+    }
+    kategoriNamaInput.focus();
+    kategoriForm.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
+  // ── Tombol Hapus → konfirmasi dulu, hasil final dari backend ─────
+  function handleHapusKategori(e) {
+    var btn = e.currentTarget;
+    var nama = btn.getAttribute("data-nama");
+    var ok = confirm(
+      "Hapus kategori \"" + nama + "\" dari daftar margin?\n\n"
+      + "Kalau masih ada produk yang memakai kategori ini, penghapusan dibatalkan otomatis."
+    );
+    if (!ok) return;
+
+    var payload = {
+      action: "deleteKategori",
+      token: MORODUIT_CONFIG.TOKEN,
+      kategori: nama
+    };
+
+    fetch(MORODUIT_CONFIG.APPS_SCRIPT_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain" },
+      body: JSON.stringify(payload)
+    })
+      .then(function (res) { return res.json(); })
+      .then(function (data) {
+        if (data.success) {
+          showStatus("✅ Kategori \"" + nama + "\" berhasil dihapus.", "success");
+          resetKategoriForm();
+          refreshSetelahUbahKategori();
+        } else {
+          // BLOCK (masih dipakai produk): tampilkan pesan + jumlah produk
+          var pesan = "❌ Gagal: " + (data.error || "Unknown error");
+          if (data.produkDipakai) {
+            pesan = "❌ Kategori \"" + nama + "\" tidak bisa dihapus: masih dipakai "
+                  + data.produkDipakai + " produk di Katalog.";
+          }
+          showStatus(pesan, "error");
+        }
+      })
+      .catch(function (err) {
+        console.error("Gagal hapus kategori:", err);
+        showStatus("❌ Gagal menghubungi server. Periksa koneksi.", "error");
+      });
+  }
+
+  // ── Submit form kategori (tambah / simpan edit) ──────────────────
+  kategoriForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    var nama = kategoriNamaInput.value.trim();
+    var marginInput = kategoriMarginInput.value.trim();
+    var marginNum = marginKeAngka(marginInput);
+
+    if (!nama) {
+      showStatus("⚠️ Nama kategori wajib diisi!", "error");
+      kategoriNamaInput.focus();
+      return;
+    }
+    if (isNaN(marginNum) || marginNum < 0) {
+      showStatus("⚠️ Margin harus angka yang valid (mis. 4 untuk 4%).", "error");
+      kategoriMarginInput.focus();
+      return;
+    }
+
+    var isEdit = editingKategoriNama !== null;
+    var payload = {
+      action: isEdit ? "updateKategori" : "addKategori",
+      token: MORODUIT_CONFIG.TOKEN,
+      kategori: nama,
+      margin: marginInput // backend normalisasi ke teks persen ("4" → "4%")
+    };
+    if (isEdit) {
+      payload.namaLama = editingKategoriNama;
+    }
+
+    kategoriSimpanBtn.disabled = true;
+    kategoriSimpanBtn.textContent = "⏳ Menyimpan...";
+
+    fetch(MORODUIT_CONFIG.APPS_SCRIPT_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain" },
+      body: JSON.stringify(payload)
+    })
+      .then(function (res) { return res.json(); })
+      .then(function (data) {
+        kategoriSimpanBtn.disabled = false;
+        if (data.success) {
+          if (isEdit) {
+            var pesan = "✅ Kategori \"" + nama + "\" berhasil diupdate.";
+            if (data.produkUpdated > 0) {
+              pesan += " " + data.produkUpdated + " produk ikut di-update namanya.";
+            }
+            showStatus(pesan, "success");
+          } else {
+            showStatus("✅ Kategori \"" + nama + "\" berhasil ditambahkan!", "success");
+          }
+          resetKategoriForm();
+          refreshSetelahUbahKategori();
+        } else {
+          showStatus("❌ Gagal: " + (data.error || "Unknown error"), "error");
+          kategoriSimpanBtn.textContent = isEdit ? "💾 Simpan Kategori" : "➕ Tambah Kategori";
+        }
+      })
+      .catch(function (err) {
+        kategoriSimpanBtn.disabled = false;
+        kategoriSimpanBtn.textContent = isEdit ? "💾 Simpan Kategori" : "➕ Tambah Kategori";
+        showStatus("❌ Gagal menghubungi server. Periksa koneksi.", "error");
+        console.error("Fetch error:", err);
+      });
+  });
+
+  // ── Tombol Batal (keluar dari mode edit) ─────────────────────────
+  kategoriBatalBtn.addEventListener("click", function () {
+    resetKategoriForm();
+  });
+
+  // ── Refresh semua data yang bergantung daftar kategori ───────────
+  // 1) invalidate cache sessionStorage dropdown produk (moroduit_kategori_list)
+  //    supaya fetch ulang, 2) re-populate dropdown form produk,
+  // 3) refresh section settingan sendiri, 4) refresh list produk + filter
+  //    (produk ikut berubah kalau ada cascade rename dari updateKategori).
+  function refreshSetelahUbahKategori() {
+    try {
+      sessionStorage.removeItem("moroduit_kategori_list");
+    } catch (err) {
+      console.warn("Gagal invalidate cache kategori:", err);
+    }
+    loadKategoriList();
+    loadMarginList();
+    loadProdukList();
+  }
+
   // ── Init ───────────────────────────────────────────────────────────
   loadKategoriList();
+  loadMarginList();
   loadProdukList();
 })();
