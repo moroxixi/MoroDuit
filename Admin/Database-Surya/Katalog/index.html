@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MoroDuit — Katalog Surya</title>
+  <link rel="stylesheet" href="../../Input/style.css">
+  <style>
+    /* ── Scoped styles for Database-Surya/Katalog (view-only) ───────── */
+    main {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    /* ── Filter bar (search) ───────────────────────────────────────── */
+    .filter-bar {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+    .filter-search { flex: 1; }
+    .filter-search input[type="text"] {
+      width: 100%;
+      padding: 0.6rem 0.75rem;
+      font-size: 1rem;
+      border: 2px solid #bdbdbd;
+      border-radius: 8px;
+      background-color: #ffffff;
+      color: #1a1a1a;
+      transition: border-color 0.2s;
+    }
+    .filter-search input[type="text"]:focus {
+      outline: none;
+      border-color: #2e7d32;
+      box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.25);
+    }
+
+    /* ── Status chips (pola visual: kategori-chips di Customer/Katalog) ── */
+    .status-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .status-chip {
+      padding: 0.4rem 0.85rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      border: 2px solid #c8e6c9;
+      border-radius: 20px;
+      background-color: #ffffff;
+      color: #2e7d32;
+      cursor: pointer;
+      transition: all 0.2s;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      touch-action: manipulation;
+      min-height: 36px;
+      display: inline-flex;
+      align-items: center;
+    }
+    .status-chip:hover { border-color: #2e7d32; background-color: #f1f8e9; }
+    .status-chip.active {
+      background-color: #2e7d32;
+      color: #ffffff;
+      border-color: #2e7d32;
+    }
+    .status-chip:focus-visible {
+      outline: 3px solid #1b5e20;
+      outline-offset: 2px;
+    }
+
+    @media (max-width: 520px) {
+      .filter-bar { flex-direction: column; gap: 0.5rem; }
+    }
+
+    /* ── Katalog grid & card (pola visual: produk-grid/produk-card) ── */
+    .katalog-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+    }
+    @media (min-width: 768px) {
+      .katalog-grid { grid-template-columns: 1fr 1fr; gap: 1rem; }
+    }
+
+    .katalog-card {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      background-color: #ffffff;
+      transition: border-color 0.2s;
+    }
+    .katalog-card:hover { border-color: #2e7d32; }
+    @media (min-width: 768px) {
+      .katalog-card { padding: 1rem; gap: 1rem; }
+    }
+
+    .katalog-info {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+    .katalog-name {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #1a1a1a;
+      word-break: normal;
+      overflow-wrap: anywhere;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    @media (min-width: 768px) { .katalog-name { font-size: 0.95rem; } }
+    .katalog-tanggal {
+      font-size: 0.75rem;
+      color: #888888;
+      font-weight: 500;
+      overflow-wrap: anywhere;
+    }
+
+    .katalog-right {
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.35rem;
+    }
+    .katalog-harga {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #2e7d32;
+      white-space: nowrap;
+    }
+
+    /* ── Badge status (Promo vs Normal) ────────────────────────────── */
+    .status-badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.15rem 0.5rem;
+      border-radius: 6px;
+      white-space: nowrap;
+    }
+    .status-badge.promo {
+      background-color: #fff3e0;
+      color: #e65100;
+    }
+    .status-badge.normal {
+      background-color: #e8f5e9;
+      color: #1b5e20;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🏪 Katalog Surya Moro Duit.</h1>
+    <p class="subtitle">Katalog harga referensi dari nota Surya Toserba (read-only)</p>
+  </header>
+
+  <main>
+    <!-- Status message -->
+    <div id="statusMessage" class="status-message hidden" role="alert" aria-live="polite"></div>
+
+    <!-- Search by nama produk -->
+    <div class="filter-bar">
+      <div class="filter-search">
+        <input type="text" id="searchInput" placeholder="Cari nama produk..." maxlength="100">
+      </div>
+    </div>
+
+    <!-- Status chips (Semua / Promo / Normal) -->
+    <div id="statusChips" class="status-chips"></div>
+
+    <!-- Loading indicator -->
+    <div id="loadingIndicator" class="loading">Memuat data Katalog Surya...</div>
+
+    <!-- Katalog grid (rendered by JS) -->
+    <div id="katalogGrid" class="katalog-grid"></div>
+  </main>
+
+  <footer>
+    <p>Moro Duit. &mdash; Toserba Online.</p>
+  </footer>
+
+  <script src="../../../config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
