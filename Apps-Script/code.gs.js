@@ -85,6 +85,32 @@ function ensureKatalogSuryaHeaders_() {
   }
 }
 
+// ── Helper: Daftar kategori dari sheet "Margin" ───────────────────────
+// Sheet "Margin" adalah sumber kebenaran daftar kategori:
+// kolom A = Kategori (header di baris 1), data mulai baris 2.
+// Skip baris kosong. Return array of string (kosong [] kalau sheet
+// tidak ada atau belum ada data).
+function getKategoriListFromMargin_() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName("Margin");
+  if (!sheet) {
+    return [];
+  }
+  var lastRow = sheet.getLastRow();
+  if (lastRow < 2) {
+    return [];
+  }
+  var values = sheet.getRange(2, 1, lastRow - 1, 1).getValues();
+  var result = [];
+  for (var i = 0; i < values.length; i++) {
+    var v = String(values[i][0] || "").trim();
+    if (v !== "") {
+      result.push(v);
+    }
+  }
+  return result;
+}
+
 // ── Helper: Validasi token ────────────────────────────────────────────
 function validateToken_(token) {
   return token === TOKEN;
@@ -360,6 +386,13 @@ function doGet(e) {
     return jsonResponse_(result);
   }
 
+  // ── getKategoriList ──
+  // Ambil daftar kategori dari sheet "Margin" (kolom A, mulai baris 2).
+  // Return array of string, mis. ["Mie Instan", "Minuman Serbuk", ...].
+  if (action === "getKategoriList") {
+    return jsonResponse_(getKategoriListFromMargin_());
+  }
+
   return jsonResponse_({success: false, error: "unknown action"});
 }
 
@@ -494,13 +527,9 @@ function doPost(e) {
 
     var row = findProdukRow_(sheet, produk);
     var kategori = String(body.kategori || "").trim();
-    var kategoriList = [
-      "Bumbu Dapur", "Gula", "Kopi", "Mie Instan", "Minuman Serbuk/Sachet",
-      "Minuman Siap Minum", "Obat Nyamuk", "Pembersih Rumah Tangga",
-      "Perawatan Diri", "Perawatan Gigi", "Popok & Pembalut", "Roti",
-      "Sabun Cuci/Deterjen Sachet", "Sabun Mandi & Shampoo Sachet",
-      "Snack & Biskuit", "Suplemen", "Susu", "Tisu"
-    ];
+    // Daftar kategori diambil dinamis dari sheet "Margin" (kolom A),
+    // bukan array hardcode — nambah/ubah kategori cukup edit sheet.
+    var kategoriList = getKategoriListFromMargin_();
     if (!kategori) {
       return jsonResponse_({success: false, error: "kategori wajib diisi"});
     }

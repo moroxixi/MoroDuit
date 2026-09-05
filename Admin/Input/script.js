@@ -91,6 +91,64 @@
     kategoriFilter.innerHTML = html;
   }
 
+  // ── Populate form kategori select from fetched list ───────────────
+  function populateKategoriSelect(kategoriList) {
+    var html = '<option value="" disabled selected>Pilih kategori</option>';
+    for (var i = 0; i < kategoriList.length; i++) {
+      html += '<option value="' + escapeHtml(kategoriList[i]) + '">'
+            + escapeHtml(kategoriList[i]) + '</option>';
+    }
+    inputKategori.innerHTML = html;
+  }
+
+  // ── Load daftar kategori dari sheet "Margin" (action=getKategoriList) ──
+  // Cache di sessionStorage per halaman (key: moroduit_kategori_list)
+  // supaya tidak fetch berkali-kali dalam satu sesi buka halaman yang sama.
+  function loadKategoriList() {
+    var CACHE_KEY = "moroduit_kategori_list";
+
+    // 1. Coba pakai cache sessionStorage dulu
+    try {
+      var cached = sessionStorage.getItem(CACHE_KEY);
+      if (cached) {
+        var parsed = JSON.parse(cached);
+        if (Array.isArray(parsed)) {
+          populateKategoriSelect(parsed);
+          return;
+        }
+      }
+    } catch (err) {
+      console.warn("Gagal baca cache kategori dari sessionStorage:", err);
+    }
+
+    // 2. Fetch dinamis dari backend
+    var url = MORODUIT_CONFIG.APPS_SCRIPT_URL
+      + "?action=getKategoriList"
+      + "&token=" + encodeURIComponent(MORODUIT_CONFIG.TOKEN);
+
+    fetch(url)
+      .then(function (res) { return res.json(); })
+      .then(function (data) {
+        if (!Array.isArray(data)) {
+          throw new Error("Response bukan array");
+        }
+        // Simpan cache biar tidak fetch ulang di sesi ini
+        try {
+          sessionStorage.setItem(CACHE_KEY, JSON.stringify(data));
+        } catch (err) {
+          console.warn("Gagal simpan cache kategori ke sessionStorage:", err);
+        }
+        populateKategoriSelect(data);
+        if (data.length === 0) {
+          showStatus("⚠️ Daftar kategori di sheet Margin kosong.", "error");
+        }
+      })
+      .catch(function (err) {
+        console.error("Gagal fetch daftar kategori:", err);
+        showStatus("⚠️ Gagal memuat daftar kategori. Coba muat ulang halaman.", "error");
+      });
+  }
+
   // ── Apply filters and re-render ──────────────────────────────────
   function applyFilters() {
     var filtered = getFilteredData();
@@ -185,6 +243,22 @@
     var catatan = el.getAttribute("data-catatan");
 
     inputProduk.value = capitalizeWords(produk);
+
+    // Pastikan opsi kategori produk ini ada di select — data lama mungkin
+    // pakai nama kategori yang sudah tidak ada di daftar sheet Margin.
+    if (kategori) {
+      var optExists = false;
+      var allOpts = inputKategori.options;
+      for (var o = 0; o < allOpts.length; o++) {
+        if (allOpts[o].value === kategori) { optExists = true; break; }
+      }
+      if (!optExists) {
+        var extraOpt = document.createElement("option");
+        extraOpt.value = kategori;
+        extraOpt.textContent = kategori;
+        inputKategori.appendChild(extraOpt);
+      }
+    }
     inputKategori.value = kategori;
     inputHargaNormal.value = formatRibuanInput(String(hargaNormal));
     inputHargaPromo.value = hargaPromo ? formatRibuanInput(String(hargaPromo)) : "";
@@ -368,5 +442,6 @@
   });
 
   // ── Init ───────────────────────────────────────────────────────────
+  loadKategoriList();
   loadProdukList();
 })();
